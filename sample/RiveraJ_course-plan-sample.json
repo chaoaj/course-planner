@@ -1,0 +1,191 @@
+{
+  "app": "course-planner",
+  "version": 1,
+  "savedAt": "2026-11-09T19:41:20.439Z",
+  "student": {
+    "name": "Jordan Rivera",
+    "studentId": "",
+    "email": "",
+    "advisor": "Dr. Chao",
+    "minor": "",
+    "catalogYear": "",
+    "startTerm": "Fall 2027",
+    "expectedGraduation": "",
+    "mathPlacement": true,
+    "admittedToMajor": false
+  },
+  "transfer": {
+    "isTransfer": true,
+    "fromVCCS": true,
+    "college": "Blue Ridge Community College (BRCC)",
+    "associateDegree": true,
+    "vccs": {
+      "CSC 201": {
+        "taken": true,
+        "grade": "A",
+        "decision": ""
+      },
+      "MTH 263": {
+        "taken": true,
+        "grade": "B",
+        "decision": ""
+      },
+      "MTH 245": {
+        "taken": true,
+        "grade": "B+",
+        "decision": ""
+      },
+      "ITP 220": {
+        "taken": true,
+        "grade": "B",
+        "decision": "CS 159"
+      },
+      "CSC 202": {
+        "taken": true,
+        "grade": "B-",
+        "decision": ""
+      }
+    },
+    "other": [],
+    "acceptedCredits": ""
+  },
+  "settings": {
+    "includeSummer": false,
+    "coursesPerTerm": 3
+  },
+  "terms": [
+    {
+      "id": "term-mw9o2pxn-1",
+      "name": "Fall 2027",
+      "items": [
+        {
+          "id": "item-mw9o2pxn-2",
+          "code": "CS 227",
+          "slot": "",
+          "label": "",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        }
+      ]
+    },
+    {
+      "id": "term-mw9o2pxn-3",
+      "name": "Spring 2028",
+      "items": [
+        {
+          "id": "item-mw9o2pxn-4",
+          "code": "CS 240",
+          "slot": "",
+          "label": "",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        },
+        {
+          "id": "item-mw9o2pxn-5",
+          "code": "CS 261",
+          "slot": "",
+          "label": "",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        },
+        {
+          "id": "item-mw9o2pxn-6",
+          "code": "CS 345",
+          "slot": "",
+          "label": "",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        }
+      ]
+    },
+    {
+      "id": "term-mw9o2pxn-7",
+      "name": "Fall 2028",
+      "items": [
+        {
+          "id": "item-mw9o2pxn-8",
+          "code": "CS 327",
+          "slot": "",
+          "label": "",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        },
+        {
+          "id": "item-mw9o2pxn-9",
+          "code": "CS 361",
+          "slot": "",
+          "label": "",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        },
+        {
+          "id": "item-mw9o2pxn-a",
+          "code": "CS 430",
+          "slot": "",
+          "label": "",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        },
+        {
+          "id": "item-mw9o2pxn-b",
+          "code": "",
+          "slot": "cselective",
+          "label": "CS Elective",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        }
+      ]
+    },
+    {
+      "id": "term-mw9o2pxn-c",
+      "name": "Spring 2029",
+      "items": [
+        {
+          "id": "item-mw9o2pxn-d",
+          "code": "",
+          "slot": "algorithms",
+          "label": "CS 412 or 452",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        },
+        {
+          "id": "item-mw9o2pxn-e",
+          "code": "",
+          "slot": "systems",
+          "label": "CS Systems Elective",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        },
+        {
+          "id": "item-mw9o2pxn-f",
+          "code": "",
+          "slot": "cselective",
+          "label": "CS Elective",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        },
+        {
+          "id": "item-mw9o2pxn-g",
+          "code": "",
+          "slot": "cselective",
+          "label": "CS Elective",
+          "credits": 3,
+          "status": "planned",
+          "grade": ""
+        }
+      ]
+    }
+  ],
+  "notes": "Sample (fictional) student. CSC 202 is awaiting advisor review; until decided, CS 240 stays in the plan."
+}

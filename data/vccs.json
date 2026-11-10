@@ -1,0 +1,34 @@
+{
+  "source": "https://www.jmu.edu/cise/cs/undergraduate/transfer/vccs-transfer.shtml",
+  "notes": [
+    "Courses marked review (starred on the department page) do not automatically transfer to their JMU equivalent. An advisor decides whether each counts toward the CS major or as university elective credit (CS 000).",
+    "JMU has articulation agreements with Piedmont Virginia Community College (PVCC) and Blue Ridge Community College (BRCC). Students should ask their current advisor about the agreement for their school.",
+    "A completed associate degree satisfies JMU General Education requirements.",
+    "Upper-level JMU CS courses depend on prerequisite material, so retaking a similar course at JMU is often advisable even with community college credit.",
+    "Completing all listed courses before enrolling lets most students finish in about two years; missing them can stretch the program to three years."
+  ],
+  "colleges": [
+    "Blue Ridge Community College (BRCC)",
+    "Piedmont Virginia Community College (PVCC)",
+    "Brightpoint Community College",
+    "Central Virginia Community College",
+    "Germanna Community College",
+    "Laurel Ridge Community College",
+    "Northern Virginia Community College (NOVA)",
+    "Reynolds Community College",
+    "Tidewater Community College",
+    "Virginia Western Community College",
+    "Other VCCS college"
+  ],
+  "articulationColleges": ["Blue Ridge Community College (BRCC)", "Piedmont Virginia Community College (PVCC)"],
+  "courses": [
+    { "vccs": "CSC 201", "topic": "Intro Programming", "jmu": ["CS 149"], "review": false },
+    { "vccs": "ITP 220", "topic": "Java Programming", "jmu": ["CS 159", "CS 000"], "review": true },
+    { "vccs": "CSC 202", "topic": "Data Structures", "jmu": ["CS 240", "CS 000"], "review": true },
+    { "vccs": "CSC 205", "topic": "Systems Programming", "jmu": ["CS 261", "CS 000"], "review": true },
+    { "vccs": "MTH 245", "topic": "Statistics", "jmu": ["MATH 220"], "review": false },
+    { "vccs": "MTH 263", "topic": "Calculus", "jmu": ["MATH 235"], "review": false },
+    { "vccs": "MTH 288", "topic": "Discrete Mathematics", "jmu": ["CS 227"], "review": false },
+    { "vccs": "CSC 208", "topic": "Discrete Mathematics", "jmu": ["CS 227"], "review": false }
+  ]
+}

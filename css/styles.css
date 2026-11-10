@@ -1,0 +1,158 @@
+/* JMU theme on Bootstrap 5.3, matching TurboFAR. Colors are tokens so dark mode can redefine them. */
+
+:root,
+[data-bs-theme="light"] {
+  --bs-primary: #450084;
+  --bs-primary-rgb: 69, 0, 132;
+  --bs-primary-text-emphasis: #2f0059;
+  --bs-primary-bg-subtle: #f3eef8;
+  --bs-primary-border-subtle: #d3bfe6;
+  --bs-secondary: #54636d;
+  --bs-secondary-rgb: 84, 99, 109;
+  --bs-warning: #cbb677;
+  --bs-warning-rgb: 203, 182, 119;
+  --bs-body-color: #1f2933;
+  --bs-body-color-rgb: 31, 41, 51;
+  --bs-tertiary-bg: #f7f3ee;
+  --bs-tertiary-bg-rgb: 247, 243, 238;
+  --bs-link-color: #450084;
+  --bs-link-color-rgb: 69, 0, 132;
+  --bs-border-radius: 0.625rem;
+  --bs-focus-ring-color: rgba(69, 0, 132, 0.35);
+
+  /* Same fills as the advising spreadsheet: light purple = B- or better, light yellow = C- or better. */
+  --band-b: #d9d2e9;
+  --band-c: #fff2cc;
+  --band-text: #1f2933;
+
+  --issue-error: #b02a37;
+  --issue-warning: #8a5a00;
+  --issue-info: #0b5ed7;
+
+  --map-bg: #ffffff;
+  --map-text: #1f2933;
+  --map-line: #6c757d;
+  --map-highlight: #450084;
+  --map-credit: #cbb677;
+  --map-done: #b7dfc4;
+  --map-planned: #d9d2e9;
+  --map-needed: #ffffff;
+  --map-needed-border: #b02a37;
+  --map-other: #e9ecef;
+}
+
+[data-bs-theme="dark"] {
+  --bs-primary: #b58ae6;
+  --bs-primary-rgb: 181, 138, 230;
+  --bs-primary-text-emphasis: #d6bcf3;
+  --bs-primary-bg-subtle: #2a1442;
+  --bs-primary-border-subtle: #5a3a85;
+  --bs-body-color: #e6e1ea;
+  --bs-body-color-rgb: 230, 225, 234;
+  --bs-body-bg: #17131c;
+  --bs-tertiary-bg: #120f16;
+  --bs-tertiary-bg-rgb: 18, 15, 22;
+  --bs-link-color: #d6bcf3;
+  --bs-link-color-rgb: 214, 188, 243;
+  --bs-focus-ring-color: rgba(214, 188, 243, 0.45);
+
+  --issue-error: #ff8a95;
+  --issue-warning: #ffcf66;
+  --issue-info: #8fb8ff;
+
+  --map-bg: #1f1a26;
+  --map-text: #f2eef6;
+  --map-line: #a7a1b0;
+  --map-highlight: #d6bcf3;
+  --map-needed: #1f1a26;
+  --map-needed-border: #ff8a95;
+  --map-other: #3a3442;
+}
+
+body { background-color: var(--bs-tertiary-bg); }
+
+/* The navbar stays JMU purple in both themes so white text keeps its contrast. */
+.navbar.bg-primary { background-color: #450084 !important; }
+.navbar .btn-warning { --bs-btn-bg: #cbb677; --bs-btn-border-color: #cbb677; --bs-btn-color: #1f2933; --bs-btn-hover-bg: #b9a35f; --bs-btn-hover-border-color: #b9a35f; }
+.border-warning { border-color: #cbb677 !important; }
+
+.skip-link { position: absolute; left: 1rem; top: 0.5rem; z-index: 2000; background: #fff; color: #450084; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+
+:focus-visible { outline: 3px solid var(--bs-primary); outline-offset: 2px; }
+.navbar :focus-visible { outline-color: #ffffff; }
+
+.btn-primary { --bs-btn-bg: var(--bs-primary); --bs-btn-border-color: var(--bs-primary); --bs-btn-hover-bg: #2f0059; --bs-btn-hover-border-color: #2f0059; }
+[data-bs-theme="dark"] .btn-primary { --bs-btn-color: #17131c; --bs-btn-hover-bg: #d6bcf3; --bs-btn-hover-border-color: #d6bcf3; --bs-btn-hover-color: #17131c; }
+.btn-outline-primary { --bs-btn-color: var(--bs-primary); --bs-btn-border-color: var(--bs-primary); --bs-btn-hover-bg: var(--bs-primary); --bs-btn-hover-border-color: var(--bs-primary); }
+[data-bs-theme="dark"] .btn-outline-primary { --bs-btn-hover-color: #17131c; }
+
+.nav-tabs .nav-link { color: var(--bs-body-color); white-space: nowrap; }
+.nav-tabs .nav-link.active { font-weight: 600; color: var(--bs-primary-text-emphasis); border-bottom-color: transparent; }
+
+/* Legend */
+.legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; align-items: center; }
+.legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.swatch { display: inline-block; width: 1.1rem; height: 1.1rem; border: 1px solid rgba(0, 0, 0, 0.45); border-radius: 0.2rem; }
+.swatch.band-b { background: var(--band-b); }
+.swatch.band-c { background: var(--band-c); }
+.swatch.map-credit { background: var(--map-credit); }
+.swatch.map-done { background: var(--map-done); }
+.swatch.map-planned { background: var(--map-planned); }
+.swatch.map-needed { background: var(--map-needed); border: 2px dashed var(--map-needed-border); }
+.swatch.map-other { background: var(--map-other); }
+
+/* Terms */
+.terms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: 1rem; }
+.term-card { border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius); background: var(--bs-body-bg); display: flex; flex-direction: column; }
+.term-card > header { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--bs-border-color); background: var(--bs-primary-bg-subtle); border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0; }
+.term-card h3 { font-size: 1.05rem; margin: 0; }
+.term-card .term-credits { font-size: 0.875rem; }
+.term-card .term-credits.heavy { color: var(--issue-warning); font-weight: 600; }
+.term-items { list-style: none; margin: 0; padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.term-item { border: 1px solid var(--bs-border-color); border-left-width: 0.5rem; border-radius: 0.5rem; padding: 0.45rem 0.6rem; }
+.term-item.band-b { border-left-color: var(--band-b); }
+.term-item.band-c { border-left-color: var(--band-c); }
+.term-item .code-badge { display: inline-block; font-weight: 700; padding: 0 0.35rem; border-radius: 0.25rem; color: var(--band-text); background: #e9ecef; border: 1px solid rgba(0,0,0,0.25); }
+.term-item.band-b .code-badge { background: var(--band-b); }
+.term-item.band-c .code-badge { background: var(--band-c); }
+.term-item .item-title { font-size: 0.875rem; }
+.term-item .item-controls { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.35rem; align-items: center; }
+.term-item .item-controls .form-select, .term-item .item-controls .form-control { width: auto; min-width: 0; font-size: 0.8rem; padding-top: 0.15rem; padding-bottom: 0.15rem; }
+.term-item.has-error { border-color: var(--issue-error); }
+.term-add { padding: 0.5rem; border-top: 1px dashed var(--bs-border-color); margin-top: auto; }
+
+.issues { list-style: none; padding: 0; margin: 0.35rem 0 0; font-size: 0.8125rem; }
+.issues li { display: flex; gap: 0.35rem; align-items: flex-start; }
+.issue-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 1.1rem; height: 1.1rem; border-radius: 50%; font-weight: 700; font-size: 0.75rem; color: #fff; }
+.issue-icon.issue-error { background: #b02a37; }
+.issue-icon.issue-warning { background: #8a5a00; }
+.issue-icon.issue-info { background: #0b5ed7; }
+.issue-text-error { color: var(--issue-error); }
+.issue-text-warning { color: var(--issue-warning); }
+
+/* Status badges always pair color with words. */
+.status-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 1rem; font-size: 0.8125rem; font-weight: 600; white-space: nowrap; }
+.status-met { background: #146c43; color: #fff; }
+.status-inprogress { background: #0b5ed7; color: #fff; }
+.status-planned { background: #450084; color: #fff; }
+.status-missing { background: #b02a37; color: #fff; }
+[data-bs-theme="dark"] .status-planned { background: #6f3fb0; }
+
+/* Map */
+.map-holder { overflow-x: auto; border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius); background: var(--map-bg); }
+.map-holder canvas { display: block; }
+.map-holder canvas:focus-visible { outline: 3px solid var(--bs-primary); outline-offset: -3px; }
+
+.table { --bs-table-bg: transparent; }
+
+dialog { background: var(--bs-body-bg); color: var(--bs-body-color); max-width: min(30rem, calc(100vw - 2rem)); }
+dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+
+/* Dark-mode outline buttons with 4.5:1 text contrast */
+[data-bs-theme="dark"] .btn-outline-danger { --bs-btn-color: #ff8a95; --bs-btn-border-color: #ff8a95; --bs-btn-hover-bg: #ff8a95; --bs-btn-hover-border-color: #ff8a95; --bs-btn-hover-color: #17131c; --bs-btn-active-bg: #ff8a95; --bs-btn-active-color: #17131c; }
+[data-bs-theme="dark"] .btn-outline-secondary { --bs-btn-color: #c4ccd3; --bs-btn-border-color: #c4ccd3; --bs-btn-hover-bg: #c4ccd3; --bs-btn-hover-border-color: #c4ccd3; --bs-btn-hover-color: #17131c; }
+
+/* Offering history */
+.history-table td, .history-table th { font-size: 0.8125rem; }
+.history-table .offered-cell { background: var(--bs-primary-bg-subtle); font-weight: 600; }
+.history-table abbr { text-decoration: none; cursor: help; }

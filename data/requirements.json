@@ -1,0 +1,31 @@
+{
+  "program": "Computer Science, B.S.",
+  "catalogYear": "2026-2027",
+  "source": "https://catalog.jmu.edu/programs/computer-science-bs/#requirementstext",
+  "totalCredits": 120,
+  "genEdCredits": 41,
+  "genEdNote": "Some General Education credits may be met by major courses. A completed VCCS associate degree satisfies JMU General Education.",
+  "groups": [
+    { "id": "intro", "label": "Introductory programming", "type": "oneOf", "options": [["CS 149"], ["CS 145"]], "note": "B- or better to continue to CS 159 and CS 227." },
+    { "id": "core", "label": "Required CS core", "type": "allOf", "courses": ["CS 159", "CS 240", "CS 261", "CS 327", "CS 345", "CS 361", "CS 430"] },
+    { "id": "discrete", "label": "Introductory discrete math", "type": "oneOf", "options": [["CS 227"], ["MATH 227"], ["MATH 245"]] },
+    { "id": "calculus", "label": "Calculus", "type": "oneOf", "options": [["MATH 235"], ["MATH 231", "MATH 232"]], "note": "Take calculus early; MATH 231 or equivalent is a prerequisite for CS 240." },
+    { "id": "stats", "label": "Statistics", "type": "oneOf", "options": [["MATH 220"], ["MATH 229"], ["MATH 318"]], "note": "Recommended in the second year; needed for CS 412/452." },
+    { "id": "algorithms", "label": "Algorithms elective", "type": "oneOf", "options": [["CS 412"], ["CS 452"], ["MATH 452"]] },
+    { "id": "systems", "label": "Systems elective", "type": "oneOf", "options": [["CS 432"], ["CS 450"], ["CS 455"], ["CS 456"], ["CS 470"]], "note": "Take the systems elective before your final semester when you can. CS 432 is offered in fall only." },
+    { "id": "cselectives", "label": "CS electives", "type": "electives", "credits": 9, "minLevel": 300, "aboveLevel": 332, "aboveCount": 2, "note": "9 credits of CS at the 300 level or above, with at least two courses above CS 332. Courses used for another requirement don't count twice." }
+  ],
+  "gradeRules": [
+    "CS 149 and CS 227 need a B- or better to continue in the major.",
+    "A C- or better is required in CS 240, CS 261, CS 327, CS 361, calculus, and statistics.",
+    "Cumulative GPA of at least 2.0 in major courses.",
+    "CS 149, CS 159, CS 240, and CS 261 may each be attempted at most twice.",
+    "Credit/no-credit may not be used for major courses or CS electives."
+  ],
+  "advisingTips": {
+    "Year 1": "Use the CS advising Canvas site and the CS wiki, attend advising events, meet your advisor, use TA hours, and explore clubs and the CISE career fair. Apply to the major the semester you take CS 159 and CS 227 (or your first semester if you transfer in beyond them).",
+    "Year 2": "Attend advising events, plan junior and senior electives, set up Handshake, build an online presence, attend the September and February career fairs, and apply for summer internships.",
+    "Year 3": "Attend advising events and career fairs, look for leadership roles, volunteer, pursue internships or department research, and plan for the GRE if considering graduate school.",
+    "Year 4": "Apply to graduate by mid-October for May graduation, attend the September career fair, build projects, apply for full-time jobs, and use on-campus recruiting."
+  }
+}

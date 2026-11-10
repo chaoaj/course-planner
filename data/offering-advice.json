@@ -1,0 +1,151 @@
+{
+  "source": "Written from the Fall 2020 \u2013 Spring 2027 CS schedules and the catalog prerequisites. Review each year when the new schedule is posted.",
+  "general": [
+    "Every required core course (CS 149, 159, 227, 240, 261, 327, 345, 361) has run every fall and spring since Fall 2020, so the core sequence can start in either term.",
+    "CS 430 and CS 412 ran only in spring through Spring 2022 and have run in both terms since Fall 2022.",
+    "Systems electives split by term: CS 432 and CS 450 are fall courses; CS 456 and CS 470 are mostly spring; CS 455 ran in some early falls but only in spring since Spring 2025. Check which options run in the student's remaining terms before choosing one.",
+    "CS 452 runs only in fall; CS 412 runs in both terms. A student who needs the algorithms elective in a spring term should plan on CS 412.",
+    "Summer CS offerings aren't in this schedule data. Confirm any summer course with the department before building a plan around it.",
+    "Spring 2027 is the planned schedule and can change; treat it as likely, not certain."
+  ],
+  "watchList": [
+    {
+      "code": "CS 354",
+      "lock": "Fall only",
+      "why": "Offered every fall (7 of 7), never in spring.",
+      "prereqAdvice": "Needs CS 240 and statistics (MATH 220, 229 or 318) with a C- or better. Finish both by the spring before.",
+      "programs": [
+        "Robotics minor (core course)",
+        "CS minor AI and Robotics focus"
+      ]
+    },
+    {
+      "code": "CS 444",
+      "lock": "Spring only",
+      "why": "Offered in 6 of 7 springs (not Spring 2026), never in fall.",
+      "prereqAdvice": "Needs CS 240 and statistics. Missing it in spring means waiting a full year, and it was skipped in Spring 2026.",
+      "programs": [
+        "Robotics minor (elective)",
+        "CS minor AI and Robotics focus"
+      ]
+    },
+    {
+      "code": "CS 452",
+      "lock": "Fall only",
+      "why": "Offered every fall, never in spring. CS 412 (the other algorithms option) runs in both terms.",
+      "prereqAdvice": "Needs CS 327 and statistics. For CS 452 in a final fall, CS 327 and statistics must be done by the previous spring."
+    },
+    {
+      "code": "CS 457",
+      "lock": "Fall only",
+      "why": "Offered every fall, never in spring. It starts the information security sequence.",
+      "prereqAdvice": "Needs CS 361 (can be taken at the same time) and statistics. Take CS 457 in fall so CS 458 can follow in spring.",
+      "programs": [
+        "Information security courses"
+      ]
+    },
+    {
+      "code": "CS 458",
+      "lock": "Spring only",
+      "why": "Offered every spring, never in fall.",
+      "prereqAdvice": "Needs CS 457 (fall only) and CS 361. The only workable order is CS 457 in a fall and CS 458 in the next spring; missing that fall delays CS 458 a full year.",
+      "programs": [
+        "Information security courses"
+      ]
+    },
+    {
+      "code": "CS 482",
+      "lock": "Spring only",
+      "why": "Selected topics in information security: offered every spring, never in fall.",
+      "prereqAdvice": "Needs CS 240 and CS 261.",
+      "programs": [
+        "Information security courses"
+      ]
+    },
+    {
+      "code": "CS 432",
+      "lock": "Usually fall",
+      "why": "Offered every fall; in spring only once (Spring 2023).",
+      "prereqAdvice": "Needs both CS 327 and CS 361, the end of two prerequisite chains. As a systems elective in a final fall, both must be done by the previous spring."
+    },
+    {
+      "code": "CS 450",
+      "lock": "Usually fall",
+      "why": "Offered in 6 of 7 falls; in spring only once (Spring 2024).",
+      "prereqAdvice": "Needs CS 361."
+    },
+    {
+      "code": "CS 470",
+      "lock": "Spring only, not every year",
+      "why": "Offered only in spring (Spring 2021\u20132024 and Spring 2026), not in Spring 2025 or the planned Spring 2027.",
+      "prereqAdvice": "Needs CS 361. Don't rely on it as the only systems elective in a plan."
+    },
+    {
+      "code": "CS 456",
+      "lock": "Usually spring",
+      "why": "Offered in 5 of 7 springs and in Fall 2026.",
+      "prereqAdvice": "Needs CS 361."
+    },
+    {
+      "code": "CS 445",
+      "lock": "Every fall, some springs",
+      "why": "Offered every fall and in 3 of 7 springs.",
+      "prereqAdvice": "Needs CS 327 and statistics."
+    },
+    {
+      "code": "CS 455",
+      "lock": "Shifted to spring",
+      "why": "Offered in Fall 2020, 2022 and 2023, then only in spring (Spring 2025, 2026, 2027).",
+      "prereqAdvice": "Needs CS 361."
+    }
+  ],
+  "sequences": [
+    {
+      "title": "Information security: CS 457 (fall) \u2192 CS 458 (spring)",
+      "advice": "Have CS 361 done or in progress and statistics done by the fall the student takes CS 457. CS 482 (spring) also fits in that year."
+    },
+    {
+      "title": "Robotics and AI: CS 354 (fall) and CS 444 (spring)",
+      "advice": "Both need CS 240 and statistics, so finish those by the end of the sophomore year (or the first transfer year) to take CS 354 the next fall and CS 444 the following spring."
+    },
+    {
+      "title": "Final-year systems elective",
+      "advice": "CS 432 and CS 450 are effectively fall courses, and the advising sheet recommends taking the systems elective before the final semester. A student graduating in spring should plan it for the fall before, or pick a spring option (CS 456, or CS 455 / CS 470 when scheduled)."
+    },
+    {
+      "title": "Spring-start transfer students",
+      "advice": "The core runs every term, so a spring start doesn't delay the core. It does shift which fall-only electives (CS 354, CS 452, CS 457) line up; check them against the student's last fall at JMU."
+    }
+  ],
+  "robotics": {
+    "summary": "The robotics minor is interdisciplinary and ends with a robotics project. Its CS courses are semester-locked: CS 354 (fall only) is a core option and CS 444 (spring only) is an elective.",
+    "courses": [
+      {
+        "code": "CS 354",
+        "role": "Core course (or PHYS 386)",
+        "title": "Introduction to Autonomous Robotics"
+      },
+      {
+        "code": "CS 444",
+        "role": "Elective",
+        "title": "Artificial Intelligence"
+      },
+      {
+        "code": "MATH 238",
+        "role": "Elective",
+        "title": "Linear Algebra with Differential Equations"
+      },
+      {
+        "code": "MATH 248",
+        "role": "Elective",
+        "title": "Numerical Methods"
+      },
+      {
+        "code": "CISE 481",
+        "role": "Robotics project",
+        "title": "Robotics Project Summary"
+      }
+    ],
+    "caveat": "Course list from the 2016\u201317 catalog; the current catalog page doesn't list the courses. Confirm current requirements with the coordinator, Nathan Sprague."
+  }
+}

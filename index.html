@@ -1,18 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Sketch</title>
-
-    <link rel="stylesheet" type="text/css" href="style.css">
-
-    <script src="libraries/p5.min.js"></script>
-    <script src="libraries/p5.sound.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function () {
+        var theme = null;
+        try { theme = localStorage.getItem('course-planner-theme'); } catch (e) {}
+        if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-bs-theme', theme);
+      })();
+    </script>
+    <title>Course Planner</title>
+    <link rel="stylesheet" href="./lib/bootstrap.min.css" />
+    <link rel="stylesheet" href="./css/styles.css?v=2026-11-09b" />
+    <link rel="icon" type="image/svg+xml" href="./images/course-planner-logo.svg" />
   </head>
+  <body class="bg-body-tertiary min-vh-100">
+    <a class="visually-hidden-focusable skip-link" href="#main">Skip to main content</a>
 
-  <body>
-    <script src="sketch.js"></script>
+    <header>
+      <nav aria-label="Application" class="navbar navbar-dark sticky-top shadow-sm py-2 bg-primary border-bottom border-3 border-warning">
+        <div class="container-fluid px-3 px-md-4 gap-2">
+          <span class="navbar-brand fw-bold d-flex align-items-center gap-2 me-2">
+            <img src="./images/course-planner-logo.svg" alt="" width="28" height="28" />
+            Course Planner
+            <span class="d-none d-md-inline fw-normal small opacity-75">CS transfer advising</span>
+          </span>
+          <div class="d-flex flex-wrap gap-1" role="group" aria-label="File actions">
+            <button type="button" class="btn btn-sm btn-light" id="btn-new">New student</button>
+            <button type="button" class="btn btn-sm btn-light" id="btn-open">Open JSON</button>
+            <button type="button" class="btn btn-sm btn-light" id="btn-save">Save JSON</button>
+            <button type="button" class="btn btn-sm btn-light" id="btn-import">Import spreadsheet</button>
+            <button type="button" class="btn btn-sm btn-warning" id="btn-xlsx">Export Excel</button>
+            <button type="button" class="btn btn-sm btn-warning" id="btn-pdf">Export PDF</button>
+            <button type="button" class="btn btn-sm btn-outline-light" id="btn-theme" aria-pressed="false">Dark mode</button>
+          </div>
+          <input type="file" id="file-json" accept=".json,application/json" hidden />
+          <input type="file" id="file-sheet" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
+        </div>
+      </nav>
+    </header>
+
+    <main id="main" class="container-fluid px-3 px-md-4 py-3" tabindex="-1">
+      <div id="status-message" class="alert py-2 mb-3" role="status" hidden></div>
+      <div id="live-region" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+      <div id="load-error" class="alert alert-danger" role="alert" hidden></div>
+
+      <section aria-labelledby="summary-heading" class="card shadow-sm mb-3">
+        <div class="card-body py-2">
+          <h1 id="summary-heading" class="h5 mb-1"><span id="summary-name">New student</span></h1>
+          <p id="summary-line" class="mb-0 small"></p>
+        </div>
+      </section>
+
+      <div class="tab-list nav nav-tabs flex-nowrap overflow-x-auto" role="tablist" aria-label="Planner sections">
+        <button class="nav-link active" role="tab" id="tab-student" aria-controls="panel-student" aria-selected="true">1. Student</button>
+        <button class="nav-link" role="tab" id="tab-transfer" aria-controls="panel-transfer" aria-selected="false" tabindex="-1">2. Transfer credit</button>
+        <button class="nav-link" role="tab" id="tab-plan" aria-controls="panel-plan" aria-selected="false" tabindex="-1">3. Plan</button>
+        <button class="nav-link" role="tab" id="tab-audit" aria-controls="panel-audit" aria-selected="false" tabindex="-1">4. Requirements</button>
+        <button class="nav-link" role="tab" id="tab-map" aria-controls="panel-map" aria-selected="false" tabindex="-1">5. Prerequisite map</button>
+        <button class="nav-link" role="tab" id="tab-offerings" aria-controls="panel-offerings" aria-selected="false" tabindex="-1">6. When courses run</button>
+      </div>
+
+      <!-- 1. Student -->
+      <section class="tab-panel card card-body border-top-0 rounded-top-0 shadow-sm" role="tabpanel" id="panel-student" aria-labelledby="tab-student" tabindex="0">
+        <h2 class="h4">Student</h2>
+        <form id="student-form" class="row g-3" novalidate>
+          <div class="col-md-4"><label class="form-label" for="f-name">Student name</label><input class="form-control" id="f-name" data-field="student.name" autocomplete="off" /></div>
+          <div class="col-md-2"><label class="form-label" for="f-id">Student ID</label><input class="form-control" id="f-id" data-field="student.studentId" autocomplete="off" /></div>
+          <div class="col-md-3"><label class="form-label" for="f-email">Email</label><input class="form-control" id="f-email" type="email" data-field="student.email" autocomplete="off" /></div>
+          <div class="col-md-3"><label class="form-label" for="f-advisor">Advisor</label><input class="form-control" id="f-advisor" data-field="student.advisor" /></div>
+          <div class="col-md-3"><label class="form-label" for="f-minor">Minor</label><input class="form-control" id="f-minor" data-field="student.minor" /></div>
+          <div class="col-md-3"><label class="form-label" for="f-catalog">Catalog year</label><input class="form-control" id="f-catalog" data-field="student.catalogYear" /></div>
+          <div class="col-md-3">
+            <label class="form-label" for="f-start">First term at JMU</label>
+            <input class="form-control" id="f-start" data-field="student.startTerm" aria-describedby="f-start-help" />
+            <div id="f-start-help" class="form-text">For example, Fall 2027.</div>
+          </div>
+          <div class="col-md-3"><label class="form-label" for="f-grad">Expected graduation</label><input class="form-control" id="f-grad" data-field="student.expectedGraduation" placeholder="May 2029" /></div>
+          <div class="col-12 d-flex flex-wrap gap-4">
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="f-placement" data-field="student.mathPlacement" /><label class="form-check-label" for="f-placement">Math placement met for CS 149</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="f-admitted" data-field="student.admittedToMajor" /><label class="form-check-label" for="f-admitted">Fully admitted to the CS major</label></div>
+          </div>
+        </form>
+
+        <h2 class="h4 mt-4">Transfer questions</h2>
+        <fieldset class="mb-3">
+          <legend class="fs-6 fw-semibold">Is this student transferring credit into JMU?</legend>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="q-transfer" id="q-transfer-yes" value="yes" /><label class="form-check-label" for="q-transfer-yes">Yes</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="q-transfer" id="q-transfer-no" value="no" /><label class="form-check-label" for="q-transfer-no">No</label></div>
+        </fieldset>
+        <fieldset class="mb-3" id="q-vccs-set" hidden>
+          <legend class="fs-6 fw-semibold">Is the student coming from a Virginia Community College System (VCCS) college?</legend>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="q-vccs" id="q-vccs-yes" value="yes" /><label class="form-check-label" for="q-vccs-yes">Yes</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="q-vccs" id="q-vccs-no" value="no" /><label class="form-check-label" for="q-vccs-no">No, another college or AP/IB credit</label></div>
+        </fieldset>
+        <div id="q-vccs-details" class="row g-3" hidden>
+          <div class="col-md-6">
+            <label class="form-label" for="f-college">Community college</label>
+            <input class="form-control" id="f-college" list="college-list" data-field="transfer.college" />
+            <datalist id="college-list"></datalist>
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="f-associate" data-field="transfer.associateDegree" /><label class="form-check-label" for="f-associate">Completed (or will complete) an associate degree, which satisfies JMU General Education</label></div>
+          </div>
+          <div class="col-12"><div id="college-note" class="alert alert-info mb-0" hidden></div></div>
+        </div>
+        <p class="mt-3 mb-0"><button type="button" class="btn btn-primary" data-go-tab="tab-transfer">Next: transfer credit</button></p>
+      </section>
+
+      <!-- 2. Transfer credit -->
+      <section class="tab-panel card card-body border-top-0 rounded-top-0 shadow-sm" role="tabpanel" id="panel-transfer" aria-labelledby="tab-transfer" tabindex="0" hidden>
+        <h2 class="h4">Transfer credit</h2>
+        <div id="vccs-section">
+          <h3 class="h5">VCCS courses</h3>
+          <p id="vccs-intro" class="small mb-2"></p>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle" id="vccs-table">
+              <caption class="visually-hidden">VCCS courses and their JMU equivalents</caption>
+              <thead><tr><th scope="col">Taken</th><th scope="col">VCCS course</th><th scope="col">Topic</th><th scope="col">Grade</th><th scope="col">JMU credit</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <ul id="vccs-notes" class="small"></ul>
+        </div>
+
+        <h3 class="h5 mt-3">Other transfer, AP, IB or waived credit</h3>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle" id="other-table">
+            <caption class="visually-hidden">Other credit the student has</caption>
+            <thead><tr><th scope="col">JMU course</th><th scope="col">Credits</th><th scope="col">Grade</th><th scope="col">Source</th><th scope="col">Note</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-sm" id="btn-add-credit">Add credit</button>
+
+        <h3 class="h5 mt-4">Credit summary</h3>
+        <div class="row g-2 mb-2">
+          <div class="col-sm-6 col-lg-4">
+            <label class="form-label" for="f-accepted">Total transfer credits JMU accepted (optional)</label>
+            <input class="form-control" type="number" min="0" max="120" id="f-accepted" data-field="transfer.acceptedCredits" aria-describedby="f-accepted-help" />
+            <div id="f-accepted-help" class="form-text">From the transfer credit evaluation. Leave blank to count only the courses listed above.</div>
+          </div>
+        </div>
+        <div id="credit-summary"></div>
+        <div id="plan-recommendation" class="alert alert-secondary mt-3"></div>
+      </section>
+
+      <!-- 3. Plan -->
+      <section class="tab-panel card card-body border-top-0 rounded-top-0 shadow-sm" role="tabpanel" id="panel-plan" aria-labelledby="tab-plan" tabindex="0" hidden>
+        <h2 class="h4">Plan</h2>
+        <div class="row g-2 align-items-end mb-3">
+          <div class="col-sm-6 col-lg-4">
+            <label class="form-label" for="sample-select">Sample transfer plan</label>
+            <div class="input-group">
+              <select class="form-select" id="sample-select"></select>
+              <button class="btn btn-outline-primary" type="button" id="btn-apply-sample">Apply</button>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <label class="form-label" for="per-term">CS courses per term (auto-plan)</label>
+            <div class="input-group">
+              <select class="form-select" id="per-term"><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+              <button class="btn btn-outline-primary" type="button" id="btn-autoplan">Auto-plan the rest</button>
+            </div>
+          </div>
+          <div class="col-auto"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="f-summer" /><label class="form-check-label" for="f-summer">Include summer terms</label></div></div>
+          <div class="col-auto d-flex gap-2">
+            <button class="btn btn-outline-secondary" type="button" id="btn-add-term">Add term</button>
+            <button class="btn btn-outline-danger" type="button" id="btn-clear-plan">Clear plan</button>
+          </div>
+        </div>
+        <div class="legend small mb-3" aria-label="Color key">
+          <span class="legend-item"><span class="swatch band-b" aria-hidden="true"></span>B- or better required</span>
+          <span class="legend-item"><span class="swatch band-c" aria-hidden="true"></span>C- or better required</span>
+          <span class="legend-item"><span class="issue-icon issue-error" aria-hidden="true">!</span>Prerequisite problem</span>
+          <span class="legend-item"><span class="issue-icon issue-warning" aria-hidden="true">?</span>Check this</span>
+        </div>
+        <datalist id="course-list"></datalist>
+        <div id="terms" class="terms-grid"></div>
+        <p id="plan-empty" class="text-body-secondary" hidden>No terms yet. Apply a sample plan, use Auto-plan, or add a term.</p>
+      </section>
+
+      <!-- 4. Requirements -->
+      <section class="tab-panel card card-body border-top-0 rounded-top-0 shadow-sm" role="tabpanel" id="panel-audit" aria-labelledby="tab-audit" tabindex="0" hidden>
+        <h2 class="h4">Requirements</h2>
+        <div id="audit-totals" class="mb-3"></div>
+        <div class="table-responsive">
+          <table class="table align-middle" id="audit-table">
+            <caption class="visually-hidden">Degree requirement status</caption>
+            <thead><tr><th scope="col">Requirement</th><th scope="col">Status</th><th scope="col">Courses</th><th scope="col">Notes</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <h3 class="h5">Grade and progress rules</h3>
+        <ul id="grade-rules" class="small"></ul>
+        <h3 class="h5">Advising notes</h3>
+        <label class="form-label visually-hidden" for="f-notes">Advising notes</label>
+        <textarea class="form-control mb-3" id="f-notes" rows="5" data-field="notes" placeholder="Notes for the student's file"></textarea>
+        <h3 class="h5">Advising tips by year</h3>
+        <dl id="advising-tips" class="small"></dl>
+      </section>
+
+      <!-- 5. Prerequisite map -->
+      <section class="tab-panel card card-body border-top-0 rounded-top-0 shadow-sm" role="tabpanel" id="panel-map" aria-labelledby="tab-map" tabindex="0" hidden>
+        <h2 class="h4">Prerequisite map</h2>
+        <div class="row g-2 align-items-end mb-2">
+          <div class="col-sm-6 col-lg-4">
+            <label class="form-label" for="map-focus">Show the chain for</label>
+            <select class="form-select" id="map-focus"><option value="">No course selected</option></select>
+          </div>
+          <div class="col-auto"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="map-all" /><label class="form-check-label" for="map-all">Show every CS elective</label></div></div>
+        </div>
+        <p class="small mb-2" id="map-help">Click a course, or focus the map and use the arrow keys, to highlight what it needs (prerequisites) and what it unlocks. Solid lines are required; dashed lines are one of several options.</p>
+        <div class="legend small mb-2" aria-label="Map key">
+          <span class="legend-item"><span class="swatch map-credit" aria-hidden="true"></span>Transfer credit (labeled "Credit")</span>
+          <span class="legend-item"><span class="swatch map-done" aria-hidden="true"></span>Completed ("Done")</span>
+          <span class="legend-item"><span class="swatch map-planned" aria-hidden="true"></span>Planned (term shown)</span>
+          <span class="legend-item"><span class="swatch map-needed" aria-hidden="true"></span>Required, not planned ("Needed")</span>
+          <span class="legend-item"><span class="swatch map-other" aria-hidden="true"></span>Optional elective</span>
+        </div>
+        <div id="map-holder" class="map-holder"></div>
+        <div id="map-details" class="mt-2" aria-live="polite"></div>
+        <details class="mt-3">
+          <summary>Prerequisite table (text version of the map)</summary>
+          <div class="table-responsive mt-2">
+            <table class="table table-sm" id="prereq-table">
+              <caption class="visually-hidden">Courses, their prerequisites and the student's status</caption>
+              <thead><tr><th scope="col">Course</th><th scope="col">Title</th><th scope="col">Prerequisites (catalog)</th><th scope="col">Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- 6. Offerings -->
+      <section class="tab-panel card card-body border-top-0 rounded-top-0 shadow-sm" role="tabpanel" id="panel-offerings" aria-labelledby="tab-offerings" tabindex="0" hidden>
+        <h2 class="h4">When courses run</h2>
+        <p class="small" id="offering-source">Based on the CS schedules from Fall 2020 through Spring 2027 (Spring 2027 is the planned schedule). Summer isn't included. The Plan tab uses this to flag courses planned in a term they don't usually run.</p>
+
+        <h3 class="h5">This student's plan</h3>
+        <div id="offering-plan-notes" class="alert alert-secondary"></div>
+
+        <h3 class="h5">Semester-locked courses to watch</h3>
+        <div class="table-responsive">
+          <table class="table table-sm align-top" id="watch-table">
+            <caption class="visually-hidden">Courses offered only or mostly in one semester, with prerequisite advice</caption>
+            <thead><tr><th scope="col">Course</th><th scope="col">Title</th><th scope="col">When it runs</th><th scope="col">Prerequisite timing</th><th scope="col">Programs</th><th scope="col">In this plan</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <h3 class="h5">Sequences to plan around</h3>
+            <dl id="offering-sequences" class="small"></dl>
+          </div>
+          <div class="col-lg-6">
+            <h3 class="h5">Robotics minor</h3>
+            <div id="robotics-card" class="small"></div>
+          </div>
+        </div>
+
+        <h3 class="h5 mt-3">General advice</h3>
+        <ul id="offering-general" class="small"></ul>
+
+        <h3 class="h5 mt-3">Offering history</h3>
+        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="history-all" /><label class="form-check-label" for="history-all">Include 100- and 200-level and special sections</label></div>
+        <p class="small mb-2">Numbers are sections offered each term; a dash means not offered. * marks the planned Spring 2027 schedule.</p>
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered align-middle history-table" id="history-table">
+            <caption class="visually-hidden">Number of sections of each course offered, Fall 2020 to Spring 2027</caption>
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="small text-body-secondary mt-4">
+        <p class="mb-1">Course data from the JMU catalog, the CS department's VCCS transfer page, and its sample transfer plans. Always confirm against the current catalog and MyMadison.</p>
+        <p class="mb-0">Plans autosave in this browser only. Use Save JSON to keep a copy for the student's file.</p>
+      </footer>
+    </main>
+
+    <dialog id="sheet-dialog" aria-labelledby="sheet-dialog-title" class="border-0 rounded-3 shadow p-4">
+      <form method="dialog">
+        <h2 id="sheet-dialog-title" class="h5">Which tab is the plan?</h2>
+        <p class="small">This workbook has more than one tab with term headings.</p>
+        <label class="form-label" for="sheet-select">Tab</label>
+        <select class="form-select mb-3" id="sheet-select"></select>
+        <div class="d-flex gap-2 justify-content-end">
+          <button class="btn btn-outline-secondary" value="cancel">Cancel</button>
+          <button class="btn btn-primary" value="ok">Import</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./lib/p5.min.js"></script>
+    <script src="./lib/exceljs.min.js" defer></script>
+    <script src="./lib/jspdf.umd.min.js" defer></script>
+    <script src="./lib/jspdf.plugin.autotable.min.js" defer></script>
+    <script type="module" src="./js/main.js?v=2026-11-09b"></script>
   </body>
 </html>

@@ -1,0 +1,392 @@
+{
+ "source": "JMU CS faculty wiki schedules, Fall 2020 through Spring 2027 (14 terms). Spring 2027 is the planned schedule and may change. Summer terms are not included.",
+ "terms": [
+  "Fall 2020",
+  "Spring 2021",
+  "Fall 2021",
+  "Spring 2022",
+  "Fall 2022",
+  "Spring 2023",
+  "Fall 2023",
+  "Spring 2024",
+  "Fall 2024",
+  "Spring 2025",
+  "Fall 2025",
+  "Spring 2026",
+  "Fall 2026",
+  "Spring 2027"
+ ],
+ "tentativeTerms": [
+  "Spring 2027"
+ ],
+ "sections": {
+  "CS 101": {
+   "Fall 2020": 2,
+   "Fall 2021": 2,
+   "Fall 2022": 2,
+   "Fall 2026": 1,
+   "Spring 2027": 1
+  },
+  "CS 129E": {
+   "Spring 2027": 1
+  },
+  "CS 145E": {
+   "Spring 2022": 1,
+   "Spring 2023": 1
+  },
+  "CS 149": {
+   "Fall 2020": 11,
+   "Spring 2021": 6,
+   "Fall 2021": 8,
+   "Spring 2022": 6,
+   "Fall 2022": 12,
+   "Spring 2023": 8,
+   "Fall 2023": 12,
+   "Spring 2024": 4,
+   "Fall 2024": 11,
+   "Spring 2025": 5,
+   "Fall 2025": 8,
+   "Spring 2026": 3,
+   "Fall 2026": 7,
+   "Spring 2027": 5
+  },
+  "CS 159": {
+   "Fall 2020": 5,
+   "Spring 2021": 6,
+   "Fall 2021": 4,
+   "Spring 2022": 6,
+   "Fall 2022": 4,
+   "Spring 2023": 8,
+   "Fall 2023": 5,
+   "Spring 2024": 8,
+   "Fall 2024": 4,
+   "Spring 2025": 8,
+   "Fall 2025": 4,
+   "Spring 2026": 6,
+   "Fall 2026": 3,
+   "Spring 2027": 4
+  },
+  "CS 201E": {
+   "Spring 2027": 1
+  },
+  "CS 227": {
+   "Fall 2020": 4,
+   "Spring 2021": 5,
+   "Fall 2021": 2,
+   "Spring 2022": 4,
+   "Fall 2022": 4,
+   "Spring 2023": 6,
+   "Fall 2023": 4,
+   "Spring 2024": 6,
+   "Fall 2024": 4,
+   "Spring 2025": 7,
+   "Fall 2025": 3,
+   "Spring 2026": 5,
+   "Fall 2026": 3,
+   "Spring 2027": 3
+  },
+  "CS 240": {
+   "Fall 2020": 4,
+   "Spring 2021": 2,
+   "Fall 2021": 4,
+   "Spring 2022": 2,
+   "Fall 2022": 4,
+   "Spring 2023": 3,
+   "Fall 2023": 4,
+   "Spring 2024": 4,
+   "Fall 2024": 4,
+   "Spring 2025": 4,
+   "Fall 2025": 4,
+   "Spring 2026": 3,
+   "Fall 2026": 3,
+   "Spring 2027": 2
+  },
+  "CS 261": {
+   "Fall 2020": 3,
+   "Spring 2021": 3,
+   "Fall 2021": 3,
+   "Spring 2022": 2,
+   "Fall 2022": 3,
+   "Spring 2023": 3,
+   "Fall 2023": 4,
+   "Spring 2024": 4,
+   "Fall 2024": 4,
+   "Spring 2025": 4,
+   "Fall 2025": 4,
+   "Spring 2026": 3,
+   "Fall 2026": 3,
+   "Spring 2027": 2
+  },
+  "CS 280": {
+   "Fall 2020": 1,
+   "Fall 2021": 1,
+   "Spring 2024": 2
+  },
+  "CS 327": {
+   "Fall 2020": 2,
+   "Spring 2021": 2,
+   "Fall 2021": 4,
+   "Spring 2022": 2,
+   "Fall 2022": 3,
+   "Spring 2023": 3,
+   "Fall 2023": 3,
+   "Spring 2024": 4,
+   "Fall 2024": 4,
+   "Spring 2025": 4,
+   "Fall 2025": 4,
+   "Spring 2026": 4,
+   "Fall 2026": 3,
+   "Spring 2027": 2
+  },
+  "CS 330": {
+   "Spring 2021": 1,
+   "Spring 2023": 1,
+   "Spring 2024": 1,
+   "Fall 2025": 1,
+   "Spring 2026": 2,
+   "Fall 2026": 2,
+   "Spring 2027": 2
+  },
+  "CS 343": {
+   "Fall 2022": 3,
+   "Spring 2023": 2,
+   "Fall 2023": 3,
+   "Spring 2024": 2,
+   "Fall 2024": 4,
+   "Spring 2025": 3,
+   "Fall 2025": 4,
+   "Spring 2026": 4,
+   "Fall 2026": 2,
+   "Spring 2027": 2
+  },
+  "CS 345": {
+   "Fall 2020": 3,
+   "Spring 2021": 3,
+   "Fall 2021": 3,
+   "Spring 2022": 3,
+   "Fall 2022": 3,
+   "Spring 2023": 3,
+   "Fall 2023": 4,
+   "Spring 2024": 3,
+   "Fall 2024": 4,
+   "Spring 2025": 3,
+   "Fall 2025": 4,
+   "Spring 2026": 3,
+   "Fall 2026": 3,
+   "Spring 2027": 3
+  },
+  "CS 347": {
+   "Fall 2020": 2,
+   "Fall 2021": 3,
+   "Spring 2022": 2,
+   "Spring 2023": 2,
+   "Spring 2024": 2,
+   "Spring 2025": 2,
+   "Fall 2025": 2,
+   "Spring 2026": 2,
+   "Fall 2026": 2
+  },
+  "CS 349": {
+   "Spring 2021": 1,
+   "Spring 2023": 1,
+   "Spring 2024": 1,
+   "Fall 2025": 1
+  },
+  "CS 354": {
+   "Fall 2020": 1,
+   "Fall 2021": 1,
+   "Fall 2022": 1,
+   "Fall 2023": 1,
+   "Fall 2024": 1,
+   "Fall 2025": 1,
+   "Fall 2026": 1
+  },
+  "CS 361": {
+   "Fall 2020": 2,
+   "Spring 2021": 3,
+   "Fall 2021": 2,
+   "Spring 2022": 3,
+   "Fall 2022": 3,
+   "Spring 2023": 3,
+   "Fall 2023": 3,
+   "Spring 2024": 4,
+   "Fall 2024": 4,
+   "Spring 2025": 4,
+   "Fall 2025": 4,
+   "Spring 2026": 4,
+   "Fall 2026": 3,
+   "Spring 2027": 3
+  },
+  "CS 374": {
+   "Fall 2020": 2,
+   "Spring 2021": 3,
+   "Fall 2021": 3,
+   "Spring 2022": 1,
+   "Fall 2022": 2,
+   "Spring 2023": 1,
+   "Spring 2024": 2,
+   "Fall 2024": 2,
+   "Fall 2025": 2,
+   "Spring 2026": 1,
+   "Fall 2026": 2
+  },
+  "CS 412": {
+   "Spring 2021": 3,
+   "Spring 2022": 3,
+   "Fall 2022": 2,
+   "Spring 2023": 3,
+   "Fall 2023": 3,
+   "Spring 2024": 3,
+   "Fall 2024": 3,
+   "Spring 2025": 3,
+   "Fall 2025": 3,
+   "Spring 2026": 3,
+   "Fall 2026": 3,
+   "Spring 2027": 2
+  },
+  "CS 415": {
+   "Spring 2027": 1
+  },
+  "CS 430": {
+   "Spring 2021": 4,
+   "Spring 2022": 4,
+   "Fall 2022": 2,
+   "Spring 2023": 3,
+   "Fall 2023": 2,
+   "Spring 2024": 3,
+   "Fall 2024": 3,
+   "Spring 2025": 3,
+   "Fall 2025": 2,
+   "Spring 2026": 4,
+   "Fall 2026": 2,
+   "Spring 2027": 2
+  },
+  "CS 432": {
+   "Fall 2020": 1,
+   "Fall 2021": 1,
+   "Fall 2022": 1,
+   "Spring 2023": 1,
+   "Fall 2023": 1,
+   "Fall 2024": 1,
+   "Fall 2025": 2,
+   "Fall 2026": 2
+  },
+  "CS 444": {
+   "Spring 2021": 1,
+   "Spring 2022": 1,
+   "Spring 2023": 1,
+   "Spring 2024": 1,
+   "Spring 2025": 1,
+   "Spring 2027": 1
+  },
+  "CS 445": {
+   "Fall 2020": 1,
+   "Spring 2021": 1,
+   "Fall 2021": 1,
+   "Fall 2022": 1,
+   "Fall 2023": 1,
+   "Spring 2024": 1,
+   "Fall 2024": 1,
+   "Fall 2025": 1,
+   "Fall 2026": 1,
+   "Spring 2027": 2
+  },
+  "CS 446": {
+   "Spring 2022": 1
+  },
+  "CS 447": {
+   "Spring 2022": 1,
+   "Fall 2023": 1,
+   "Fall 2024": 1,
+   "Fall 2025": 1
+  },
+  "CS 450": {
+   "Fall 2020": 1,
+   "Fall 2021": 2,
+   "Fall 2022": 1,
+   "Spring 2024": 1,
+   "Fall 2024": 2,
+   "Fall 2025": 2,
+   "Fall 2026": 2
+  },
+  "CS 452": {
+   "Fall 2020": 1,
+   "Fall 2021": 1,
+   "Fall 2022": 1,
+   "Fall 2023": 1,
+   "Fall 2024": 1,
+   "Fall 2025": 1,
+   "Fall 2026": 1
+  },
+  "CS 455": {
+   "Fall 2020": 1,
+   "Spring 2021": 1,
+   "Fall 2022": 1,
+   "Fall 2023": 2,
+   "Spring 2025": 1,
+   "Spring 2026": 2,
+   "Spring 2027": 2
+  },
+  "CS 456": {
+   "Spring 2022": 1,
+   "Spring 2023": 1,
+   "Spring 2024": 1,
+   "Spring 2025": 1,
+   "Spring 2026": 1,
+   "Fall 2026": 1
+  },
+  "CS 457": {
+   "Fall 2020": 2,
+   "Fall 2021": 2,
+   "Fall 2022": 2,
+   "Fall 2023": 1,
+   "Fall 2024": 2,
+   "Fall 2025": 1,
+   "Fall 2026": 1
+  },
+  "CS 458": {
+   "Spring 2021": 1,
+   "Spring 2022": 1,
+   "Spring 2023": 1,
+   "Spring 2024": 1,
+   "Spring 2025": 1,
+   "Spring 2026": 1,
+   "Spring 2027": 1
+  },
+  "CS 462": {
+   "Fall 2020": 1
+  },
+  "CS 470": {
+   "Spring 2021": 1,
+   "Spring 2022": 1,
+   "Spring 2023": 1,
+   "Spring 2024": 2,
+   "Spring 2026": 1
+  },
+  "CS 480": {
+   "Fall 2023": 1,
+   "Fall 2024": 1,
+   "Spring 2025": 3,
+   "Fall 2025": 1,
+   "Spring 2026": 5,
+   "Fall 2026": 2,
+   "Spring 2027": 3
+  },
+  "CS 482": {
+   "Spring 2021": 2,
+   "Spring 2022": 1,
+   "Spring 2023": 2,
+   "Spring 2024": 1,
+   "Spring 2025": 1,
+   "Spring 2026": 1,
+   "Spring 2027": 1
+  },
+  "CS 488": {
+   "Spring 2021": 1,
+   "Spring 2022": 1,
+   "Fall 2023": 1,
+   "Fall 2025": 1,
+   "Fall 2026": 1
+  }
+ }
+}
