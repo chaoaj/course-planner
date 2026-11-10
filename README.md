@@ -2,12 +2,16 @@
 
 A browser-based tool for advising transfer students into the JMU Computer Science B.S. It runs entirely client-side with no build step, in the same style as TurboFAR (plain ES modules, Bootstrap with the JMU theme), with the prerequisite map drawn in **p5.js**.
 
+## Live site
+
+[Course Planner on GitHub Pages](https://chaoaj.github.io/course-planner/)
+
 ## Running it
 
 The app loads its course data with `fetch`, so open it through a local web server rather than as a file:
 
 ```bash
-cd ~/claude/course-planner
+cd ~/Github/course-planner
 python3 -m http.server 8001
 # then open http://localhost:8001
 ```
@@ -16,7 +20,7 @@ All libraries are in `lib/`, so it works offline. It can also be hosted as stati
 
 ## Deploying to GitHub Pages
 
-The app is static files with relative paths, so it works at `https://<user>.github.io/<repo>/` (a project site) or at a custom domain's root.
+The app is static files with relative paths, so it works at its project-site address, https://chaoaj.github.io/course-planner/, or at a custom domain's root.
 
 1. Put the contents of this folder at the root of a repository (or in a `docs/` folder) and push.
 2. In the repository, go to **Settings → Pages → Build and deployment**, choose **Deploy from a branch**, then pick the branch and `/ (root)` (or `/docs`).
