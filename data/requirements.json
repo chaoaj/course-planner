@@ -158,5 +158,14 @@
     "Year 2": "Attend advising events, plan junior and senior electives, set up Handshake, build an online presence, attend the September and February career fairs, and apply for summer internships.",
     "Year 3": "Attend advising events and career fairs, look for leadership roles, volunteer, pursue internships or department research, and plan for the GRE if considering graduate school.",
     "Year 4": "Apply to graduate by mid-October for May graduation, attend the September career fair, build projects, apply for full-time jobs, and use on-campus recruiting."
-  }
+  },
+  "avoidTogether": [
+    {
+      "courses": [
+        "CS 240",
+        "CS 261"
+      ],
+      "reason": "CS 240 and CS 261 are both demanding gateway courses with a C- minimum and a two-attempt limit; taking them in separate terms is recommended."
+    }
+  ]
 }

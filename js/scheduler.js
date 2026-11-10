@@ -381,6 +381,7 @@ export function autoPlan() {
     for (const need of candidates) {
       const credits = need.code ? getCourse(need.code)?.credits ?? 3 : slotInfo(need.slot)?.credits ?? 3;
       if (load + credits > limit) continue;
+      if (need.code && clashesInTerm({ code: need.code }, { items: [...term.items, ...placedNow.filter((other) => other.code).map((other) => ({ code: other.code }))] })) continue;
       if (isMath(need)) {
         if (mathCount >= 1) continue;
         mathCount += 1;
@@ -419,6 +420,16 @@ function isCore(item) {
   if (/^(CS|MATH) /.test(code)) return true;
   const course = getCourse(code);
   return Boolean(course && !course.genEd && (course.prereqs ?? []).length);
+}
+
+// True when another course in the term is one the department advises against taking with this one.
+function clashesInTerm(item, term) {
+  if (!item.code) return false;
+  const code = canonical(item.code);
+  return (catalog.requirements.avoidTogether ?? []).some((rule) => {
+    const pair = rule.courses.map(canonical);
+    return pair.includes(code) && term.items.some((other) => other !== item && other.code && pair.includes(canonical(other.code)) && canonical(other.code) !== code);
+  });
 }
 
 function itemPrereqs(item) {
@@ -500,6 +511,8 @@ export function balancePlan() {
       // elective wait on it.
       const critical = height.get(item.id) >= termsLeft - 1 || /^MATH /.test(item.code ?? '');
       const fitsTarget = coreLoad + item.credits <= target || coreLoad === 0;
+      // Split pairs like CS 240 and CS 261 unless keeping them apart would lengthen the plan.
+      if (clashesInTerm(item, term) && height.get(item.id) < termsLeft - 1) continue;
       if ((fitsTarget || critical) && termLoad(term) + item.credits <= limit) {
         term.items.push(item);
         coreLoad += item.credits;

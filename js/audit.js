@@ -190,6 +190,18 @@ export function checkItem(item, termIndex, ctx) {
       issues.push({ level: 'warning', text: `Credit is not given for both ${code} and ${other}.` });
     }
   }
+  // Course pairs the department advises against taking together (CS 240 and CS 261).
+  if (!taken || item.status === 'in-progress') {
+    for (const rule of catalog.requirements.avoidTogether ?? []) {
+      const pair = rule.courses.map(canonical);
+      if (!pair.includes(code)) continue;
+      const others = ctx.plan.terms[termIndex].items
+        .filter((other) => other !== item && other.code && pair.includes(canonical(other.code)) && canonical(other.code) !== code)
+        .map((other) => canonical(other.code));
+      if (others.length) issues.push({ level: 'warning', text: `Planned in the same term as ${others.join(' and ')}. ${rule.reason}` });
+    }
+  }
+
   // Madison Foundations (C1) belong in the first year at JMU: the first two fall/spring terms from the start term.
   const domainId = course.genEd ?? '';
   if (!taken && domainId.startsWith('C1')) {
