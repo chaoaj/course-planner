@@ -9,7 +9,8 @@ export const catalog = {
   vccs: null,
   samplePlans: null,
   offerings: null,
-  offeringAdvice: null
+  offeringAdvice: null,
+  gened: null
 };
 
 async function loadJson(path) {
@@ -19,13 +20,14 @@ async function loadJson(path) {
 }
 
 export async function loadCatalog() {
-  const [courses, requirements, vccs, samplePlans, offerings, offeringAdvice] = await Promise.all([
+  const [courses, requirements, vccs, samplePlans, offerings, offeringAdvice, gened] = await Promise.all([
     loadJson('./data/courses.json'),
     loadJson('./data/requirements.json'),
     loadJson('./data/vccs.json'),
     loadJson('./data/sample-plans.json'),
     loadJson('./data/offerings.json'),
-    loadJson('./data/offering-advice.json')
+    loadJson('./data/offering-advice.json'),
+    loadJson('./data/gened.json')
   ]);
   for (const course of courses.courses) {
     catalog.courses.set(course.code, course);
@@ -36,6 +38,19 @@ export async function loadCatalog() {
   catalog.samplePlans = samplePlans;
   catalog.offerings = offerings;
   catalog.offeringAdvice = offeringAdvice;
+  catalog.gened = gened;
+  // General Education courses join the course list (unless already there, like MATH 220) so they can be planned,
+  // credited and checked for their lab co-requisites.
+  for (const course of gened.courses) if (!catalog.courses.has(course.code)) catalog.courses.set(course.code, course);
+}
+
+// Every General Education domain, in planner order, with its area: [{ ...domain, area }]
+export function genEdDomains() {
+  return (catalog.gened?.areas ?? []).flatMap((area) => area.domains.map((domain) => ({ ...domain, area })));
+}
+
+export function genEdDomain(id) {
+  return genEdDomains().find((domain) => domain.id === id) ?? null;
 }
 
 // MATH 227 -> CS 227, MATH 452 -> CS 452, and so on.

@@ -1,6 +1,6 @@
 // Sample transfer plans and the auto-planner that fills in what's still needed, term by term, in prerequisite order.
 
-import { catalog, canonical, getCourse, parseTerm, slotInfo, termSortKey } from './catalog.js';
+import { catalog, canonical, getCourse, parseTerm, slotInfo, termSortKey, nextTerm } from './catalog.js';
 import { state, ensureTerm, termSequence, normalizeItem, followingTerm } from './state.js';
 import { auditRequirements, creditedCourses, SLOT_PREREQS } from './audit.js';
 import { reliableSeasons } from './offerings.js';
@@ -57,12 +57,13 @@ export function applySamplePlan(planId) {
     || state.plan.transfer.other.some((row) => canonical(row.code) === canonical(code))
     || state.plan.terms.some((term) => term.items.some((item) => item.code && canonical(item.code) === canonical(code))));
 
-  // A plan that assumes math transfer credit ("grants", e.g. MATH 235 and MATH 220) records it as transfer credit,
-  // unless the student already has that requirement covered by another course (MATH 231, MATH 229, ...).
-  const MATH_GROUPS = [['MATH 235', 'MATH 231', 'MATH 232'], ['MATH 220', 'MATH 229', 'MATH 318']];
+  // The courses a plan assumes the student has credit for ("assumes", e.g. CS 149 and CS 240) and any math it
+  // assumes ("grants", e.g. MATH 235 and MATH 220) are recorded as transfer credit, so prerequisites and requirements
+  // map to them. Skipped when the student already has that course, or an equivalent, as credit or in the plan.
+  const EQUIVALENTS = [['MATH 235', 'MATH 231', 'MATH 232'], ['MATH 220', 'MATH 229', 'MATH 318'], ['CS 149', 'CS 145'], ['CS 227', 'MATH 245']];
   const granted = [];
-  for (const code of sample.grants ?? []) {
-    const group = MATH_GROUPS.find((codes) => codes.includes(code)) ?? [code];
+  for (const code of [...new Set([...(sample.assumes ?? []), ...(sample.grants ?? [])])]) {
+    const group = EQUIVALENTS.find((codes) => codes.includes(code)) ?? [code];
     if (covered(group)) continue;
     state.plan.transfer.other.push({ id: uid('credit'), code, credits: getCourse(code)?.credits ?? 3, grade: '', source: 'Other college', note: `Transfer credit assumed by the sample plan "${sample.title}". Confirm on the transfer evaluation.` });
     granted.push(code);
@@ -82,9 +83,10 @@ export function applySamplePlan(planId) {
   }
   const credited = creditedCourses(state.plan);
   const missing = sample.assumes.filter((code) => !credited.has(canonical(code)));
+  const genEd = fillGenEd();
   const electives = fillUniversityElectives();
-  added += electives.added;
-  return { added, missing, skipped, mathAdded, granted, electives };
+  added += genEd.added + electives.added;
+  return { added, missing, skipped, mathAdded, granted, electives, genEd };
 }
 
 /* ---------- Auto-planner ---------- */
@@ -137,8 +139,9 @@ export function autoPlan() {
   const plan = state.plan;
   const needs = remainingNeeds(plan);
   if (!needs.length) {
+    const genEd = fillGenEd();
     const electives = fillUniversityElectives();
-    return { added: electives.added, unplaced: [], electives };
+    return { added: genEd.added + electives.added, unplaced: [], electives, genEd };
   }
 
   const credited = creditedCourses(plan);
@@ -213,13 +216,73 @@ export function autoPlan() {
   }
   // Drop empty terms the planner created past the last course.
   while (plan.terms.length && !plan.terms[plan.terms.length - 1].items.length) plan.terms.pop();
+  const genEd = fillGenEd();
   const electives = fillUniversityElectives();
-  return { added: added + electives.added, unplaced: pending.map((need) => need.code ?? slotInfo(need.slot)?.label ?? need.slot), electives };
+  return { added: added + genEd.added + electives.added, unplaced: pending.map((need) => need.code ?? slotInfo(need.slot)?.label ?? need.slot), electives, genEd };
+}
+
+/* ---------- General Education ---------- */
+
+// Without an associate degree, adds a placeholder for each General Education domain still needed. Madison
+// Foundations go in the first year (the first two fall/spring terms); the rest go in the lightest terms.
+export function fillGenEd() {
+  const plan = state.plan;
+  if (plan.transfer.associateDegree) return { added: 0, newTerms: [] };
+  const result = auditRequirements(plan).groups.find((entry) => entry.group.type === 'gened');
+  let added = 0;
+  const newTerms = [];
+  for (const domain of result?.missingDomains ?? []) {
+    const lab = domain.id === 'C3L';
+    const item = normalizeItem({ slot: 'gened', domain: domain.id, label: `Gen Ed: ${domain.label}${lab ? ' if needed' : ''} (${domain.id})`, credits: domain.credits ?? 3 });
+    // The lab goes with its science course: same term as the Physical Principles (or Natural Systems) placeholder.
+    if (lab) {
+      const science = plan.terms.find((term) => term.items.some((entry) => ['C3PP', 'C3NS'].includes(entry.domain) || ['C3PP', 'C3NS'].includes(getCourse(entry.code)?.genEd)));
+      if (science) { science.items.push(item); added += 1; continue; }
+    }
+    const placed = placeSlot(item, { firstYearOnly: domain.id.startsWith('C1') });
+    if (placed.newTerm) newTerms.push(placed.newTerm);
+    added += 1;
+  }
+  return { added, newTerms };
 }
 
 /* ---------- University electives ---------- */
 
 export const MAX_COURSES_PER_TERM = 5;
+
+function usableTerms() {
+  const plan = state.plan;
+  const start = termSortKey(plan.student.startTerm);
+  return plan.terms.filter((term) => {
+    const season = parseTerm(term.name)?.season;
+    return (season !== 'Summer' || plan.settings.includeSummer) && termSortKey(term.name) >= start;
+  });
+}
+
+// Puts a placeholder in the lightest usable term with room (at most 5 courses), or in a new term at the end.
+// firstYearOnly limits it to the first two fall/spring terms, allowing a sixth course there if both are full.
+function placeSlot(item, { firstYearOnly = false } = {}) {
+  const plan = state.plan;
+  let candidates = usableTerms();
+  if (firstYearOnly) {
+    const firstYear = candidates.filter((term) => parseTerm(term.name)?.season !== 'Summer').slice(0, 2);
+    while (firstYear.length < 2) {
+      const name = firstYear.length ? nextTerm(firstYear[firstYear.length - 1].name, false) : plan.student.startTerm;
+      firstYear.push(ensureTerm(name));
+    }
+    const open = firstYear.filter((term) => term.items.length < MAX_COURSES_PER_TERM);
+    const target = (open.length ? open : firstYear).sort((a, b) => termLoad(a) - termLoad(b) || termSortKey(a.name) - termSortKey(b.name))[0];
+    target.items.push(item);
+    return { term: target.name };
+  }
+  const open = candidates
+    .filter((term) => term.items.length < MAX_COURSES_PER_TERM)
+    .sort((a, b) => termLoad(a) - termLoad(b) || termSortKey(a.name) - termSortKey(b.name));
+  if (open[0]) { open[0].items.push(item); return { term: open[0].name }; }
+  const term = ensureTerm(followingTerm());
+  term.items.push(item);
+  return { term: term.name, newTerm: term.name };
+}
 
 // Adds "University Elective" placeholders until the university-elective requirement is covered, each in the
 // lightest fall or spring term that has room (at most 5 courses), adding a term at the end only when none has room.
@@ -230,20 +293,9 @@ export function fillUniversityElectives() {
   const info = slotInfo('elective');
   let added = 0;
   const newTerms = [];
-  const usable = (term) => {
-    const season = parseTerm(term.name)?.season;
-    return (season !== 'Summer' || plan.settings.includeSummer) && termSortKey(term.name) >= termSortKey(plan.student.startTerm);
-  };
   while (remaining > 0) {
-    const open = plan.terms
-      .filter((term) => usable(term) && term.items.length < MAX_COURSES_PER_TERM)
-      .sort((a, b) => termLoad(a) - termLoad(b) || termSortKey(a.name) - termSortKey(b.name));
-    let term = open[0];
-    if (!term) {
-      term = ensureTerm(followingTerm());
-      newTerms.push(term.name);
-    }
-    term.items.push(normalizeItem({ slot: 'elective', label: info?.label ?? 'University Elective', credits: info?.credits ?? 3 }));
+    const placed = placeSlot(normalizeItem({ slot: 'elective', label: info?.label ?? 'University Elective', credits: info?.credits ?? 3 }));
+    if (placed.newTerm) newTerms.push(placed.newTerm);
     added += 1;
     remaining -= 1;
   }

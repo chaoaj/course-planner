@@ -1,6 +1,6 @@
 // Plan tab: one card per term with its courses, their prerequisite checks, and controls to move, change or remove them.
 
-import { catalog, canonical, getCourse, gradeBand, slotInfo, parseTerm } from '../catalog.js';
+import { catalog, canonical, getCourse, gradeBand, slotInfo, parseTerm, genEdDomain, genEdDomains } from '../catalog.js';
 import { state, commit, ensureTerm, followingTerm, normalizeItem } from '../state.js';
 import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal } from '../audit.js';
 import { gradeMeets } from '../util.js';
@@ -13,7 +13,11 @@ const ISSUE_ICONS = { error: '!', warning: '?', info: 'i' };
 const ISSUE_WORDS = { error: 'Problem', warning: 'Check', info: 'Note' };
 
 // Choices offered for a placeholder slot.
-function slotChoices(slot) {
+function slotChoices(slot, item = {}) {
+  if (slot === 'gened') {
+    const domains = item.domain ? [genEdDomain(item.domain)].filter(Boolean) : genEdDomains();
+    return domains.flatMap((domain) => domain.options);
+  }
   const group = catalog.requirements.groups.find((item) => item.id === slotInfo(slot)?.group);
   if (group?.type === 'oneOf') return group.options.flat().filter((code) => !code.startsWith('MATH'));
   if (slot === 'cselective') {
@@ -23,6 +27,13 @@ function slotChoices(slot) {
       .map((course) => course.code);
   }
   return [];
+}
+
+// General Education choices: the placeholder's own domain, or every domain grouped by domain for a generic one.
+function genEdChoiceGroups(item) {
+  const domains = item.domain ? [genEdDomain(item.domain)].filter(Boolean) : genEdDomains();
+  const option = (code) => `<option value="${code}">${code} ${escapeHtml(getCourse(code)?.title ?? '')}</option>`;
+  return domains.map((domain) => `<optgroup label="${escapeHtml(`${domain.id} ${domain.label}`)}">${domain.options.map(option).join('')}</optgroup>`).join('');
 }
 
 // Options split by whether they usually run in this term's season, each labeled with its offering pattern.
@@ -63,12 +74,12 @@ function renderItem(item, term, termIndex, issues) {
 
   let slotPicker = '';
   if (!item.code && item.slot) {
-    const choices = slotChoices(item.slot);
+    const choices = slotChoices(item.slot, item);
     if (choices.length) {
       slotPicker = `<label class="visually-hidden" for="${item.id}-choose">Choose a course for ${escapeHtml(label)}</label>
         <select class="form-select form-select-sm" id="${item.id}-choose" data-item="${item.id}" data-action="choose">
           <option value="">Choose course…</option>
-          ${choiceGroups(choices, term.name)}
+          ${item.slot === 'gened' ? genEdChoiceGroups(item) : choiceGroups(choices, term.name)}
         </select>`;
     }
   }
@@ -300,8 +311,8 @@ export function bindPlan(refresh) {
     const result = applySamplePlan(id);
     commit({ render: false });
     refresh('all');
-    const warning = result.missing.length ? ` This plan assumes credit for ${result.missing.join(' and ')}, which the student doesn't have yet.` : '';
-    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.granted?.length ? ` Recorded ${result.granted.join(' and ')} as transfer credit; confirm on the transfer evaluation.` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.electives?.added ? ` Added ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}${result.electives.newTerms.length ? ` (and ${result.electives.newTerms.join(', ')} to fit them)` : ''}.` : ''}${warning}`, warning ? 'warning' : 'success');
+    const warning = result.missing.length ? ` This plan assumes credit for ${result.missing.join(' and ')}, which is already in the plan as a course to take.` : '';
+    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.granted?.length ? ` Recorded ${result.granted.join(', ')} as transfer credit, as the plan assumes; confirm on the transfer evaluation.` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.genEd?.added ? ` Added ${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'} (no associate degree).` : ''}${result.electives?.added ? ` Added ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}${result.electives.newTerms.length ? ` (and ${result.electives.newTerms.join(', ')} to fit them)` : ''}.` : ''}${warning}`, warning ? 'warning' : 'success');
   });
 
   document.getElementById('btn-autoplan').addEventListener('click', () => {
@@ -310,7 +321,7 @@ export function bindPlan(refresh) {
     commit({ render: false });
     refresh('all');
     if (!result.added) showStatus('Nothing to add: every requirement, including university electives, already has a course in the plan or credit.', 'info');
-    else showStatus(`Auto-plan added ${result.added} course${result.added === 1 ? '' : 's'}${result.electives?.added ? `, including ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}` : ''}.${result.unplaced.length ? ` Couldn't place: ${result.unplaced.join(', ')}.` : ''} General Education is not added automatically.`, result.unplaced.length ? 'warning' : 'success');
+    else showStatus(`Auto-plan added ${result.added} course${result.added === 1 ? '' : 's'}${result.genEd?.added || result.electives?.added ? `, including ${[result.genEd?.added ? `${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'}` : '', result.electives?.added ? `${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}` : ''].filter(Boolean).join(' and ')}` : ''}.${result.unplaced.length ? ` Couldn't place: ${result.unplaced.join(', ')}.` : ''}${state.plan.transfer.associateDegree ? ' General Education is met by the associate degree.' : ''}`, result.unplaced.length ? 'warning' : 'success');
   });
 
   document.getElementById('btn-add-term').addEventListener('click', () => {

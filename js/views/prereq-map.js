@@ -59,7 +59,7 @@ function courseStatuses() {
 function buildGraph() {
   const statuses = courseStatuses();
   const codes = new Set(BASE_COURSES.map(canonical));
-  for (const code of statuses.keys()) if (getCourse(code) && !getCourse(code).transferOnly) codes.add(code);
+  for (const code of statuses.keys()) if (getCourse(code) && !getCourse(code).transferOnly && !(getCourse(code).genEd && !/^MATH/.test(code))) codes.add(code);
   if (map.showAll) for (const course of catalog.courses.values()) if (isCsCourse(course.code) && Number(course.code.slice(3, 6)) >= 300) codes.add(course.code);
   // Calculus alternatives make MATH 232 a separate node only when it's in play.
   const nodes = [...codes].filter((code) => getCourse(code)).map((code) => {

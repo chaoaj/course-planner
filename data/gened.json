@@ -1,0 +1,996 @@
+{
+  "program": "General Education: The Human Community",
+  "catalogYear": "2026-2027",
+  "totalCredits": 41,
+  "source": "https://www.jmu.edu/gened/_files/general-education-planner-2026-2027.pdf (revised 4/4/2025)",
+  "notes": [
+    "A completed associate degree satisfies JMU General Education; check the associate degree box on the Student tab.",
+    "Course credits here are estimates (3 for most courses, 1 for separate labs, 4 for courses with an embedded lab); edit them on the plan if they differ.",
+    "General Education courses can overlap with major courses: MATH 220 or MATH 235 for the major also meets Quantitative Reasoning.",
+    "Titles not given on the planner are shown by domain; check course details in the catalog."
+  ],
+  "areas": [
+    {
+      "id": "foundations",
+      "label": "Madison Foundations",
+      "note": "Must be completed before the end of the student's first year at JMU.",
+      "domains": [
+        {
+          "id": "C1CT",
+          "label": "Critical Thinking",
+          "options": [
+            "BUS 160",
+            "EDUC 102",
+            "HIST 150",
+            "ISAT 160",
+            "PHIL 120",
+            "PHIL 150",
+            "SMAD 150"
+          ],
+          "note": "Juniors and seniors who still need C1CT take an integrative course (UNST 300 and others).",
+          "credits": 3
+        },
+        {
+          "id": "C1HC",
+          "label": "Human Communication",
+          "options": [
+            "SCOM 121",
+            "SCOM 122",
+            "SCOM 123"
+          ],
+          "credits": 3
+        },
+        {
+          "id": "C1W",
+          "label": "Writing",
+          "options": [
+            "WRTC 103"
+          ],
+          "credits": 3
+        }
+      ]
+    },
+    {
+      "id": "arts",
+      "label": "Arts and Humanities",
+      "domains": [
+        {
+          "id": "C2HQC",
+          "label": "Human Questions and Contexts",
+          "options": [
+            "AMST 200",
+            "ANTH 205",
+            "HIST 101",
+            "HIST 102",
+            "HUM 250",
+            "HUM 251",
+            "HUM 252",
+            "LAXC 252",
+            "PHIL 101",
+            "REL 101",
+            "REL 102"
+          ],
+          "credits": 3
+        },
+        {
+          "id": "C2VPA",
+          "label": "Visual and Performing Arts",
+          "options": [
+            "ART 200",
+            "ARTH 204",
+            "ARTH 205",
+            "ARTH 206",
+            "DANC 215",
+            "MUS 200",
+            "MUS 203",
+            "MUS 206",
+            "THEA 210"
+          ],
+          "credits": 3
+        },
+        {
+          "id": "C2L",
+          "label": "Literature",
+          "options": [
+            "ENG 221",
+            "ENG 222",
+            "ENG 235",
+            "ENG 236",
+            "ENG 239",
+            "ENG 247",
+            "ENG 248",
+            "ENG 260",
+            "HUM 200"
+          ],
+          "credits": 3
+        }
+      ]
+    },
+    {
+      "id": "natural",
+      "label": "The Natural World",
+      "note": "Some Physical Principles and Natural Systems courses include a lab, which also meets Lab Experience; others need a lab taken with them.",
+      "domains": [
+        {
+          "id": "C3QR",
+          "label": "Quantitative Reasoning",
+          "options": [
+            "ISAT 151",
+            "ISAT 251",
+            "MATH 103",
+            "MATH 105",
+            "MATH 110",
+            "MATH 205",
+            "MATH 220",
+            "MATH 229",
+            "MATH 231",
+            "MATH 235"
+          ],
+          "note": "Met by the major's calculus or statistics (MATH 220, 229, 231 or 235).",
+          "credits": 3
+        },
+        {
+          "id": "C3PP",
+          "label": "Physical Principles",
+          "options": [
+            "ASTR 120",
+            "ASTR 121",
+            "CHEM 120",
+            "CHEM 131",
+            "ENVT 101",
+            "ISAT 100",
+            "ISAT 112",
+            "ISCI 101",
+            "ISCI 172",
+            "PHYS 121",
+            "PHYS 125",
+            "PHYS 140",
+            "PHYS 215",
+            "PHYS 240"
+          ],
+          "credits": 3
+        },
+        {
+          "id": "C3NS",
+          "label": "Natural Systems",
+          "options": [
+            "ANTH 196",
+            "BIO 103",
+            "BIO 140",
+            "BIO 270",
+            "GEOL 102",
+            "GEOL 110",
+            "GEOL 115",
+            "GEOL 210",
+            "GEOL 211",
+            "ISAT 113",
+            "ISCI 171"
+          ],
+          "credits": 3
+        },
+        {
+          "id": "C3L",
+          "label": "Lab Experience",
+          "credits": 1,
+          "options": [
+            "ANTH 196L",
+            "BIO 140L",
+            "BIO 270L",
+            "CHEM 131L",
+            "GEOL 110L",
+            "GEOL 115L",
+            "ISAT 113L",
+            "ISCI 104",
+            "ISCI 173",
+            "PHYS 125L",
+            "PHYS 140L",
+            "PHYS 240L"
+          ],
+          "metBy": [
+            "ISAT 112",
+            "PHYS 121"
+          ],
+          "note": "Not needed when the Physical Principles or Natural Systems course includes its lab (ISAT 112, PHYS 121)."
+        }
+      ]
+    },
+    {
+      "id": "american",
+      "label": "American and Global Perspectives",
+      "note": "POSC 200 and POSC 225 can't both be used in this area.",
+      "domains": [
+        {
+          "id": "C4AE",
+          "label": "The American Experience",
+          "options": [
+            "HIST 225",
+            "JUST 225",
+            "POSC 225"
+          ],
+          "credits": 3
+        },
+        {
+          "id": "C4GE",
+          "label": "The Global Experience",
+          "options": [
+            "AAAD 200",
+            "ANTH 195",
+            "ECON 200",
+            "GEOG 200",
+            "POSC 200",
+            "SOCI 110"
+          ],
+          "credits": 3
+        }
+      ]
+    },
+    {
+      "id": "wellness",
+      "label": "Sociocultural and Wellness",
+      "domains": [
+        {
+          "id": "C5WD",
+          "label": "Wellness",
+          "options": [
+            "HTH 100",
+            "KIN 100"
+          ],
+          "credits": 3
+        },
+        {
+          "id": "C5SD",
+          "label": "Sociocultural",
+          "options": [
+            "PSYC 101",
+            "PSYC 160",
+            "SOCI 140",
+            "WGSS 200",
+            "EDUC 175"
+          ],
+          "credits": 3
+        }
+      ]
+    }
+  ],
+  "courses": [
+    {
+      "code": "BUS 160",
+      "title": "Applied Critical Thinking in Business",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1CT"
+    },
+    {
+      "code": "EDUC 102",
+      "title": "Critical Questions in Education",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1CT"
+    },
+    {
+      "code": "HIST 150",
+      "title": "Critical Issues in Recent Global History",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1CT"
+    },
+    {
+      "code": "ISAT 160",
+      "title": "Problem Solving Approaches in Science and Technology",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1CT"
+    },
+    {
+      "code": "PHIL 120",
+      "title": "Critical Thinking",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1CT"
+    },
+    {
+      "code": "PHIL 150",
+      "title": "Ethical Reasoning",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1CT"
+    },
+    {
+      "code": "SMAD 150",
+      "title": "Mediated Communication: Issues and Skills",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1CT"
+    },
+    {
+      "code": "SCOM 121",
+      "title": "Fundamental Human Communication: Presentations",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1HC"
+    },
+    {
+      "code": "SCOM 122",
+      "title": "Fundamental Human Communication: Individual Presentations",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1HC"
+    },
+    {
+      "code": "SCOM 123",
+      "title": "Fundamental Human Communication: Group Presentations",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1HC"
+    },
+    {
+      "code": "WRTC 103",
+      "title": "Rhetorical Reading and Writing",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C1W"
+    },
+    {
+      "code": "AMST 200",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "ANTH 205",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "HIST 101",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "HIST 102",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "HUM 250",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "HUM 251",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "HUM 252",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "LAXC 252",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "PHIL 101",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "REL 101",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "REL 102",
+      "title": "General Education: Human Questions and Contexts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2HQC"
+    },
+    {
+      "code": "ART 200",
+      "title": "General Education: Visual and Performing Arts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2VPA"
+    },
+    {
+      "code": "ARTH 204",
+      "title": "General Education: Visual and Performing Arts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2VPA"
+    },
+    {
+      "code": "ARTH 205",
+      "title": "General Education: Visual and Performing Arts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2VPA"
+    },
+    {
+      "code": "ARTH 206",
+      "title": "General Education: Visual and Performing Arts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2VPA"
+    },
+    {
+      "code": "DANC 215",
+      "title": "General Education: Visual and Performing Arts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2VPA"
+    },
+    {
+      "code": "MUS 200",
+      "title": "General Education: Visual and Performing Arts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2VPA"
+    },
+    {
+      "code": "MUS 203",
+      "title": "General Education: Visual and Performing Arts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2VPA"
+    },
+    {
+      "code": "MUS 206",
+      "title": "General Education: Visual and Performing Arts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2VPA"
+    },
+    {
+      "code": "THEA 210",
+      "title": "General Education: Visual and Performing Arts",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2VPA"
+    },
+    {
+      "code": "ENG 221",
+      "title": "General Education: Literature",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2L"
+    },
+    {
+      "code": "ENG 222",
+      "title": "General Education: Literature",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2L"
+    },
+    {
+      "code": "ENG 235",
+      "title": "General Education: Literature",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2L"
+    },
+    {
+      "code": "ENG 236",
+      "title": "General Education: Literature",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2L"
+    },
+    {
+      "code": "ENG 239",
+      "title": "General Education: Literature",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2L"
+    },
+    {
+      "code": "ENG 247",
+      "title": "General Education: Literature",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2L"
+    },
+    {
+      "code": "ENG 248",
+      "title": "General Education: Literature",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2L"
+    },
+    {
+      "code": "ENG 260",
+      "title": "General Education: Literature",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2L"
+    },
+    {
+      "code": "HUM 200",
+      "title": "General Education: Literature",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C2L"
+    },
+    {
+      "code": "ISAT 151",
+      "title": "General Education: Quantitative Reasoning",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3QR"
+    },
+    {
+      "code": "ISAT 251",
+      "title": "General Education: Quantitative Reasoning",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3QR"
+    },
+    {
+      "code": "MATH 103",
+      "title": "General Education: Quantitative Reasoning",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3QR"
+    },
+    {
+      "code": "MATH 105",
+      "title": "General Education: Quantitative Reasoning",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3QR"
+    },
+    {
+      "code": "MATH 110",
+      "title": "General Education: Quantitative Reasoning",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3QR"
+    },
+    {
+      "code": "ASTR 120",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP"
+    },
+    {
+      "code": "ASTR 121",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP"
+    },
+    {
+      "code": "CHEM 120",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP"
+    },
+    {
+      "code": "CHEM 131",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP",
+      "coreqs": [
+        [
+          "CHEM 131L"
+        ]
+      ],
+      "prereqText": "Take with CHEM 131L"
+    },
+    {
+      "code": "ENVT 101",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP"
+    },
+    {
+      "code": "ISAT 100",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP"
+    },
+    {
+      "code": "ISAT 112",
+      "title": "General Education: Physical Principles",
+      "credits": 4,
+      "prereqs": [],
+      "genEd": "C3PP",
+      "prereqText": "Includes its lab (also meets Lab Experience)"
+    },
+    {
+      "code": "ISCI 101",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP"
+    },
+    {
+      "code": "ISCI 172",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP",
+      "prereqText": "Interdisciplinary Liberal Studies and some College of Education majors only"
+    },
+    {
+      "code": "PHYS 121",
+      "title": "General Education: Physical Principles",
+      "credits": 4,
+      "prereqs": [],
+      "genEd": "C3PP",
+      "prereqText": "Includes its lab (also meets Lab Experience)"
+    },
+    {
+      "code": "PHYS 125",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP"
+    },
+    {
+      "code": "PHYS 140",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP",
+      "coreqs": [
+        [
+          "PHYS 140L"
+        ]
+      ],
+      "prereqText": "Take with PHYS 140L"
+    },
+    {
+      "code": "PHYS 215",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP"
+    },
+    {
+      "code": "PHYS 240",
+      "title": "General Education: Physical Principles",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3PP",
+      "coreqs": [
+        [
+          "PHYS 240L"
+        ]
+      ],
+      "prereqText": "Take with PHYS 240L"
+    },
+    {
+      "code": "ANTH 196",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS"
+    },
+    {
+      "code": "BIO 103",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS"
+    },
+    {
+      "code": "BIO 140",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS",
+      "coreqs": [
+        [
+          "BIO 140L"
+        ]
+      ],
+      "prereqText": "Take with BIO 140L"
+    },
+    {
+      "code": "BIO 270",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS",
+      "coreqs": [
+        [
+          "BIO 270L"
+        ]
+      ],
+      "prereqText": "Take with BIO 270L"
+    },
+    {
+      "code": "GEOL 102",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS"
+    },
+    {
+      "code": "GEOL 110",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS",
+      "coreqs": [
+        [
+          "GEOL 110L"
+        ]
+      ],
+      "prereqText": "Take with GEOL 110L"
+    },
+    {
+      "code": "GEOL 115",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS",
+      "coreqs": [
+        [
+          "GEOL 115L"
+        ]
+      ],
+      "prereqText": "Take with GEOL 115L"
+    },
+    {
+      "code": "GEOL 210",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS"
+    },
+    {
+      "code": "GEOL 211",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS"
+    },
+    {
+      "code": "ISAT 113",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS",
+      "coreqs": [
+        [
+          "ISAT 113L"
+        ]
+      ],
+      "prereqText": "Take with ISAT 113L"
+    },
+    {
+      "code": "ISCI 171",
+      "title": "General Education: Natural Systems",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C3NS",
+      "prereqText": "Interdisciplinary Liberal Studies and some College of Education majors only"
+    },
+    {
+      "code": "ANTH 196L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "BIO 140L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "BIO 270L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "CHEM 131L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "GEOL 110L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "GEOL 115L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "ISAT 113L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "ISCI 104",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "ISCI 173",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L",
+      "prereqText": "Interdisciplinary Liberal Studies and some College of Education majors only"
+    },
+    {
+      "code": "PHYS 125L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "PHYS 140L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "PHYS 240L",
+      "title": "General Education: Lab Experience",
+      "credits": 1,
+      "prereqs": [],
+      "genEd": "C3L"
+    },
+    {
+      "code": "HIST 225",
+      "title": "U.S. History",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C4AE"
+    },
+    {
+      "code": "JUST 225",
+      "title": "Justice and American Society",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C4AE"
+    },
+    {
+      "code": "POSC 225",
+      "title": "U.S. Government",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C4AE"
+    },
+    {
+      "code": "AAAD 200",
+      "title": "General Education: The Global Experience",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C4GE"
+    },
+    {
+      "code": "ANTH 195",
+      "title": "General Education: The Global Experience",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C4GE"
+    },
+    {
+      "code": "ECON 200",
+      "title": "General Education: The Global Experience",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C4GE"
+    },
+    {
+      "code": "GEOG 200",
+      "title": "General Education: The Global Experience",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C4GE"
+    },
+    {
+      "code": "POSC 200",
+      "title": "General Education: The Global Experience",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C4GE"
+    },
+    {
+      "code": "SOCI 110",
+      "title": "General Education: The Global Experience",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C4GE"
+    },
+    {
+      "code": "HTH 100",
+      "title": "Personal Wellness",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C5WD"
+    },
+    {
+      "code": "KIN 100",
+      "title": "Lifetime Fitness and Wellness",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C5WD"
+    },
+    {
+      "code": "PSYC 101",
+      "title": "General Psychology",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C5SD"
+    },
+    {
+      "code": "PSYC 160",
+      "title": "Life Span Human Development",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C5SD"
+    },
+    {
+      "code": "SOCI 140",
+      "title": "Microsociology: The Individual in Society",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C5SD"
+    },
+    {
+      "code": "WGSS 200",
+      "title": "Introduction to Women's, Gender, and Sexuality Studies",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C5SD"
+    },
+    {
+      "code": "EDUC 175",
+      "title": "Learning, Behavior and Engagement in Context",
+      "credits": 3,
+      "prereqs": [],
+      "genEd": "C5SD"
+    }
+  ]
+}

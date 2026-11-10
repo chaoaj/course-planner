@@ -1,6 +1,6 @@
 // Prerequisite checks for every planned course, and the degree-requirement audit.
 
-import { catalog, canonical, getCourse, courseLevel, isCsCourse, parseTerm, slotInfo } from './catalog.js';
+import { catalog, canonical, getCourse, courseLevel, isCsCourse, parseTerm, slotInfo, genEdDomains, genEdDomain, termSortKey } from './catalog.js';
 import { gradeMeets } from './util.js';
 import { seasonIssue, isSemesterLocked, reliableSeasons } from './offerings.js';
 
@@ -98,6 +98,13 @@ function describeGroup(group) {
   return group.map((code) => (code === 'PLACEMENT' ? 'math placement' : code)).join(' or ');
 }
 
+// Fall/spring terms at JMU (from the start term) before this one.
+function firstYearTermsBefore(plan, termIndex) {
+  const start = termSortKey(plan.student.startTerm);
+  return plan.terms.slice(0, termIndex)
+    .filter((term) => termSortKey(term.name) >= start && parseTerm(term.name)?.season !== 'Summer').length;
+}
+
 // Issues for one planned item: [{level: 'error'|'warning'|'info', text}]
 export function checkItem(item, termIndex, ctx) {
   const issues = [];
@@ -111,6 +118,9 @@ export function checkItem(item, termIndex, ctx) {
       }
     }
     if (['algorithms', 'systems', 'cselective'].includes(item.slot)) issues.push({ level: 'info', text: 'Choose a specific course when the schedule is known.' });
+    if (item.slot === 'gened' && item.domain.startsWith('C1') && firstYearTermsBefore(ctx.plan, termIndex) >= 2) {
+      issues.push({ level: 'warning', text: 'Madison Foundations must be finished by the end of the first year at JMU; move this to the first year.' });
+    }
     return issues;
   }
   if (!item.code) return issues;
@@ -175,6 +185,12 @@ export function checkItem(item, termIndex, ctx) {
       issues.push({ level: 'warning', text: `Credit is not given for both ${code} and ${other}.` });
     }
   }
+  // Madison Foundations (C1) belong in the first year at JMU: the first two fall/spring terms from the start term.
+  const domainId = course.genEd ?? '';
+  if (!taken && domainId.startsWith('C1')) {
+    if (firstYearTermsBefore(ctx.plan, termIndex) >= 2) issues.push({ level: 'warning', text: 'Madison Foundations must be finished by the end of the first year at JMU; move this to the first year.' });
+  }
+
   if (item.status === 'completed' && item.grade && course.majorMinGrade && !gradeMeets(item.grade, course.majorMinGrade)) {
     issues.push({ level: 'error', text: `Grade ${item.grade} is below the ${course.majorMinGrade} the major requires.` });
   }
@@ -249,6 +265,8 @@ export function auditRequirements(plan) {
       results.push({ group, status, courses });
     } else if (group.type === 'electives') {
       results.push(auditElectives(group, plan, ctx, used));
+    } else if (group.type === 'gened') {
+      results.push(auditGenEd(group, plan, ctx, used));
     } else if (group.type === 'jmuElectives') {
       results.push(auditJmuElectives(group, plan, used));
     }
@@ -303,6 +321,84 @@ function auditElectives(group, plan, ctx, used) {
     courses,
     detail: `${allCredits} of ${group.credits} credits planned or earned (${metCredits} earned); ${above} course${above === 1 ? '' : 's'} above CS ${group.aboveLevel}${unknownSlots ? ` plus ${unknownSlots} elective slot${unknownSlots === 1 ? '' : 's'} still to choose` : ''}.`
   };
+}
+
+// General Education by domain. Each domain is met by a credited or planned course from its list (the major's math
+// counts for Quantitative Reasoning), then by a placeholder for that domain, then by a generic Gen Ed placeholder.
+// A completed associate degree satisfies all of it.
+function auditGenEd(group, plan, ctx, used) {
+  if (plan.transfer.associateDegree) {
+    return { group, status: 'met', courses: [{ code: 'Associate degree', status: 'met', where: 'satisfies General Education' }], missingDomains: [], detail: 'Satisfied by the associate degree.' };
+  }
+  const domains = genEdDomains();
+  const takenCodes = new Set();
+  const statusOfItem = (item) => (item.status === 'completed' ? 'met' : item.status === 'in-progress' ? 'inprogress' : 'planned');
+  const findCourse = (codes) => {
+    // Credit first, then the best-progressed planned course.
+    for (const code of codes) {
+      const canon = canonical(code);
+      if (ctx.credited.has(canon) && !takenCodes.has(canon)) return { code: canon, status: 'met', where: ctx.credited.get(canon).via };
+    }
+    let best = null;
+    plan.terms.forEach((term) => term.items.forEach((item) => {
+      if (!item.code) return;
+      const canon = canonical(item.code);
+      if (!codes.map(canonical).includes(canon) || takenCodes.has(canon)) return;
+      const status = statusOfItem(item);
+      if (!best || STATUS_RANK[status] > STATUS_RANK[best.status]) best = { code: canon, status, where: term.name };
+    }));
+    return best;
+  };
+  const results = [];
+  const unplaced = [];
+  for (const domain of domains) {
+    let found = findCourse(domain.options);
+    // Lab Experience is also met by a lecture course that includes its lab.
+    if (!found && domain.metBy) {
+      const embedded = findCourse(domain.metBy);
+      if (embedded) found = { ...embedded, shared: true };
+    }
+    if (found) {
+      if (!found.shared && !/^MATH/.test(found.code)) takenCodes.add(found.code);
+      used.add(found.code);
+      results.push({ domain, ...found });
+      continue;
+    }
+    const placeholder = slotItemsFor(plan, (item) => item.slot === 'gened' && item.domain === domain.id)[0];
+    if (placeholder) results.push({ domain, code: `${domain.label} placeholder`, status: 'planned', where: placeholder.term, placeholder: true });
+    else unplaced.push(domain);
+  }
+  // Generic "General Education" placeholders cover the remaining domains in order.
+  const generic = slotItemsFor(plan, (item) => item.slot === 'gened' && !item.domain);
+  const missingDomains = [];
+  for (const domain of unplaced) {
+    const slot = generic.shift();
+    if (slot) results.push({ domain, code: 'General Education placeholder', status: 'planned', where: slot.term, placeholder: true });
+    else { results.push({ domain, code: '', status: 'missing', where: '' }); missingDomains.push(domain); }
+  }
+  results.sort((a, b) => domains.indexOf(a.domain) - domains.indexOf(b.domain));
+  const worst = Math.min(...results.map((result) => STATUS_RANK[result.status]));
+  const met = results.filter((result) => result.status === 'met').length;
+  const covered = results.filter((result) => result.status !== 'missing').length;
+  return {
+    group,
+    status: Object.keys(STATUS_RANK).find((key) => STATUS_RANK[key] === worst),
+    courses: results.map((result) => ({
+      code: `${result.domain.id} ${result.domain.label}: ${result.code || 'not yet planned'}`,
+      status: result.status,
+      where: result.where,
+      placeholder: result.placeholder
+    })),
+    domains: results,
+    missingDomains,
+    detail: `${met} of ${results.length} domains met, ${covered} covered by credit or the plan.${missingDomains.length ? ` Still needed: ${missingDomains.map((domain) => domain.label).join(', ')}.` : ''}`
+  };
+}
+
+function slotItemsFor(plan, test) {
+  const found = [];
+  plan.terms.forEach((term) => term.items.forEach((item) => { if (!item.code && test(item)) found.push({ term: term.name, item }); }));
+  return found;
 }
 
 // University electives: courses in the JMU plan (not transfer credit) that no other requirement uses. Elective and

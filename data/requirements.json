@@ -132,6 +132,12 @@
       "note": "9 credits of CS at the 300 level or above, with at least two courses above CS 332. Courses used for another requirement don't count twice."
     },
     {
+      "id": "gened",
+      "label": "General Education",
+      "type": "gened",
+      "note": "The Human Community (41 credits): 14 domains in five areas. Satisfied by a completed associate degree. Madison Foundations (C1) must be finished by the end of the first year at JMU."
+    },
+    {
       "id": "univelectives",
       "label": "University electives",
       "type": "jmuElectives",

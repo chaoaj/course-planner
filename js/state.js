@@ -114,6 +114,7 @@ export function normalizeItem(item) {
     id: item.id || uid('item'),
     code: item.code ? String(item.code).trim() : '',
     slot: item.slot || '',
+    domain: item.domain || '',
     label: item.label ?? '',
     credits: Number(item.credits ?? 3) || 0,
     status: ['planned', 'in-progress', 'completed'].includes(item.status) ? item.status : 'planned',
