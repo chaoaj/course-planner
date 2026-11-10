@@ -1,0 +1,6 @@
+# Student records are private (FERPA). Keep saved plans and exports out of the repository;
+# only the fictional files in sample/ are committed.
+*_course-plan.json
+*_course-plan.xlsx
+*_course-plan.pdf
+.DS_Store
