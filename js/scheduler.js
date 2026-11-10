@@ -18,6 +18,8 @@ export function recommendSamplePlan(plan) {
   const credited = creditedCourses(plan);
   const has = (code) => credited.has(canonical(code));
   if (has('CS 149') && has('CS 240')) return '149-240';
+  if (has('CS 149') && has('CS 159') && has('CS 227')) return '149-159-227';
+  if (has('CS 149') && has('CS 159')) return '149-159';
   if (has('CS 149')) return '149-4';
   return 'none-5';
 }
@@ -26,19 +28,37 @@ export function recommendSamplePlan(plan) {
 export function applySamplePlan(planId) {
   const sample = catalog.samplePlans.plans.find((plan) => plan.id === planId);
   if (!sample) return { added: 0, missing: [] };
-  const names = termSequence(sample.terms.length);
   const creditedBefore = creditedCourses(state.plan);
   const skipped = [];
+  // Courses the student already has credit for (for example CS 159 from ITP 220) are left out, and a sample term
+  // left empty by that is dropped so the rest of the plan moves up a term. Order is kept, so prerequisites still hold.
+  const sampleTerms = sample.terms
+    .map((entries) => entries.filter((entry) => {
+      if (typeof entry === 'string' && creditedBefore.has(canonical(entry))) { skipped.push(entry); return false; }
+      return true;
+    }))
+    .filter((entries) => entries.length);
+  const names = termSequence(Math.max(1, sampleTerms.length));
   let added = 0;
-  sample.terms.forEach((entries, index) => {
+  sampleTerms.forEach((entries, index) => {
     const term = ensureTerm(names[index]);
     for (const entry of entries) {
-      // Courses the student already has credit for (for example CS 159 from ITP 220) are left out.
-      if (typeof entry === 'string' && creditedBefore.has(canonical(entry))) { skipped.push(entry); continue; }
       term.items.push(makeItem(entry));
       added += 1;
     }
   });
+  // The sample plans list only CS courses. Add calculus and statistics to the first term when the student has neither
+  // credit nor a plan for them, since CS 240 needs calculus and the algorithms elective needs statistics.
+  const mathAdded = [];
+  const firstTerm = sampleTerms.length ? ensureTerm(names[0]) : null;
+  const covered = (codes) => codes.some((code) => creditedBefore.has(canonical(code))
+    || state.plan.terms.some((term) => term.items.some((item) => item.code && canonical(item.code) === canonical(code))));
+  if (firstTerm) {
+    if (!covered(['MATH 235', 'MATH 231', 'MATH 232'])) { firstTerm.items.push(makeItem('MATH 235')); mathAdded.push('MATH 235'); }
+    if (!covered(['MATH 220', 'MATH 229', 'MATH 318'])) { firstTerm.items.push(makeItem('MATH 220')); mathAdded.push('MATH 220'); }
+  }
+  added += mathAdded.length;
+
   // Waived courses become a credit row so prerequisites see them.
   for (const code of sample.waives ?? []) {
     if (!state.plan.transfer.other.some((row) => canonical(row.code) === canonical(code))) {
@@ -47,7 +67,7 @@ export function applySamplePlan(planId) {
   }
   const credited = creditedCourses(state.plan);
   const missing = sample.assumes.filter((code) => !credited.has(canonical(code)));
-  return { added, missing, skipped };
+  return { added, missing, skipped, mathAdded };
 }
 
 /* ---------- Auto-planner ---------- */

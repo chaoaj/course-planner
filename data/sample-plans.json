@@ -1,46 +1,237 @@
 {
-  "source": "Adapted from the department's Sample Plans of Study for Transfer Students (May 2019), https://www.jmu.edu/cise/cs/_files/transfer-student-sample-plans.pdf. Each plan lists the same CS courses as the department plan; the term placement here follows the current catalog prerequisites. Required math may be added wherever it is convenient.",
+  "source": "Adapted from the department's Sample Plans of Study for Transfer Students (May 2019), https://www.jmu.edu/cise/cs/_files/transfer-student-sample-plans.pdf. Each plan lists the same CS courses as the department plan; the term placement here follows the current catalog prerequisites. Required math may be added wherever it is convenient. Plans with a \"note\" were added for advising and aren't in the department's document.",
   "slots": {
-    "algorithms": { "label": "CS 412 or 452", "group": "algorithms", "credits": 3 },
-    "systems": { "label": "CS Systems Elective", "group": "systems", "credits": 3 },
-    "cselective": { "label": "CS Elective", "group": "cselectives", "credits": 3 },
-    "gened": { "label": "General Education", "group": "gened", "credits": 3 },
-    "elective": { "label": "University Elective", "group": "elective", "credits": 3 }
+    "algorithms": {
+      "label": "CS 412 or 452",
+      "group": "algorithms",
+      "credits": 3
+    },
+    "systems": {
+      "label": "CS Systems Elective",
+      "group": "systems",
+      "credits": 3
+    },
+    "cselective": {
+      "label": "CS Elective",
+      "group": "cselectives",
+      "credits": 3
+    },
+    "gened": {
+      "label": "General Education",
+      "group": "gened",
+      "credits": 3
+    },
+    "elective": {
+      "label": "University Elective",
+      "group": "elective",
+      "credits": 3
+    }
   },
   "plans": [
     {
       "id": "149-240",
       "title": "Credit for CS 149 and CS 240 (CS 159 waived), four semesters",
-      "assumes": ["CS 149", "CS 240"],
-      "waives": ["CS 159"],
+      "assumes": [
+        "CS 149",
+        "CS 240"
+      ],
+      "waives": [
+        "CS 159"
+      ],
       "terms": [
-        ["CS 227", "CS 345", { "slot": "cselective" }],
-        ["CS 261", "CS 327", { "slot": "cselective" }],
-        ["CS 361", "CS 430", { "slot": "algorithms" }],
-        [{ "slot": "systems" }, { "slot": "cselective" }]
+        [
+          "CS 227",
+          "CS 345",
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          "CS 261",
+          "CS 327",
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          "CS 361",
+          "CS 430",
+          {
+            "slot": "algorithms"
+          }
+        ],
+        [
+          {
+            "slot": "systems"
+          },
+          {
+            "slot": "cselective"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "149-159-227",
+      "title": "Credit for CS 149, CS 159 and CS 227, four semesters",
+      "note": "Added for advising (not one of the department's 2019 sample plans). With 4 CS courses per term this can finish in three semesters.",
+      "assumes": [
+        "CS 149",
+        "CS 159",
+        "CS 227"
+      ],
+      "terms": [
+        [
+          "CS 240",
+          "CS 261",
+          "CS 345"
+        ],
+        [
+          "CS 327",
+          "CS 361",
+          "CS 430"
+        ],
+        [
+          {
+            "slot": "algorithms"
+          },
+          {
+            "slot": "systems"
+          },
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          {
+            "slot": "cselective"
+          },
+          {
+            "slot": "cselective"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "149-159",
+      "title": "Credit for CS 149 and CS 159 (not CS 227), four semesters",
+      "note": "Added for advising (not one of the department's 2019 sample plans). CS 227 gates CS 240 and CS 261, so take it in the first term.",
+      "assumes": [
+        "CS 149",
+        "CS 159"
+      ],
+      "terms": [
+        [
+          "CS 227",
+          "CS 345",
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          "CS 240",
+          "CS 261",
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          "CS 327",
+          "CS 361",
+          "CS 430"
+        ],
+        [
+          {
+            "slot": "algorithms"
+          },
+          {
+            "slot": "systems"
+          },
+          {
+            "slot": "cselective"
+          }
+        ]
       ]
     },
     {
       "id": "149-4",
       "title": "Credit for CS 149 but not CS 159, four semesters",
-      "assumes": ["CS 149"],
+      "assumes": [
+        "CS 149"
+      ],
       "terms": [
-        ["CS 159", "CS 227"],
-        ["CS 240", "CS 261", "CS 345"],
-        ["CS 327", "CS 361", "CS 430", { "slot": "cselective" }],
-        [{ "slot": "algorithms" }, { "slot": "systems" }, { "slot": "cselective" }, { "slot": "cselective" }]
+        [
+          "CS 159",
+          "CS 227"
+        ],
+        [
+          "CS 240",
+          "CS 261",
+          "CS 345"
+        ],
+        [
+          "CS 327",
+          "CS 361",
+          "CS 430",
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          {
+            "slot": "algorithms"
+          },
+          {
+            "slot": "systems"
+          },
+          {
+            "slot": "cselective"
+          },
+          {
+            "slot": "cselective"
+          }
+        ]
       ]
     },
     {
       "id": "149-5",
       "title": "Credit for CS 149 but not CS 159, five semesters",
-      "assumes": ["CS 149"],
+      "assumes": [
+        "CS 149"
+      ],
       "terms": [
-        ["CS 159", "CS 227"],
-        ["CS 240", "CS 261"],
-        ["CS 327", "CS 361", "CS 345"],
-        ["CS 430", { "slot": "algorithms" }, { "slot": "cselective" }],
-        [{ "slot": "systems" }, { "slot": "cselective" }, { "slot": "cselective" }]
+        [
+          "CS 159",
+          "CS 227"
+        ],
+        [
+          "CS 240",
+          "CS 261"
+        ],
+        [
+          "CS 327",
+          "CS 361",
+          "CS 345"
+        ],
+        [
+          "CS 430",
+          {
+            "slot": "algorithms"
+          },
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          {
+            "slot": "systems"
+          },
+          {
+            "slot": "cselective"
+          },
+          {
+            "slot": "cselective"
+          }
+        ]
       ]
     },
     {
@@ -48,11 +239,40 @@
       "title": "No transferable CS credit, five semesters",
       "assumes": [],
       "terms": [
-        ["CS 149"],
-        ["CS 159", "CS 227"],
-        ["CS 240", "CS 261", "CS 345", { "slot": "cselective" }],
-        ["CS 327", "CS 361", "CS 430"],
-        [{ "slot": "algorithms" }, { "slot": "systems" }, { "slot": "cselective" }, { "slot": "cselective" }]
+        [
+          "CS 149"
+        ],
+        [
+          "CS 159",
+          "CS 227"
+        ],
+        [
+          "CS 240",
+          "CS 261",
+          "CS 345",
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          "CS 327",
+          "CS 361",
+          "CS 430"
+        ],
+        [
+          {
+            "slot": "algorithms"
+          },
+          {
+            "slot": "systems"
+          },
+          {
+            "slot": "cselective"
+          },
+          {
+            "slot": "cselective"
+          }
+        ]
       ]
     },
     {
@@ -60,12 +280,42 @@
       "title": "No transferable CS credit, six semesters",
       "assumes": [],
       "terms": [
-        ["CS 149"],
-        ["CS 159", "CS 227"],
-        ["CS 240", "CS 261"],
-        ["CS 327", "CS 361", "CS 345"],
-        ["CS 430", { "slot": "algorithms" }, { "slot": "cselective" }],
-        [{ "slot": "systems" }, { "slot": "cselective" }, { "slot": "cselective" }]
+        [
+          "CS 149"
+        ],
+        [
+          "CS 159",
+          "CS 227"
+        ],
+        [
+          "CS 240",
+          "CS 261"
+        ],
+        [
+          "CS 327",
+          "CS 361",
+          "CS 345"
+        ],
+        [
+          "CS 430",
+          {
+            "slot": "algorithms"
+          },
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          {
+            "slot": "systems"
+          },
+          {
+            "slot": "cselective"
+          },
+          {
+            "slot": "cselective"
+          }
+        ]
       ]
     }
   ]

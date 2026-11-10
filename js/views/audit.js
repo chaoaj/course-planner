@@ -14,6 +14,7 @@ export function renderAudit() {
   const { totals } = audit;
   document.getElementById('audit-totals').innerHTML = `
     <p class="mb-1"><strong>${totals.total} of ${totals.required} credits</strong> (${totals.transfer} transfer, ${totals.planned} in the plan, ${totals.completed} completed). ${totals.remaining ? `${totals.remaining} more credits are needed to reach ${totals.required}; add General Education or university electives.` : 'The plan reaches the credit total.'}</p>
+    ${state.plan.transfer.isTransfer && !(Number(state.plan.transfer.acceptedCredits) > 0) ? '<p class="mb-1 issue-text-warning"><strong>Check:</strong> transfer credits count only the courses listed. Enter the total JMU accepted on the Transfer credit tab for an accurate credit total.</p>' : ''}
     <p class="mb-0">General Education (${catalog.requirements.genEdCredits} credits): ${totals.genEdMet ? 'satisfied by the associate degree.' : `${totals.genEdPlanned} credits of placeholders in the plan. ${escapeHtml(catalog.requirements.genEdNote)}`}</p>`;
 
   document.querySelector('#audit-table tbody').innerHTML = audit.groups.map((result) => {

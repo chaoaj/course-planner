@@ -156,3 +156,7 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
 .history-table td, .history-table th { font-size: 0.8125rem; }
 .history-table .offered-cell { background: var(--bs-primary-bg-subtle); font-weight: 600; }
 .history-table abbr { text-decoration: none; cursor: help; }
+
+/* "Has credit for" card at the start of the plan */
+.credit-card > header { background: var(--bs-warning-bg-subtle, #fbf6e6); }
+[data-bs-theme="dark"] .credit-card > header { background: #2e2716; }

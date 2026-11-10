@@ -187,7 +187,7 @@ function bindFiles() {
     commit({ render: false });
     refresh('all');
     activateTab(document.getElementById('tab-plan'));
-    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.missing.length ? ` It assumes credit for ${result.missing.join(' and ')}.` : ''}`, result.missing.length ? 'warning' : 'success');
+    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.missing.length ? ` It assumes credit for ${result.missing.join(' and ')}.` : ''}`, result.missing.length ? 'warning' : 'success');
   });
 }
 

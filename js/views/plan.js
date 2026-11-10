@@ -2,7 +2,8 @@
 
 import { catalog, canonical, getCourse, gradeBand, slotInfo, parseTerm } from '../catalog.js';
 import { state, commit, ensureTerm, followingTerm, normalizeItem } from '../state.js';
-import { checkPlan, termCredits, SLOT_PREREQS } from '../audit.js';
+import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal } from '../audit.js';
+import { gradeMeets } from '../util.js';
 import { applySamplePlan, autoPlan, recommendSamplePlan } from '../scheduler.js';
 import { escapeHtml, GRADES, showStatus, announce } from '../util.js';
 import { offeringPattern, reliableSeasons, isSemesterLocked, neverScheduled } from '../offerings.js';
@@ -106,12 +107,57 @@ function renderItem(item, term, termIndex, issues) {
   </li>`;
 }
 
+// First card in the plan grid: what the student already has credit for, like the advising sheet's "Has Credit For"
+// column. Shown so the advisor can check that transfer credit is applied before planning around it.
+function renderCreditCard() {
+  const plan = state.plan;
+  if (!plan.transfer.isTransfer && !plan.transfer.other.length) return '';
+  const credited = [...creditedCourses(plan).entries()].sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true }));
+  const pending = pendingVccsReviews(plan);
+  const total = transferCreditTotal(plan);
+  const accepted = Number(plan.transfer.acceptedCredits) > 0;
+  const rows = credited.map(([code, record]) => {
+    const course = getCourse(code);
+    const band = gradeBand(code);
+    const bandClass = band === 'B-' ? 'band-b' : band === 'C-' ? 'band-c' : '';
+    const low = record.grade && course?.majorMinGrade && !gradeMeets(record.grade, course.majorMinGrade);
+    return `<li class="term-item ${bandClass}${low ? ' has-error' : ''}">
+      <div class="d-flex justify-content-between gap-2">
+        <div><span class="code-badge">${escapeHtml(code)}</span>${band ? `<span class="small ms-1">${band} or better</span>` : ''}
+          <div class="item-title">${escapeHtml(course?.title ?? '')}</div>
+          <div class="small">${record.waived ? 'Waived' : `Credit via ${escapeHtml(record.via)}`}${record.grade ? `, grade ${escapeHtml(record.grade)}` : ''}</div></div>
+        <span class="small text-nowrap">${record.waived ? '0' : record.credits} cr</span>
+      </div>
+      ${low ? `<ul class="issues"><li class="issue-text-error"><span class="issue-icon issue-error" aria-hidden="true">!</span><span><span class="visually-hidden">Problem: </span>Grade ${escapeHtml(record.grade)} is below the ${course.majorMinGrade} the major requires; plan to retake ${escapeHtml(code)}.</span></li></ul>` : ''}
+    </li>`;
+  }).join('');
+  const pendingRows = pending.map((mapping) => `<li class="term-item"><span class="code-badge">VCCS ${escapeHtml(mapping.vccs)}</span>
+      <ul class="issues"><li class="issue-text-warning"><span class="issue-icon issue-warning" aria-hidden="true">?</span><span><span class="visually-hidden">Check: </span>Awaiting advisor review (could be ${escapeHtml(mapping.jmu.join(' or '))}). Until decided it isn't counted.</span></li></ul></li>`).join('');
+  const totalNote = accepted
+    ? `Total from JMU's transfer evaluation: <strong>${total}</strong> credits.`
+    : `<strong>${total}</strong> credits from the courses listed.${plan.transfer.associateDegree || plan.transfer.isTransfer ? ' <span class="issue-text-warning">Enter the total JMU accepted (on the Transfer credit tab) so General Education and elective credit count too; an associate degree is often about 60.</span>' : ''}`;
+  return `<section class="term-card credit-card" aria-labelledby="credit-card-heading">
+    <header>
+      <h3 id="credit-card-heading">Has credit for</h3>
+      <span class="term-credits">${total} credits</span>
+    </header>
+    <ul class="term-items" aria-label="Courses the student already has credit for">
+      ${rows || '<li class="small text-body-secondary px-1">No JMU course credit yet.</li>'}
+      ${pendingRows}
+    </ul>
+    <div class="term-add small">
+      <p class="mb-2">${totalNote}</p>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-go-tab="tab-transfer">Edit transfer credit</button>
+    </div>
+  </section>`;
+}
+
 export function renderPlan() {
   const { terms } = state.plan;
   const issuesById = checkPlan(state.plan);
   document.getElementById('plan-empty').hidden = terms.length > 0;
 
-  document.getElementById('terms').innerHTML = terms.map((term, termIndex) => {
+  document.getElementById('terms').innerHTML = renderCreditCard() + terms.map((term, termIndex) => {
     const credits = termCredits(term);
     const heavy = credits > 18;
     const season = parseTerm(term.name)?.season ?? '';
@@ -255,7 +301,7 @@ export function bindPlan(refresh) {
     commit({ render: false });
     refresh('all');
     const warning = result.missing.length ? ` This plan assumes credit for ${result.missing.join(' and ')}, which the student doesn't have yet.` : '';
-    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${warning}`, warning ? 'warning' : 'success');
+    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${warning}`, warning ? 'warning' : 'success');
   });
 
   document.getElementById('btn-autoplan').addEventListener('click', () => {

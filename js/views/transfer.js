@@ -87,7 +87,7 @@ function renderCreditSummary() {
 
   const recommended = catalog.samplePlans.plans.find((plan) => plan.id === recommendSamplePlan(state.plan));
   document.getElementById('plan-recommendation').innerHTML = `
-    <p class="mb-2"><strong>Suggested starting point:</strong> ${escapeHtml(recommended.title)}.${recommended.id !== '149-240' && creditedCourses(state.plan).has('CS 159') ? ' CS 159 is already credited, so it will be left out.' : ''}</p>
+    <p class="mb-2"><strong>Suggested starting point:</strong> ${escapeHtml(recommended.title)}.${['149-4', '149-5'].includes(recommended.id) && creditedCourses(state.plan).has('CS 159') ? ' CS 159 is already credited, so it will be left out.' : ''}${recommended.note ? ` <span class="small">${escapeHtml(recommended.note)}</span>` : ''}</p>
     <button type="button" class="btn btn-primary btn-sm" data-use-sample="${recommended.id}">Use this sample plan</button>
     <span class="small ms-2">You can still change any course on the Plan tab.</span>`;
 }
