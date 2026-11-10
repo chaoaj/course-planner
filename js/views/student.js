@@ -55,6 +55,12 @@ export function bindStudentForm(refresh) {
     const handler = () => {
       const value = input.type === 'checkbox' ? input.checked : input.value;
       setPath(state.plan, input.dataset.field, value);
+      // The same setting can appear on more than one tab (the associate degree box); keep the copies in step.
+      for (const other of document.querySelectorAll(`[data-field="${input.dataset.field}"]`)) {
+        if (other === input) continue;
+        if (other.type === 'checkbox') other.checked = Boolean(value);
+        else other.value = value ?? '';
+      }
       commit({ render: false });
       if (input.dataset.field.startsWith('transfer.')) updateTransferQuestions();
       refresh(input.type === 'checkbox' || input.type === 'number' || input.dataset.field === 'student.startTerm' ? 'all' : 'summary');

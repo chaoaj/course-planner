@@ -13,7 +13,7 @@
     </script>
     <title>Course Planner</title>
     <link rel="stylesheet" href="./lib/bootstrap.min.css" />
-    <link rel="stylesheet" href="./css/styles.css?v=2026-11-10h" />
+    <link rel="stylesheet" href="./css/styles.css?v=2026-11-10i" />
     <link rel="icon" type="image/svg+xml" href="./images/course-planner-logo.svg" />
   </head>
   <body class="bg-body-tertiary min-vh-100">
@@ -113,6 +113,13 @@
       <!-- 2. Transfer credit -->
       <section class="tab-panel card card-body border-top-0 rounded-top-0 shadow-sm" role="tabpanel" id="panel-transfer" aria-labelledby="tab-transfer" tabindex="0" hidden>
         <h2 class="h4">Transfer credit</h2>
+        <div class="alert alert-secondary py-2 mb-3">
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" id="f-associate-transfer" data-field="transfer.associateDegree" aria-describedby="f-associate-transfer-help" />
+            <label class="form-check-label fw-semibold" for="f-associate-transfer">Associate degree from a community college: ignore General Education</label>
+          </div>
+          <div id="f-associate-transfer-help" class="small ms-4">A completed associate degree satisfies JMU General Education, so individual Gen Ed courses don't need to be entered or planned. Same setting as on the Student tab.</div>
+        </div>
         <div id="vccs-section">
           <h3 class="h5">VCCS courses</h3>
           <p id="vccs-intro" class="small mb-2"></p>
@@ -171,6 +178,13 @@
             <button class="btn btn-outline-secondary" type="button" id="btn-add-term">Add term</button>
             <button class="btn btn-outline-danger" type="button" id="btn-clear-plan">Clear plan</button>
           </div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" id="f-associate-plan" data-field="transfer.associateDegree" />
+            <label class="form-check-label" for="f-associate-plan">Associate degree: ignore General Education</label>
+          </div>
+          <div id="gened-cleanup" class="small" aria-live="polite"></div>
         </div>
         <div class="legend small mb-3" aria-label="Color key">
           <span class="legend-item"><span class="swatch band-b" aria-hidden="true"></span>B- or better required</span>
@@ -301,6 +315,6 @@
     <script src="./lib/exceljs.min.js" defer></script>
     <script src="./lib/jspdf.umd.min.js" defer></script>
     <script src="./lib/jspdf.plugin.autotable.min.js" defer></script>
-    <script type="module" src="./js/main.js?v=2026-11-10h"></script>
+    <script type="module" src="./js/main.js?v=2026-11-10i"></script>
   </body>
 </html>

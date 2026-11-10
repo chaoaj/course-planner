@@ -4,7 +4,7 @@ import { catalog, canonical, getCourse, gradeBand, slotInfo, parseTerm, genEdDom
 import { state, commit, ensureTerm, followingTerm, normalizeItem } from '../state.js';
 import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal } from '../audit.js';
 import { gradeMeets } from '../util.js';
-import { applySamplePlan, autoPlan, recommendSamplePlan } from '../scheduler.js';
+import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives } from '../scheduler.js';
 import { escapeHtml, GRADES, showStatus, announce } from '../util.js';
 import { offeringPattern, reliableSeasons, isSemesterLocked, neverScheduled } from '../offerings.js';
 
@@ -136,7 +136,8 @@ function renderCreditCard() {
       <div class="d-flex justify-content-between gap-2">
         <div><span class="code-badge">${escapeHtml(code)}</span>${band ? `<span class="small ms-1">${band} or better</span>` : ''}
           <div class="item-title">${escapeHtml(course?.title ?? '')}</div>
-          <div class="small">${record.waived ? 'Waived' : `Credit via ${escapeHtml(record.via)}`}${record.grade ? `, grade ${escapeHtml(record.grade)}` : ''}</div></div>
+          <div class="small">${record.waived ? 'Waived' : `Credit via ${escapeHtml(record.via)}`}${record.grade ? `, grade ${escapeHtml(record.grade)}` : ''}</div>
+          ${course?.genEd && !/^MATH/.test(code) && plan.transfer.associateDegree ? '<div class="small fst-italic">General Education is covered by the associate degree; this credit isn’t needed for Gen Ed.</div>' : ''}</div>
         <span class="small text-nowrap">${record.waived ? '0' : record.credits} cr</span>
       </div>
       ${low ? `<ul class="issues"><li class="issue-text-error"><span class="issue-icon issue-error" aria-hidden="true">!</span><span><span class="visually-hidden">Problem: </span>Grade ${escapeHtml(record.grade)} is below the ${course.majorMinGrade} the major requires; plan to retake ${escapeHtml(code)}.</span></li></ul>` : ''}
@@ -163,7 +164,22 @@ function renderCreditCard() {
   </section>`;
 }
 
+// With an associate degree, General Education placeholders left in the plan are no longer needed: offer to remove them.
+function renderGenEdCleanup() {
+  const box = document.getElementById('gened-cleanup');
+  if (!box) return;
+  const count = state.plan.terms.reduce((total, term) => total + term.items.filter((item) => !item.code && item.slot === 'gened').length, 0);
+  if (state.plan.transfer.associateDegree) {
+    box.innerHTML = count
+      ? `General Education is met by the associate degree. <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-remove-gened="1">Remove ${count} Gen Ed placeholder${count === 1 ? '' : 's'}</button>`
+      : 'General Education is met by the associate degree.';
+  } else {
+    box.textContent = count ? `${count} Gen Ed placeholder${count === 1 ? '' : 's'} in the plan.` : '';
+  }
+}
+
 export function renderPlan() {
+  renderGenEdCleanup();
   const { terms } = state.plan;
   const issuesById = checkPlan(state.plan);
   document.getElementById('plan-empty').hidden = terms.length > 0;
@@ -256,6 +272,25 @@ export function bindPlan(refresh) {
   panel.addEventListener('click', (event) => {
     const button = event.target.closest('button');
     if (!button) return;
+    if (button.dataset.removeGened) {
+      let removed = 0;
+      for (const term of state.plan.terms) {
+        const before = term.items.length;
+        term.items = term.items.filter((item) => item.code || item.slot !== 'gened');
+        removed += before - term.items.length;
+      }
+      // University elective placeholders move up into the space that freed, and terms left empty at the end go.
+      for (const term of state.plan.terms) term.items = term.items.filter((item) => item.code || item.slot !== 'elective');
+      const dropEmptyTail = () => { while (state.plan.terms.length && !state.plan.terms[state.plan.terms.length - 1].items.length) state.plan.terms.pop(); };
+      dropEmptyTail();
+      fillUniversityElectives();
+      dropEmptyTail();
+      commit({ render: false });
+      refresh('all');
+      document.getElementById('f-associate-plan')?.focus();
+      showStatus(`Removed ${removed} General Education placeholder${removed === 1 ? '' : 's'}; the associate degree covers General Education. University electives were moved into the freed space.`, 'success');
+      return;
+    }
     if (button.dataset.action === 'remove') {
       const found = findItem(button.dataset.item);
       if (!found) return;

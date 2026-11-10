@@ -58,7 +58,8 @@ export function renderTransfer() {
     ? transfer.other.map((row) => `<tr data-row="${row.id}">
       <td><label class="visually-hidden" for="${row.id}-code">JMU course</label>
         <input class="form-control form-control-sm${row.code && !getCourse(row.code) ? ' is-invalid' : ''}" id="${row.id}-code" list="course-list" data-other="${row.id}" data-key="code" value="${escapeHtml(row.code)}" placeholder="CS 149"${row.code && !getCourse(row.code) ? ` aria-describedby="${row.id}-code-help" aria-invalid="true"` : ''} />
-        ${row.code && !getCourse(row.code) ? `<div id="${row.id}-code-help" class="small issue-text-error">Not a course this app knows, so it isn't counted. Enter a JMU code such as CS 149.</div>` : ''}</td>
+        ${row.code && !getCourse(row.code) ? `<div id="${row.id}-code-help" class="small issue-text-error">Not a course this app knows, so it isn't counted. Enter a JMU code such as CS 149.</div>` : ''}
+        ${getCourse(row.code)?.genEd && !/^MATH/.test(row.code) && transfer.associateDegree ? '<div class="small fst-italic">Covered by the associate degree; not needed for Gen Ed.</div>' : ''}</td>
       <td><label class="visually-hidden" for="${row.id}-credits">Credits</label>
         <input class="form-control form-control-sm" type="number" min="0" max="12" id="${row.id}-credits" data-other="${row.id}" data-key="credits" value="${row.credits}" style="width:5rem" /></td>
       <td><label class="visually-hidden" for="${row.id}-grade">Grade</label>
