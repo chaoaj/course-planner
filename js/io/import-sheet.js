@@ -4,7 +4,7 @@
 
 import { getCourse, canonical, parseTerm, termSortKey } from '../catalog.js';
 import { blankPlan, normalizePlan, normalizeItem } from '../state.js';
-import { normalizeCode, uid } from '../util.js';
+import { normalizeCode, uid, parseCourseCodes } from '../util.js';
 
 const TERM_RE = /^\s*(Fall|Spring|Summer)\s+(\d{4})\s*$/i;
 const CREDIT_HEADER_RE = /^\s*has\s+credit\s+for\s*:?\s*$/i;
@@ -179,12 +179,18 @@ export function gridToPlan(grid, { sheetName = '', today = new Date() } = {}) {
   while (plan.terms.length && !plan.terms[plan.terms.length - 1].items.length) plan.terms.pop();
   if (plan.terms.length) plan.student.startTerm = plan.terms.find((term) => term.items.length)?.name ?? plan.terms[0].name;
 
-  plan.transfer.other = credits
-    .filter(({ text }) => normalizeCode(text))
-    .map(({ text, credits: hours }) => {
-      const code = canonical(normalizeCode(text));
-      return { id: uid('credit'), code, credits: hours ?? getCourse(code)?.credits ?? 3, grade: '', source: 'Imported', note: `From "Has Credit For"${sheetName ? ` on ${sheetName}` : ''}` };
-    });
+  // "MATH 231/232" or "CS/MATH 227" in the Has Credit For column become one credit row per course.
+  plan.transfer.other = credits.flatMap(({ text, credits: hours }) => {
+    const codes = [...new Set(parseCourseCodes(text).map(canonical))];
+    return codes.map((code) => ({
+      id: uid('credit'),
+      code,
+      credits: codes.length === 1 ? hours ?? getCourse(code)?.credits ?? 3 : getCourse(code)?.credits ?? 3,
+      grade: '',
+      source: 'Imported',
+      note: `From "Has Credit For"${sheetName ? ` on ${sheetName}` : ''}`
+    }));
+  });
   if (plan.transfer.other.length) plan.transfer.isTransfer = true;
   if (plan.terms.some((term) => parseTerm(term.name)?.season === 'Summer' && term.items.length)) plan.settings.includeSummer = true;
 

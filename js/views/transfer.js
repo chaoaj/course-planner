@@ -4,7 +4,7 @@ import { catalog, canonical, getCourse, pickerCourses } from '../catalog.js';
 import { state, commit } from '../state.js';
 import { creditedCourses, pendingVccsReviews, transferCreditTotal } from '../audit.js';
 import { recommendSamplePlan } from '../scheduler.js';
-import { escapeHtml, GRADES, uid } from '../util.js';
+import { escapeHtml, GRADES, uid, parseCourseCodes } from '../util.js';
 
 const SOURCES = ['Other college', 'AP', 'IB', 'Dual enrollment', 'Waived', 'Imported'];
 
@@ -57,7 +57,8 @@ export function renderTransfer() {
   otherBody.innerHTML = transfer.other.length
     ? transfer.other.map((row) => `<tr data-row="${row.id}">
       <td><label class="visually-hidden" for="${row.id}-code">JMU course</label>
-        <input class="form-control form-control-sm" id="${row.id}-code" list="course-list" data-other="${row.id}" data-key="code" value="${escapeHtml(row.code)}" placeholder="CS 149" /></td>
+        <input class="form-control form-control-sm${row.code && !getCourse(row.code) ? ' is-invalid' : ''}" id="${row.id}-code" list="course-list" data-other="${row.id}" data-key="code" value="${escapeHtml(row.code)}" placeholder="CS 149"${row.code && !getCourse(row.code) ? ` aria-describedby="${row.id}-code-help" aria-invalid="true"` : ''} />
+        ${row.code && !getCourse(row.code) ? `<div id="${row.id}-code-help" class="small issue-text-error">Not a course this app knows, so it isn't counted. Enter a JMU code such as CS 149.</div>` : ''}</td>
       <td><label class="visually-hidden" for="${row.id}-credits">Credits</label>
         <input class="form-control form-control-sm" type="number" min="0" max="12" id="${row.id}-credits" data-other="${row.id}" data-key="credits" value="${row.credits}" style="width:5rem" /></td>
       <td><label class="visually-hidden" for="${row.id}-grade">Grade</label>
@@ -108,9 +109,22 @@ export function bindTransfer(refresh) {
       if (!row) return;
       const key = target.dataset.key;
       if (key === 'code') {
-        row.code = canonical(target.value) || target.value.trim();
+        // One entry can name several courses ("MATH 231/232", "CS 149, CS 159"); each gets its own credit row.
+        // A VCCS code typed here (CSC 201) becomes its JMU equivalent when that transfer is automatic.
+        const vccsNotes = [];
+        const codes = parseCourseCodes(target.value).map((code) => {
+          const mapping = catalog.vccs.courses.find((entry) => entry.vccs === code);
+          if (mapping && !mapping.review) { vccsNotes.push(`${mapping.vccs} → ${mapping.jmu[0]}`); return canonical(mapping.jmu[0]); }
+          return canonical(code);
+        });
+        if (vccsNotes.length && !row.note) row.note = `VCCS ${vccsNotes.join(', ')}`;
+        row.code = codes[0] ?? target.value.trim();
         const course = getCourse(row.code);
         if (course && (!row.credits || row.credits === 3)) row.credits = course.credits;
+        const index = state.plan.transfer.other.indexOf(row);
+        codes.slice(1).forEach((code, offset) => {
+          state.plan.transfer.other.splice(index + 1 + offset, 0, { ...row, id: uid('credit'), code, credits: getCourse(code)?.credits ?? 3 });
+        });
       } else if (key === 'credits') {
         row.credits = Number(target.value) || 0;
       } else {

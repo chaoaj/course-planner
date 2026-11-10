@@ -85,3 +85,19 @@ export function readFileAsArrayBuffer(file) {
     reader.readAsArrayBuffer(file);
   });
 }
+
+// Every course code in free text, for credit entries: "CS/MATH 227" -> [CS 227], "MATH 231/232" -> [MATH 231, MATH 232],
+// "Calc I (MATH 235)" -> [MATH 235], "CS 149, CS 159" -> [CS 149, CS 159]. Cross-listed "CS/MATH" keeps the first department.
+export function parseCourseCodes(text) {
+  const upper = String(text ?? '').toUpperCase().replace(/\b([A-Z]{2,5})\s*\/\s*[A-Z]{2,5}(?=\s*-?\s*\d{3})/g, '$1');
+  const codes = [];
+  const pattern = /\b([A-Z]{2,5})\s*-?\s*(\d{3}[A-Z]?)((?:\s*(?:\/|&|,|AND)\s*\d{3}[A-Z]?\b)*)/g;
+  let match;
+  while ((match = pattern.exec(upper))) {
+    const dept = match[1];
+    if (['OR', 'AND', 'TO'].includes(dept)) continue;
+    codes.push(`${dept} ${match[2]}`);
+    for (const extra of match[3].match(/\d{3}[A-Z]?/g) ?? []) codes.push(`${dept} ${extra}`);
+  }
+  return [...new Set(codes)];
+}

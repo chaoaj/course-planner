@@ -82,7 +82,11 @@ function placements(plan) {
 }
 
 function satisfiedBefore(code, termIndex, ctx, { sameTermOk = false } = {}) {
-  if (code === 'PLACEMENT') return ctx.plan.student.mathPlacement || ctx.credited.has('MATH 155') || ctx.credited.has('MATH 156');
+  if (code === 'PLACEMENT') {
+    // Math placement is also shown by credit for (or an earlier term of) MATH 155/156 or calculus.
+    if (ctx.plan.student.mathPlacement) return true;
+    return ['MATH 155', 'MATH 156', 'MATH 231', 'MATH 235'].some((option) => satisfiedBefore(option, termIndex, ctx));
+  }
   const canon = canonical(code);
   if (ctx.credited.has(canon)) return { via: 'credit', record: ctx.credited.get(canon) };
   const spots = ctx.placed.get(canon) ?? [];
@@ -118,7 +122,11 @@ export function checkItem(item, termIndex, ctx) {
     return issues;
   }
 
-  for (const group of course.prereqs ?? []) {
+  // A course the student has completed or is taking already cleared its prerequisites, so only plan-ahead checks
+  // (prerequisites, co-requisites, term offered) are skipped for it; grade and duplicate checks still apply.
+  const taken = item.status === 'completed' || item.status === 'in-progress';
+
+  for (const group of taken ? [] : course.prereqs ?? []) {
     const met = group.map((option) => satisfiedBefore(option, termIndex, ctx)).find(Boolean);
     if (!met) {
       issues.push({ level: 'error', text: `Needs ${describeGroup(group)} before ${termName}.` });
@@ -129,20 +137,20 @@ export function checkItem(item, termIndex, ctx) {
       }
     }
   }
-  for (const group of course.coreqs ?? []) {
+  for (const group of taken ? [] : course.coreqs ?? []) {
     if (!group.some((option) => satisfiedBefore(option, termIndex, ctx, { sameTermOk: true }))) {
       issues.push({ level: 'error', text: `Needs ${describeGroup(group)} before or in the same term.` });
     }
   }
 
   // When the course has actually run, from the past schedules.
-  const timing = seasonIssue(code, termName);
+  const timing = taken ? null : seasonIssue(code, termName);
   if (timing) issues.push(timing);
 
   // A semester-locked course whose prerequisite is planned for the term just before it: if that prerequisite slips
   // (a grade below the minimum, a full section), the next chance is a year later.
   const season = parseTerm(termName)?.season;
-  if (isSemesterLocked(code) && reliableSeasons(code).includes(season)) {
+  if (!taken && isSemesterLocked(code) && reliableSeasons(code).includes(season)) {
     for (const group of course.prereqs ?? []) {
       const met = group.map((option) => satisfiedBefore(option, termIndex, ctx)).find(Boolean);
       if (met && met !== true && met.via === 'plan' && met.record.status !== 'completed') {
