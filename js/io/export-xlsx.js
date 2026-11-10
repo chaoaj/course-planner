@@ -205,7 +205,7 @@ export async function exportExcel(plan) {
     [14, 18, 36, 9, 13, 8, 70]);
 
   const watch = workbook.addWorksheet('Semester-Locked Courses');
-  writeTable(watch, 1, ['Course', 'Title', 'When it runs', 'Pattern from schedules', 'Prerequisite timing', 'Programs', 'In this plan'],
+  writeTable(watch, 1, ['Course', 'Title', 'When it\'s offered', 'Pattern from schedules', 'Prerequisite timing', 'Programs', 'In this plan'],
     catalog.offeringAdvice.watchList.map((entry) => [
       entry.code,
       getCourse(entry.code)?.title ?? '',

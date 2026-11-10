@@ -37,7 +37,7 @@ function genEdChoiceGroups(item) {
   return domains.map((domain) => `<optgroup label="${escapeHtml(`${domain.id} ${domain.label}`)}">${domain.options.map(option).join('')}</optgroup>`).join('');
 }
 
-// Options split by whether they usually run in this term's season, each labeled with its offering pattern.
+// Options split by whether they are usually offered in this term's season, each labeled with its offering pattern.
 function choiceGroups(choices, termName) {
   const season = parseTerm(termName)?.season;
   const option = (code) => {
@@ -99,7 +99,7 @@ function renderItem(item, term, termIndex, issues) {
       <div>
         <span class="code-badge">${escapeHtml(label)}</span>
         ${band ? `<span class="small ms-1">${band} or better</span>` : ''}
-        ${course ? `<div class="item-title">${escapeHtml(course.title)}</div>${isSemesterLocked(course.code) ? `<div class="small fw-semibold">Runs: ${escapeHtml(offeringPattern(course.code).label)}</div>` : ''}` : isPlaceholder && item.slot && SLOT_PREREQS[item.slot] ? '<div class="item-title">Placeholder</div>' : ''}
+        ${course ? `<div class="item-title">${escapeHtml(course.title)}</div>${isSemesterLocked(course.code) ? `<div class="small fw-semibold">Offered: ${escapeHtml(offeringPattern(course.code).label)}</div>` : ''}` : isPlaceholder && item.slot && SLOT_PREREQS[item.slot] ? '<div class="item-title">Placeholder</div>' : ''}
       </div>
       <span class="small text-nowrap">${item.credits} cr</span>
     </div>
@@ -261,8 +261,18 @@ function renderPrograms() {
       <input class="form-check-input" type="checkbox" id="program-${program.id}" data-program="${program.id}"${selected.has(program.id) ? ' checked' : ''} />
       <label class="form-check-label" for="program-${program.id}">${escapeHtml(program.label)}${program.draft ? ' <span class="badge text-bg-warning">confirm requirements</span>' : ''}</label>
     </div>`).join('');
+  const audit = auditRequirements(state.plan);
   document.getElementById('program-notes').innerHTML = (catalog.programs?.programs ?? []).filter((program) => selected.has(program.id))
-    .map((program) => `<p class="mb-1"><strong>${escapeHtml(program.short)}:</strong> ${escapeHtml(program.note)} <a href="${escapeHtml(program.source)}" target="_blank" rel="noopener">Program page<span class="visually-hidden"> for the ${escapeHtml(program.short)} (opens in a new tab)</span></a></p>`).join('');
+    .map((program) => {
+      const results = audit.groups.filter((result) => result.group.program === program.id);
+      const complete = results.length && results.every((result) => result.status === 'met');
+      const email = (text) => escapeHtml(text).replace(escapeHtml(program.contactEmail ?? '\u0000'), `<a href="mailto:${escapeHtml(program.contactEmail)}">${escapeHtml(program.contactEmail)}</a>`);
+      const steps = program.claimSteps?.length
+        ? `<div class="mt-1">${complete ? '<strong class="text-success-emphasis">All required courses are complete; the student can claim the certificate:</strong>' : '<strong>To claim it once the courses are done:</strong>'}<ol class="mb-1">${program.claimSteps.map((step) => `<li>${email(step)}</li>`).join('')}</ol></div>`
+        : '';
+      return `<div class="mb-2"><strong>${escapeHtml(program.short)}:</strong> ${program.description ? `${escapeHtml(program.description)} ` : ''}${escapeHtml(program.note)}
+        <a href="${escapeHtml(program.source)}" target="_blank" rel="noopener">Program page<span class="visually-hidden"> for the ${escapeHtml(program.short)} (opens in a new tab)</span></a>${steps}</div>`;
+    }).join('');
 }
 
 export function renderPlan() {

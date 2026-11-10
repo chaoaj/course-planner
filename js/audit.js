@@ -158,7 +158,7 @@ export function checkItem(item, termIndex, ctx) {
     }
   }
 
-  // When the course has actually run, from the past schedules.
+  // When the course has actually been offered, from the past schedules.
   const timing = taken ? null : seasonIssue(code, termName);
   if (timing) issues.push(timing);
 
@@ -171,7 +171,7 @@ export function checkItem(item, termIndex, ctx) {
       if (met && met !== true && met.via === 'plan' && met.record.status !== 'completed') {
         const spot = (ctx.placed.get(canonical(met.record.code)) ?? []).find((entry) => entry.item.id === met.record.id);
         if (spot && spot.termIndex === termIndex - 1) {
-          issues.push({ level: 'info', text: `${met.record.code} is planned for the term right before. ${code} runs only in ${season.toLowerCase()}, so if ${met.record.code} slips, ${code} waits a year.` });
+          issues.push({ level: 'info', text: `${met.record.code} is planned for the term right before. ${code} is offered only in ${season.toLowerCase()}, so if ${met.record.code} slips, ${code} waits a year.` });
         }
       }
     }

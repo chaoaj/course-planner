@@ -55,12 +55,12 @@ function renderSequences() {
     <p>${escapeHtml(robotics.summary)}</p>
     <ul>${robotics.courses.map((course) => {
       const pattern = offeringPattern(course.code);
-      return `<li><strong>${escapeHtml(course.code)}</strong> ${escapeHtml(getCourse(course.code)?.title ?? course.title ?? '')} — ${escapeHtml(course.role)}${pattern ? `. Runs: ${escapeHtml(pattern.label)}` : ''}</li>`;
+      return `<li><strong>${escapeHtml(course.code)}</strong> ${escapeHtml(getCourse(course.code)?.title ?? course.title ?? '')} — ${escapeHtml(course.role)}${pattern ? `. Offered: ${escapeHtml(pattern.label)}` : ''}</li>`;
     }).join('')}</ul>
     <p class="small mb-0">${escapeHtml(robotics.caveat)}</p>`;
 }
 
-// Notes for this student's plan: locked courses in the wrong season, and which elective options run in each slot's term.
+// Notes for this student's plan: locked courses in the wrong season, and which elective options are offered in each slot's term.
 function renderPlanNotes() {
   const notes = [];
   state.plan.terms.forEach((term) => {

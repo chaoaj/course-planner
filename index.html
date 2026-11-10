@@ -13,7 +13,7 @@
     </script>
     <title>Course Planner</title>
     <link rel="stylesheet" href="./lib/bootstrap.min.css" />
-    <link rel="stylesheet" href="./css/styles.css?v=2026-11-11a" />
+    <link rel="stylesheet" href="./css/styles.css?v=2026-11-11c" />
     <link rel="icon" type="image/svg+xml" href="./images/course-planner-logo.svg" />
   </head>
   <body class="bg-body-tertiary min-vh-100">
@@ -60,7 +60,7 @@
         <button class="nav-link" role="tab" id="tab-plan" aria-controls="panel-plan" aria-selected="false" tabindex="-1">3. Plan</button>
         <button class="nav-link" role="tab" id="tab-audit" aria-controls="panel-audit" aria-selected="false" tabindex="-1">4. Requirements</button>
         <button class="nav-link" role="tab" id="tab-map" aria-controls="panel-map" aria-selected="false" tabindex="-1">5. Prerequisite map</button>
-        <button class="nav-link" role="tab" id="tab-offerings" aria-controls="panel-offerings" aria-selected="false" tabindex="-1">6. When courses run</button>
+        <button class="nav-link" role="tab" id="tab-offerings" aria-controls="panel-offerings" aria-selected="false" tabindex="-1">6. Course Offering Term</button>
       </div>
 
       <!-- 1. Student -->
@@ -282,8 +282,8 @@
 
       <!-- 6. Offerings -->
       <section class="tab-panel card card-body border-top-0 rounded-top-0 shadow-sm" role="tabpanel" id="panel-offerings" aria-labelledby="tab-offerings" tabindex="0" hidden>
-        <h2 class="h4">When courses run</h2>
-        <p class="small" id="offering-source">Based on the CS schedules from Fall 2020 through Spring 2027 (Spring 2027 is the planned schedule). Summer isn't included. The Plan tab uses this to flag courses planned in a term they don't usually run.</p>
+        <h2 class="h4">Course Offering Term</h2>
+        <p class="small" id="offering-source">Based on the CS schedules from Fall 2020 through Spring 2027 (Spring 2027 is the planned schedule). Summer isn't included. The Plan tab uses this to flag courses planned in a term they aren't usually offered.</p>
 
         <h3 class="h5">This student's plan</h3>
         <div id="offering-plan-notes" class="alert alert-secondary"></div>
@@ -292,7 +292,7 @@
         <div class="table-responsive">
           <table class="table table-sm align-top" id="watch-table">
             <caption class="visually-hidden">Courses offered only or mostly in one semester, with prerequisite advice</caption>
-            <thead><tr><th scope="col">Course</th><th scope="col">Title</th><th scope="col">When it runs</th><th scope="col">Prerequisite timing</th><th scope="col">Programs</th><th scope="col">In this plan</th></tr></thead>
+            <thead><tr><th scope="col">Course</th><th scope="col">Title</th><th scope="col">When it's offered</th><th scope="col">Prerequisite timing</th><th scope="col">Programs</th><th scope="col">In this plan</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -346,6 +346,6 @@
     <script src="./lib/exceljs.min.js" defer></script>
     <script src="./lib/jspdf.umd.min.js" defer></script>
     <script src="./lib/jspdf.plugin.autotable.min.js" defer></script>
-    <script type="module" src="./js/main.js?v=2026-11-11a"></script>
+    <script type="module" src="./js/main.js?v=2026-11-11c"></script>
   </body>
 </html>

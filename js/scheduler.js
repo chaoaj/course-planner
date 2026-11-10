@@ -386,7 +386,7 @@ export function autoPlan() {
 
     const candidates = pending
       .filter((need) => ready(need, termIndex))
-      // Semester-locked courses go only in the term they run (from the past schedules).
+      // Semester-locked courses go only in the term they are offered (from the past schedules).
       .filter((need) => !need.code || reliableSeasons(need.code).includes(season))
       .sort((a, b) => (height.get(keyOf(b)) ?? 0) - (height.get(keyOf(a)) ?? 0));
 
@@ -608,7 +608,7 @@ function balanceOnce({ extra = 0 } = {}) {
       return placedAt.has(canon) && placedAt.get(canon) < index;
     };
     const metByNow = (code) => met(code) || (placedAt.has(canonical(code)) && placedAt.get(canonical(code)) <= index);
-    // Terms left in the plan (from this one) in which a semester-locked course can run.
+    // Terms left in the plan (from this one) in which a semester-locked course is offered.
     const seasonTermsLeft = (item) => names.slice(index, Math.max(termCount, index + 1))
       .filter((other) => !item.code || reliableSeasons(item.code).includes(parseTerm(other)?.season)).length;
     const ready = pending

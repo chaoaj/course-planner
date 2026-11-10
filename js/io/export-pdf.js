@@ -151,7 +151,7 @@ export function exportPdf(plan) {
     report.checks.map((row) => [row.term, row.course, row.title, String(row.credits), `${row.status}${row.grade ? ` (${row.grade})` : ''}`, row.issues || 'OK']),
     { 0: { cellWidth: 70 }, 1: { cellWidth: 90 }, 3: { cellWidth: 26 }, 4: { cellWidth: 75 }, 5: { cellWidth: 260 } });
 
-  sectionTable('Semester-locked courses to watch', ['Course', 'When it runs', 'Prerequisite timing', 'In this plan'],
+  sectionTable('Semester-locked courses to watch', ['Course', 'When it\'s offered', 'Prerequisite timing', 'In this plan'],
     catalog.offeringAdvice.watchList.map((entry) => [
       `${entry.code}\n${getCourse(entry.code)?.title ?? ''}`,
       `${entry.lock}. ${entry.why}`,

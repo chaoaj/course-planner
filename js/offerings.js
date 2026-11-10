@@ -1,4 +1,4 @@
-// When courses have run, from past schedules (data/offerings.json), and what that means for a plan.
+// When courses have been offered, from past schedules (data/offerings.json), and what that means for a plan.
 // Patterns are computed here so a new term's schedule only needs its section counts added to the JSON.
 
 import { catalog, canonical, parseTerm } from './catalog.js';
@@ -62,7 +62,7 @@ export function isSemesterLocked(code) {
   return Boolean(pattern && ['fall-only', 'spring-only', 'mostly-fall', 'mostly-spring'].includes(pattern.kind));
 }
 
-// The season(s) a course reliably runs in, for planning: ['Fall'], ['Spring'] or both.
+// The season(s) a course is reliably offered in, for planning: ['Fall'], ['Spring'] or both.
 // CS courses that never appear in the schedule data (for example CS 332 or CS 442 in 2020–2027).
 export function neverScheduled(code) {
   const canon = canonical(code);
@@ -90,7 +90,7 @@ export function seasonIssue(code, termName) {
   if (!pattern || !season) return null;
   const range = `${catalog.offerings.terms[0]}–${catalog.offerings.terms[catalog.offerings.terms.length - 1]}`;
   if (season === 'Summer') {
-    return { level: 'info', text: 'Summer offerings aren’t in the schedule data; confirm this course runs in summer.' };
+    return { level: 'info', text: 'Summer offerings aren’t in the schedule data; confirm this course is offered in summer.' };
   }
   if (pattern.kind === 'every' || pattern.kind === 'recent-every') return null;
   const count = season === 'Fall' ? pattern.falls : pattern.springs;
@@ -100,7 +100,7 @@ export function seasonIssue(code, termName) {
     return { level: 'warning', text: `Not offered in any ${season.toLowerCase()} from ${range} (${pattern.label.toLowerCase()}). Plan it for a ${other} term.` };
   }
   if (count <= 2 && count < total) {
-    return { level: 'warning', text: `Rarely offered in ${season.toLowerCase()} (${count} of ${total} since ${catalog.offerings.terms[0]}). It usually runs in ${other}.` };
+    return { level: 'warning', text: `Rarely offered in ${season.toLowerCase()} (${count} of ${total} since ${catalog.offerings.terms[0]}). It's usually offered in ${other}.` };
   }
   if (count < total - 1) {
     return { level: 'info', text: `Offered in ${count} of ${total} ${season.toLowerCase()} terms since ${catalog.offerings.terms[0]}; confirm it’s on the schedule.` };

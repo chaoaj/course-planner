@@ -1,11 +1,11 @@
 {
   "source": "Written from the Fall 2020 \u2013 Spring 2027 CS schedules and the catalog prerequisites. Review each year when the new schedule is posted.",
   "general": [
-    "Every required core course (CS 149, 159, 227, 240, 261, 327, 345, 361) has run every fall and spring since Fall 2020, so the core sequence can start in either term.",
-    "Avoid taking CS 240 and CS 261 in the same term. Both are demanding gateway courses (C- minimum, at most two attempts); splitting them usually costs no time, since CS 327 needs only CS 240 and can run alongside CS 261.",
-    "CS 430 and CS 412 ran only in spring through Spring 2022 and have run in both terms since Fall 2022.",
-    "Systems electives split by term: CS 432 and CS 450 are fall courses; CS 456 and CS 470 are mostly spring; CS 455 ran in some early falls but only in spring since Spring 2025. Check which options run in the student's remaining terms before choosing one.",
-    "CS 452 runs only in fall; CS 412 runs in both terms. A student who needs the algorithms elective in a spring term should plan on CS 412.",
+    "Every required core course (CS 149, 159, 227, 240, 261, 327, 345, 361) has been offered every fall and spring since Fall 2020, so the core sequence can start in either term.",
+    "Avoid taking CS 240 and CS 261 in the same term. Both are demanding gateway courses (C- minimum, at most two attempts); splitting them usually costs no time, since CS 327 needs only CS 240 and can be taken alongside CS 261.",
+    "CS 430 and CS 412 were offered only in spring through Spring 2022 and have been offered in both terms since Fall 2022.",
+    "Systems electives split by term: CS 432 and CS 450 are fall courses; CS 456 and CS 470 are mostly spring; CS 455 was offered in some early falls but only in spring since Spring 2025. Check which options are offered in the student's remaining terms before choosing one.",
+    "CS 452 is offered only in fall; CS 412 is offered in both terms. A student who needs the algorithms elective in a spring term should plan on CS 412.",
     "Summer CS offerings aren't in this schedule data. Confirm any summer course with the department before building a plan around it.",
     "Spring 2027 is the planned schedule and can change; treat it as likely, not certain."
   ],
@@ -33,7 +33,7 @@
     {
       "code": "CS 452",
       "lock": "Fall only",
-      "why": "Offered every fall, never in spring. CS 412 (the other algorithms option) runs in both terms.",
+      "why": "Offered every fall, never in spring. CS 412 (the other algorithms option) is offered in both terms.",
       "prereqAdvice": "Needs CS 327 and statistics. For CS 452 in a final fall, CS 327 and statistics must be done by the previous spring."
     },
     {
@@ -115,7 +115,7 @@
     },
     {
       "title": "Spring-start transfer students",
-      "advice": "The core runs every term, so a spring start doesn't delay the core. It does shift which fall-only electives (CS 354, CS 452, CS 457) line up; check them against the student's last fall at JMU."
+      "advice": "The core is offered every term, so a spring start doesn't delay the core. It does shift which fall-only electives (CS 354, CS 452, CS 457) line up; check them against the student's last fall at JMU."
     }
   ],
   "robotics": {

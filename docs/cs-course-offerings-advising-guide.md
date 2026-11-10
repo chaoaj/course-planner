@@ -1,4 +1,4 @@
-# When CS Courses Run: Advising Watch List
+# CS Course Offering Terms: Advising Watch List
 
 *For JMU Computer Science advisors. Based on the CS department schedules from Fall 2020 through Spring 2027 (14 terms). Spring 2027 is the planned schedule and may change. Summer terms are not included. Prepared November 2026.*
 
@@ -15,7 +15,7 @@
 
 ## Quick summary
 
-| When it runs | Courses |
+| When it's offered | Courses |
 |---|---|
 | Every fall and spring (core) | CS 149, CS 159, CS 227, CS 240, CS 261, CS 327, CS 345, CS 361 |
 | Every fall and spring since Fall 2022 | CS 412, CS 430 (both were spring-only through Spring 2022) |
@@ -28,11 +28,11 @@ The "Fall only" and "Spring only" rows are fully semester-locked: missing that t
 
 ## Semester-locked watch list
 
-| Course | When it runs | Prerequisite timing | Programs |
+| Course | When it's offered | Prerequisite timing | Programs |
 |---|---|---|---|
 | **CS 354** Introduction to Autonomous Robotics | **Fall only.** Offered every fall (7 of 7), never in spring. | Needs CS 240 and statistics (MATH 220, 229 or 318) with a C- or better. Finish both by the spring before. | Robotics minor (core course); CS minor AI and Robotics focus |
 | **CS 444** Artificial Intelligence | **Spring only.** Offered in 6 of 7 springs (not Spring 2026), never in fall. | Needs CS 240 and statistics. Missing it in spring means waiting a full year, and it was skipped in Spring 2026. | Robotics minor (elective); CS minor AI and Robotics focus |
-| **CS 452** Design and Analysis of Algorithms | **Fall only.** Offered every fall, never in spring. CS 412 (the other algorithms option) runs in both terms. | Needs CS 327 and statistics. For CS 452 in a final fall, CS 327 and statistics must be done by the previous spring. | — |
+| **CS 452** Design and Analysis of Algorithms | **Fall only.** Offered every fall, never in spring. CS 412 (the other algorithms option) is offered in both terms. | Needs CS 327 and statistics. For CS 452 in a final fall, CS 327 and statistics must be done by the previous spring. | — |
 | **CS 457** Information Security | **Fall only.** Offered every fall, never in spring. It starts the information security sequence. | Needs CS 361 (can be taken at the same time) and statistics. Take CS 457 in fall so CS 458 can follow in spring. | Information security courses |
 | **CS 458** Cyber Defense | **Spring only.** Offered every spring, never in fall. | Needs CS 457 (fall only) and CS 361. The only workable order is CS 457 in a fall and CS 458 in the next spring; missing that fall delays CS 458 a full year. | Information security courses |
 | **CS 482** Selected Topics in Information Security | **Spring only.** Selected topics in information security: offered every spring, never in fall. | Needs CS 240 and CS 261. | Information security courses |
@@ -59,13 +59,13 @@ CS 432 and CS 450 are effectively fall courses, and the advising sheet recommend
 
 ### Spring-start transfer students
 
-The core runs every term, so a spring start doesn't delay the core. It does shift which fall-only electives (CS 354, CS 452, CS 457) line up; check them against the student's last fall at JMU.
+The core is offered every term, so a spring start doesn't delay the core. It does shift which fall-only electives (CS 354, CS 452, CS 457) line up; check them against the student's last fall at JMU.
 
 ## Robotics minor
 
 From the [2026–27 catalog](https://catalog.jmu.edu/programs/robotics-minor/#requirementstext): 20–21 credits. Coordinator: Nathan Sprague (spragunr@jmu.edu).
 
-| Requirement | Choose | Credits | When CS options run |
+| Requirement | Choose | Credits | When CS options are offered |
 |---|---|---|---|
 | Basic preparation: introductory programming | CS 149, IA 241 or ISAT 252 | 3 | Every term |
 | Basic preparation: calculus | MATH 232, MATH 235 or ISAT 151 | 3–4 | — |
@@ -80,11 +80,11 @@ From the [2026–27 catalog](https://catalog.jmu.edu/programs/robotics-minor/#re
 
 ## General advice
 
-- Avoid taking CS 240 and CS 261 in the same term. Both are demanding gateway courses (C- minimum, at most two attempts); splitting them usually costs no time, since CS 327 needs only CS 240 and can run alongside CS 261. In the tightest plans (an associate-degree student starting from CS 149 or earlier), CS 361 needs both, so separating them adds a semester.
-- Every required core course (CS 149, 159, 227, 240, 261, 327, 345, 361) has run every fall and spring since Fall 2020, so the core sequence can start in either term.
-- CS 430 and CS 412 ran only in spring through Spring 2022 and have run in both terms since Fall 2022.
-- Systems electives split by term: CS 432 and CS 450 are fall courses; CS 456 and CS 470 are mostly spring; CS 455 ran in some early falls but only in spring since Spring 2025. Check which options run in the student's remaining terms before choosing one.
-- CS 452 runs only in fall; CS 412 runs in both terms. A student who needs the algorithms elective in a spring term should plan on CS 412.
+- Avoid taking CS 240 and CS 261 in the same term. Both are demanding gateway courses (C- minimum, at most two attempts); splitting them usually costs no time, since CS 327 needs only CS 240 and can be taken alongside CS 261. In the tightest plans (an associate-degree student starting from CS 149 or earlier), CS 361 needs both, so separating them adds a semester.
+- Every required core course (CS 149, 159, 227, 240, 261, 327, 345, 361) has been offered every fall and spring since Fall 2020, so the core sequence can start in either term.
+- CS 430 and CS 412 were offered only in spring through Spring 2022 and have been offered in both terms since Fall 2022.
+- Systems electives split by term: CS 432 and CS 450 are fall courses; CS 456 and CS 470 are mostly spring; CS 455 was offered in some early falls but only in spring since Spring 2025. Check which options are offered in the student's remaining terms before choosing one.
+- CS 452 is offered only in fall; CS 412 is offered in both terms. A student who needs the algorithms elective in a spring term should plan on CS 412.
 - Summer CS offerings aren't in this schedule data. Confirm any summer course with the department before building a plan around it.
 - Spring 2027 is the planned schedule and can change; treat it as likely, not certain.
 
@@ -133,7 +133,7 @@ Number of sections offered each term; a dash (–) means not offered. Columns: F
 | CS 482 Selected Topics in Information Security | Spring only | – | 2 | – | 1 | – | 2 | – | 1 | – | 1 | – | 1 | – | 1 |
 | CS 488 Computer Graphics Applications | Irregular (5 of 14 terms) | – | 1 | – | 1 | – | – | 1 | – | – | – | 1 | – | 1 | – |
 
-Every 100- and 200-level major course (CS 149, 159, 227, 240, 261) ran every fall and spring in this period.
+Every 100- and 200-level major course (CS 149, 159, 227, 240, 261) were offered every fall and spring in this period.
 
 ## Sources and updates
 

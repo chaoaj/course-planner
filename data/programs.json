@@ -5,10 +5,17 @@
   "programs": [
     {
       "id": "cyber",
-      "label": "Information Systems Security certificate (Cybersecurity, NSA-approved)",
-      "short": "Cybersecurity certificate",
+      "label": "NSA Information Systems Security Professionals Certification (Cybersecurity)",
+      "short": "NSA Cybersecurity certificate",
       "source": "https://www.jmu.edu/cise/cs/undergraduate/nsa-certificate.shtml",
-      "note": "Every CS student who completes these courses earns the certificate. To claim it, bring or email an unofficial transcript with the courses circled to the CS administrative assistant (King Hall 219B). CS 482 can be replaced by a relevant course only with permission from the Cybersecurity Office. CS 457 runs in fall only and CS 458 in spring only, so plan CS 457 in the fall before.",
+      "description": "All undergraduate Computer Science students who take CS 457, CS 458 and CS 482 receive the NSA-approved \"Information Systems Security Professionals Certification.\" Students learn cybersecurity tools and techniques to protect networks and systems from attackers, preparing them for the nation's shortage of technical cybersecurity expertise.",
+      "note": "With permission of the Cybersecurity Office, and only in special circumstances, CS 482 may be replaced by a relevant course; record an approved substitute as credit for CS 482 (source Waived) with a note. CS 457 is offered in fall only and CS 458 in spring only, so plan CS 457 in the fall before CS 458. The courses also count as CS electives.",
+      "claimSteps": [
+        "Print an unofficial transcript.",
+        "Circle the required courses taken.",
+        "Take the transcript to the CS Admin Assistant (King Hall 219B) or email it to hopperlg@jmu.edu."
+      ],
+      "contactEmail": "hopperlg@jmu.edu",
       "groups": [
         {
           "id": "cyber-core",
@@ -18,7 +25,8 @@
             "CS 457",
             "CS 458",
             "CS 482"
-          ]
+          ],
+          "note": "CS 457 Information Security, CS 458 Cyber Defense, CS 482 Selected Topics in Information Security."
         }
       ]
     },
@@ -103,7 +111,7 @@
             ]
           ],
           "credits": "3",
-          "note": "CS 354 runs in fall only."
+          "note": "CS 354 is offered in fall only."
         },
         {
           "id": "rob-electives",
@@ -130,7 +138,7 @@
             "PHYS 372",
             "PHYS 388"
           ],
-          "note": "At least one elective must be from a different department than the core course. CS 444 runs in spring only.",
+          "note": "At least one elective must be from a different department than the core course. CS 444 is offered in spring only.",
           "suggest": [
             "CS 444",
             "MATH 238",
