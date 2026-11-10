@@ -728,11 +728,15 @@ function placeSlot(item, { firstYearOnly = false } = {}) {
   const fits = (term) => termLoad(term) + (Number(item.credits) || 0) <= limit;
   const lightest = (terms) => [...terms].sort((a, b) => termLoad(a) - termLoad(b) || termSortKey(a.name) - termSortKey(b.name))[0];
   if (firstYearOnly) {
-    const firstYear = usableTerms().filter((term) => parseTerm(term.name)?.season !== 'Summer').slice(0, 2);
-    while (firstYear.length < 2) {
-      const name = firstYear.length ? nextTerm(firstYear[firstYear.length - 1].name, false) : planStartTerm();
-      firstYear.push(ensureTerm(name));
-    }
+    // The first year at JMU is the first two fall/spring terms from the start term, including terms already being
+    // taken; only the ones still open for planning can take the placeholder.
+    const yearNames = [plan.student.startTerm];
+    while (parseTerm(yearNames[0])?.season === 'Summer') yearNames[0] = nextTerm(yearNames[0], false);
+    yearNames.push(nextTerm(yearNames[0], false));
+    const openKey = termSortKey(planStartTerm());
+    let firstYear = yearNames.filter((name) => termSortKey(name) >= openKey).map((name) => ensureTerm(name));
+    // Both first-year terms already taken: the earliest open term is the soonest it can happen.
+    if (!firstYear.length) firstYear = [ensureTerm(planStartTerm())];
     let target = lightest(firstYear.filter(fits));
     if (!target) {
       for (const term of firstYear) {

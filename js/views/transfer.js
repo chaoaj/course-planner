@@ -57,8 +57,17 @@ export function renderTransfer() {
   otherBody.innerHTML = transfer.other.length
     ? transfer.other.map((row) => `<tr data-row="${row.id}">
       <td><label class="visually-hidden" for="${row.id}-code">JMU course</label>
-        <input class="form-control form-control-sm${row.code && !getCourse(row.code) ? ' is-invalid' : ''}" id="${row.id}-code" list="course-list" data-other="${row.id}" data-key="code" value="${escapeHtml(row.code)}" placeholder="CS 149"${row.code && !getCourse(row.code) ? ` aria-describedby="${row.id}-code-help" aria-invalid="true"` : ''} />
-        ${row.code && !getCourse(row.code) ? `<div id="${row.id}-code-help" class="small issue-text-error">Not a course this app knows, so it isn't counted. Enter a JMU code such as CS 149.</div>` : ''}
+        ${(() => {
+          // A code that isn't a course code at all can't count; a real course the app doesn't list (MATH 135,
+          // UNST 000) still counts as transfer credit; a GNED row counts for its General Education domain.
+          const looksLikeCode = /^[A-Z]{2,5} \d{3}[A-Z]?$/.test(row.code);
+          const invalid = row.code && !getCourse(row.code) && !looksLikeCode && !row.genEd;
+          const hint = !row.code || getCourse(row.code) ? ''
+            : row.genEd ? `<div id="${row.id}-code-help" class="small">Counts for General Education ${escapeHtml(row.genEd)}.</div>`
+              : looksLikeCode ? `<div id="${row.id}-code-help" class="small text-body-secondary">${/ 000$/.test(row.code) ? 'General credit: counts toward the 120 credits, not a specific requirement.' : 'Not in this app’s course list: counts as transfer credit, not toward a specific requirement.'}</div>`
+                : `<div id="${row.id}-code-help" class="small issue-text-error">Not a course this app knows, so it isn't counted. Enter a JMU code such as CS 149.</div>`;
+          return `<input class="form-control form-control-sm${invalid ? ' is-invalid' : ''}" id="${row.id}-code" list="course-list" data-other="${row.id}" data-key="code" value="${escapeHtml(row.code)}" placeholder="CS 149"${hint ? ` aria-describedby="${row.id}-code-help"` : ''}${invalid ? ' aria-invalid="true"' : ''} />${hint}`;
+        })()}
         ${getCourse(row.code)?.genEd && !/^MATH/.test(row.code) && transfer.associateDegree ? '<div class="small fst-italic">Covered by the associate degree; not needed for Gen Ed.</div>' : ''}</td>
       <td><label class="visually-hidden" for="${row.id}-credits">Credits</label>
         <input class="form-control form-control-sm" type="number" min="0" max="12" id="${row.id}-credits" data-other="${row.id}" data-key="credits" value="${row.credits}" style="width:5rem" /></td>

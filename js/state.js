@@ -105,7 +105,8 @@ export function normalizePlan(input) {
     credits: Number(row.credits ?? 3) || 0,
     grade: row.grade ?? '',
     source: row.source ?? 'Other college',
-    note: row.note ?? ''
+    note: row.note ?? '',
+    genEd: row.genEd ?? ''
   }));
   plan.terms = (Array.isArray(plan.terms) ? plan.terms : []).map((term) => ({
     id: term.id || uid('term'),

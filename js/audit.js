@@ -432,7 +432,10 @@ function auditGenEd(group, plan, ctx, used) {
   const results = [];
   const unplaced = [];
   for (const domain of domains) {
-    let found = findCourse(domain.options);
+    // Transfer credit recorded by domain (a GNED row for C2HQC) meets that domain directly.
+    const byDomain = plan.transfer.other.find((row) => row.genEd === domain.id);
+    let found = byDomain ? { code: row_label(byDomain), status: 'met', where: byDomain.source || 'Transfer' } : null;
+    found ??= findCourse(domain.options);
     // Lab Experience is also met by a lecture course that includes its lab.
     if (!found && domain.metBy) {
       // The lecture already counts for Physical Principles or Natural Systems; its lab counts here too.
@@ -474,6 +477,10 @@ function auditGenEd(group, plan, ctx, used) {
     missingDomains,
     detail: `${met} of ${results.length} domains met, ${covered} covered by credit or the plan.${missingDomains.length ? ` Still needed: ${missingDomains.map((domain) => domain.label).join(', ')}.` : ''}`
   };
+}
+
+function row_label(row) {
+  return `${row.code} (General Education ${row.genEd})`;
 }
 
 function slotItemsFor(plan, test) {

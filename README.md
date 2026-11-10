@@ -52,6 +52,22 @@ Notes:
 
 `sample/` has a fictional student JSON and a small advising sheet to try the importer with.
 
+## Importing a transcript and schedule (`tools/transcript_to_plan.py`)
+
+Builds a plan file the app opens with **Open JSON** from a MyMadison unofficial transcript and class schedule, copied as text into two files:
+
+```bash
+python3 tools/transcript_to_plan.py --transcript transcript.txt --schedule schedule.txt \
+    --name "Student Name" --term "Fall 2026" --out LastF_course-plan.json
+```
+
+- **Transfer credit** becomes rows on the Transfer credit tab (JMU equivalents as shown on the transcript; `MATH 227` becomes CS 227). `GNED` rows count for the General Education domain in their description, and `CS 000`-style general credit counts toward the 120 credits only. The transfer total is entered as the accepted credits.
+- **The schedule** becomes an in-progress term, and its meeting times and rooms go into the advising notes.
+- **Assumed prerequisites:** if the student is taking courses whose prerequisites aren't on the transcript (CS 327 needs CS 240), the tool records them as assumed credit, flagged to confirm on the transfer evaluation. Turn this off with `--no-infer`.
+- `--associate` marks an associate degree; `--start` sets the first term at JMU. Python 3 only, no packages needed; course data comes from `data/`.
+
+Transcripts are student records (FERPA): keep them and the generated files out of this public repository (`*_course-plan.*` is already ignored).
+
 ## Accessibility
 
 Built for WCAG 2.1 AA / Section 508: keyboard-operable tabs (arrow keys, Home/End), labeled controls, a skip link, visible focus, live-region announcements after actions, and no color-only meaning: the advising sheet's purple (B- or better) and yellow (C- or better) fills are kept exactly (`#D9D2E9`, `#FFF2CC`) and paired with "B-" / "C-" text. Problems are marked with an icon *and* words. The canvas map has a text description and a full table equivalent. Checked with axe-core in light and dark modes. The Excel export uses header rows, frozen panes and text markers alongside fills. jsPDF can't produce tagged PDFs, so share the Excel file (or the JSON in the app) with students who use screen readers.
