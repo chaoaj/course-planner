@@ -13,7 +13,7 @@
     </script>
     <title>Course Planner</title>
     <link rel="stylesheet" href="./lib/bootstrap.min.css" />
-    <link rel="stylesheet" href="./css/styles.css?v=2026-11-10q" />
+    <link rel="stylesheet" href="./css/styles.css?v=2026-11-10v" />
     <link rel="icon" type="image/svg+xml" href="./images/course-planner-logo.svg" />
   </head>
   <body class="bg-body-tertiary min-vh-100">
@@ -76,9 +76,9 @@
           <div class="col-md-3">
             <label class="form-label" for="f-start">First term at JMU</label>
             <input class="form-control" id="f-start" data-field="student.startTerm" aria-describedby="f-start-help" />
-            <div id="f-start-help" class="form-text">For example, Fall 2027.</div>
+            <div id="f-start-help" class="form-text">For example, Fall 2026 (the default).</div>
           </div>
-          <div class="col-md-3"><label class="form-label" for="f-grad">Expected graduation</label><input class="form-control" id="f-grad" data-field="student.expectedGraduation" placeholder="May 2029" /></div>
+          <div class="col-md-3"><label class="form-label" for="f-grad">Expected graduation</label><input class="form-control" id="f-grad" data-field="student.expectedGraduation" placeholder="May 2029" aria-describedby="f-grad-help" /><div id="f-grad-help" class="form-text">Filled in from the first term and the target semesters on the Plan tab; type a date to set it yourself.</div></div>
           <div class="col-12 d-flex flex-wrap gap-4">
             <div class="form-check"><input class="form-check-input" type="checkbox" id="f-placement" data-field="student.mathPlacement" /><label class="form-check-label" for="f-placement">Math placement met for CS 149</label></div>
             <div class="form-check"><input class="form-check-input" type="checkbox" id="f-admitted" data-field="student.admittedToMajor" /><label class="form-check-label" for="f-admitted">Fully admitted to the CS major</label></div>
@@ -180,6 +180,18 @@
             </select>
             <div id="max-credits-help" class="visually-hidden">Applying a sample plan and Auto-plan keep each term at or under this many credits.</div>
           </div>
+          <div class="col-6 col-sm-3 col-lg-2">
+            <label class="form-label" for="min-terms">Min semesters at JMU</label>
+            <select class="form-select" id="min-terms">
+              <option value="0">No minimum</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            </select>
+          </div>
+          <div class="col-6 col-sm-3 col-lg-2">
+            <label class="form-label" for="target-terms">Target semesters</label>
+            <select class="form-select" id="target-terms">
+              <option value="0">No target</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+            </select>
+          </div>
           <div class="col-auto"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="f-summer" /><label class="form-check-label" for="f-summer">Include summer terms</label></div></div>
           <div class="col-auto d-flex gap-2">
             <button class="btn btn-outline-primary" type="button" id="btn-balance" aria-describedby="balance-help">Balance terms</button>
@@ -195,6 +207,12 @@
           </div>
           <div id="gened-cleanup" class="small" aria-live="polite"></div>
         </div>
+        <fieldset class="mb-3" id="program-picker">
+          <legend class="fs-6 fw-semibold mb-1">Also complete</legend>
+          <div id="program-options" class="d-flex flex-wrap gap-3"></div>
+          <div id="program-notes" class="small mt-1"></div>
+        </fieldset>
+        <div id="target-note" class="mb-3" aria-live="polite"></div>
         <details id="gened-tracker" class="gened-tracker card mb-3" open hidden>
           <summary class="card-header fw-semibold" id="gened-tracker-summary">General Education</summary>
           <div class="card-body py-2" id="gened-tracker-body"></div>
@@ -328,6 +346,6 @@
     <script src="./lib/exceljs.min.js" defer></script>
     <script src="./lib/jspdf.umd.min.js" defer></script>
     <script src="./lib/jspdf.plugin.autotable.min.js" defer></script>
-    <script type="module" src="./js/main.js?v=2026-11-10q"></script>
+    <script type="module" src="./js/main.js?v=2026-11-10v"></script>
   </body>
 </html>

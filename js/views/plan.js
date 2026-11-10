@@ -1,11 +1,11 @@
 // Plan tab: one card per term with its courses, their prerequisite checks, and controls to move, change or remove them.
 
-import { catalog, canonical, getCourse, gradeBand, slotInfo, parseTerm, genEdDomain, genEdDomains } from '../catalog.js';
-import { state, commit, ensureTerm, followingTerm, normalizeItem } from '../state.js';
+import { catalog, canonical, getCourse, gradeBand, slotInfo, parseTerm, genEdDomain, genEdDomains, graduationLabel } from '../catalog.js';
+import { state, commit, ensureTerm, followingTerm, normalizeItem, syncGraduation } from '../state.js';
 import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal, auditRequirements } from '../audit.js';
 import { statusBadge } from './audit.js';
 import { gradeMeets } from '../util.js';
-import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives, fillGenEd, enforceMaxCredits, maxCredits, plannedCount, balancePlan } from '../scheduler.js';
+import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives, fillGenEd, enforceMaxCredits, maxCredits, plannedCount, balancePlan, targetCheck, setProgram } from '../scheduler.js';
 import { escapeHtml, GRADES, showStatus, announce } from '../util.js';
 import { offeringPattern, reliableSeasons, isSemesterLocked, neverScheduled } from '../offerings.js';
 
@@ -225,7 +225,49 @@ function renderGenEdTracker() {
     </div>`;
 }
 
+// Whether the plan finishes within the target number of semesters, and what would make it fit if not.
+function renderTargetNote() {
+  const box = document.getElementById('target-note');
+  if (!box) return;
+  const check = targetCheck();
+  if (!state.plan.terms.length) { box.innerHTML = ''; return; }
+  const grad = graduationLabel(check.last);
+  const minNote = check.min && check.semesters < check.min
+    ? `<div class="alert alert-warning py-2 mb-2 small"><strong>Under the minimum:</strong> the plan has ${check.semesters} fall/spring semester${check.semesters === 1 ? '' : 's'} at JMU; the minimum is ${check.min}. Add a term or use Balance terms to spread the plan over ${check.min}.</div>`
+    : '';
+  const lowLoad = state.plan.terms.filter((term) => termCredits(term) > 0 && termCredits(term) < 12 && parseTerm(term.name)?.season !== 'Summer').length;
+  const loadNote = lowLoad && check.min && check.semesters === check.min
+    ? `<p class="small mb-1">${lowLoad} semester${lowLoad === 1 ? ' is' : 's are'} under 12 credits (part-time) because the plan is spread over the ${check.min}-semester minimum. Add electives or a minor to keep full-time status if the student needs it.</p>`
+    : '';
+  if (!check.target) { box.innerHTML = minNote + loadNote; return; }
+  if (check.used <= check.target) {
+    box.innerHTML = `${minNote}${loadNote}<p class="small mb-0"><strong>On target:</strong> ${check.used} of ${check.target} semesters, finishing ${escapeHtml(check.last)}${grad ? ` (${escapeHtml(grad)} graduation)` : ''}${check.min ? `; minimum ${check.min} at JMU` : ''}.</p>`;
+    return;
+  }
+  const reasons = [];
+  if (check.chain > check.target) reasons.push(`the CS prerequisite chain alone needs ${check.chain} semesters`);
+  else if (check.fitsAt && check.fitsAt > maxCredits()) reasons.push(`raising Max credits per term to ${check.fitsAt} would fit it in ${check.target}`);
+  else if (!check.fitsAt) reasons.push(`it doesn't fit in ${check.target} semesters even at 21 credits per term`);
+  reasons.push('transfer credit, summer terms, or an associate degree (for General Education) can shorten it');
+  box.innerHTML = `${minNote}<div class="alert alert-warning py-2 mb-0 small"><strong>Over target:</strong> the plan uses ${check.used} semesters (through ${escapeHtml(check.last)}), more than the ${check.target}-semester target. ${escapeHtml(reasons.join('; ').replace(/^./, (letter) => letter.toUpperCase()))}.</div>`;
+}
+
+// Minor and certificate checkboxes, with each selected program's notes and source.
+function renderPrograms() {
+  const options = document.getElementById('program-options');
+  if (!options) return;
+  const selected = new Set(state.plan.programs ?? []);
+  options.innerHTML = (catalog.programs?.programs ?? []).map((program) => `<div class="form-check mb-0">
+      <input class="form-check-input" type="checkbox" id="program-${program.id}" data-program="${program.id}"${selected.has(program.id) ? ' checked' : ''} />
+      <label class="form-check-label" for="program-${program.id}">${escapeHtml(program.label)}${program.draft ? ' <span class="badge text-bg-warning">confirm requirements</span>' : ''}</label>
+    </div>`).join('');
+  document.getElementById('program-notes').innerHTML = (catalog.programs?.programs ?? []).filter((program) => selected.has(program.id))
+    .map((program) => `<p class="mb-1"><strong>${escapeHtml(program.short)}:</strong> ${escapeHtml(program.note)} <a href="${escapeHtml(program.source)}" target="_blank" rel="noopener">Program page<span class="visually-hidden"> for the ${escapeHtml(program.short)} (opens in a new tab)</span></a></p>`).join('');
+}
+
 export function renderPlan() {
+  renderPrograms();
+  renderTargetNote();
   renderGenEdCleanup();
   renderGenEdTracker();
   const { terms } = state.plan;
@@ -286,6 +328,38 @@ export function bindPlan(refresh) {
     const target = event.target;
     if (target.id === 'sample-select') { target.dataset.touched = '1'; return; }
     if (target.id === 'per-term') { state.plan.settings.coursesPerTerm = Number(target.value); commit({ render: false }); return; }
+    if (target.dataset.program) {
+      const program = catalog.programs.programs.find((entry) => entry.id === target.dataset.program);
+      const result = setProgram(target.dataset.program, target.checked);
+      commit({ render: false });
+      refresh('all');
+      document.getElementById(`program-${program.id}`)?.focus();
+      showStatus(target.checked
+        ? `Added the ${program.short} to the plan${result.added ? ` (${result.added} course${result.added === 1 ? '' : 's'} and placeholders added and the plan rebalanced)` : ''}. Its requirements are on the Requirements tab.`
+        : `Removed the ${program.short}${result.removed ? ` and ${result.removed} planned course${result.removed === 1 ? '' : 's'} only it needed` : ''}.`, 'success');
+      return;
+    }
+    if (target.id === 'min-terms') {
+      state.plan.settings.minTerms = Number(target.value);
+      if (plannedCount()) { balancePlan(); enforceMaxCredits(); }
+      while (state.plan.terms.length && !state.plan.terms[state.plan.terms.length - 1].items.length) state.plan.terms.pop();
+      commit({ render: false });
+      refresh('all');
+      showStatus(Number(target.value) ? `Minimum ${target.value} semesters at JMU.${plannedCount() ? ' Rebalanced the plan.' : ''}` : 'No minimum number of semesters.', 'info');
+      return;
+    }
+    if (target.id === 'target-terms') {
+      state.plan.settings.targetTerms = Number(target.value);
+      syncGraduation();
+      if (plannedCount()) { balancePlan(); enforceMaxCredits(); }
+      while (state.plan.terms.length && !state.plan.terms[state.plan.terms.length - 1].items.length) state.plan.terms.pop();
+      commit({ render: false });
+      const grad = document.getElementById('f-grad');
+      if (grad) grad.value = state.plan.student.expectedGraduation;
+      refresh('all');
+      showStatus(Number(target.value) ? `Target ${target.value} semesters${state.plan.settings.autoGraduation ? `; expected graduation ${state.plan.student.expectedGraduation}` : ''}.${plannedCount() ? ' Rebalanced the plan.' : ''}` : 'No semester target.', 'info');
+      return;
+    }
     if (target.id === 'max-credits') {
       state.plan.settings.maxCredits = Number(target.value);
       // A new limit rebalances the planned courses over the terms they now need.

@@ -1,0 +1,78 @@
+{
+  "notes": [
+    "Program courses can also count toward the CS major (for example CS 457 as a CS elective); the planner counts them for both. Check overlap rules with the program coordinator."
+  ],
+  "programs": [
+    {
+      "id": "cyber",
+      "label": "Information Systems Security certificate (Cybersecurity, NSA-approved)",
+      "short": "Cybersecurity certificate",
+      "source": "https://www.jmu.edu/cise/cs/undergraduate/nsa-certificate.shtml",
+      "note": "Every CS student who completes these courses earns the certificate. To claim it, bring or email an unofficial transcript with the courses circled to the CS administrative assistant (King Hall 219B). CS 482 can be replaced by a relevant course only with permission from the Cybersecurity Office. CS 457 runs in fall only and CS 458 in spring only, so plan CS 457 in the fall before.",
+      "groups": [
+        {
+          "id": "cyber-core",
+          "label": "Required courses",
+          "type": "allOf",
+          "courses": [
+            "CS 457",
+            "CS 458",
+            "CS 482"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "robotics",
+      "label": "Robotics minor",
+      "short": "Robotics minor",
+      "source": "https://catalog.jmu.edu/programs/robotics-minor/",
+      "draft": true,
+      "note": "20\u201321 credits. Interdisciplinary: at least one elective must come from a different department than the core course, and the minor ends with a robotics project summarized in CISE 481. Course lists here are partial (the 2016\u201317 catalog list and the 2023\u201324 structure); confirm the current requirements with the coordinator, Nathan Sprague (spragunr@jmu.edu), and edit data/programs.json.",
+      "groups": [
+        {
+          "id": "rob-core",
+          "label": "Robotics core course",
+          "type": "oneOf",
+          "options": [
+            [
+              "CS 354"
+            ],
+            [
+              "PHYS 386"
+            ]
+          ],
+          "note": "CS 354 runs in fall only."
+        },
+        {
+          "id": "rob-pp",
+          "label": "Physical Principles (General Education C3PP) course",
+          "type": "genEdDomain",
+          "domain": "C3PP",
+          "note": "Also counts toward General Education. See the coordinator if the student's Physical Principles course isn't on the minor's list."
+        },
+        {
+          "id": "rob-elect",
+          "label": "Electives (at least 6 credits)",
+          "type": "creditsFrom",
+          "credits": 6,
+          "courses": [
+            "CS 444",
+            "MATH 238",
+            "MATH 248"
+          ],
+          "note": "At least one elective must be from a different department than the core course. CS 444 runs in spring only. The full elective list is longer; confirm with the coordinator."
+        },
+        {
+          "id": "rob-capstone",
+          "label": "Robotics project (CISE 481)",
+          "type": "allOf",
+          "courses": [
+            "CISE 481"
+          ],
+          "note": "Taken with, or after, an approved capstone, special topics or independent study course involving a robotics project; an internship or research experience in robotics may also be approved."
+        }
+      ]
+    }
+  ]
+}

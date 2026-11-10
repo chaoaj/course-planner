@@ -1,8 +1,8 @@
 // Sample transfer plans and the auto-planner that fills in what's still needed, term by term, in prerequisite order.
 
-import { catalog, canonical, getCourse, parseTerm, slotInfo, termSortKey, nextTerm } from './catalog.js';
+import { catalog, canonical, getCourse, parseTerm, slotInfo, termSortKey, nextTerm, genEdDomain, getProgram } from './catalog.js';
 import { state, ensureTerm, termSequence, normalizeItem, followingTerm } from './state.js';
-import { auditRequirements, creditedCourses, SLOT_PREREQS } from './audit.js';
+import { auditRequirements, creditedCourses, SLOT_PREREQS, programDomains } from './audit.js';
 import { reliableSeasons } from './offerings.js';
 import { uid } from './util.js';
 
@@ -87,6 +87,8 @@ export function applySamplePlan(planId) {
   }
   const credited = creditedCourses(state.plan);
   const missing = sample.assumes.filter((code) => !credited.has(canonical(code)));
+  const programAdded = addProgramNeeds();
+  added += programAdded.length;
   const moved = enforceMaxCredits();
   added -= pruneSurplusSlots();
   const genEd = fillGenEd();
@@ -95,7 +97,7 @@ export function applySamplePlan(planId) {
   const movedLater = enforceMaxCredits();
   dropEmptyTail();
   added += genEd.added + electives.added;
-  return { added, missing, skipped, mathAdded, granted, electives, genEd, replaced, moved: moved + movedLater };
+  return { added, missing, skipped, mathAdded, granted, electives, genEd, replaced, moved: moved + movedLater, programAdded };
 }
 
 /* ---------- Term load ---------- */
@@ -249,7 +251,10 @@ export function pruneSurplusSlots() {
     removeSlots((item) => item.slot === 'cselective', Math.max(0, Math.ceil((electives.group.credits - real) / 3)));
   }
   const gened = resultFor('gened');
-  if (plan.transfer.associateDegree) removeSlots((item) => item.slot === 'gened', 0);
+  if (plan.transfer.associateDegree) {
+    const keep = new Set(programDomains(plan));
+    removeSlots((item) => item.slot === 'gened' && !keep.has(item.domain), 0);
+  }
   else if (gened?.domains) {
     for (const entry of gened.domains) {
       if (!entry.placeholder && entry.status !== 'missing') removeSlots((item) => item.slot === 'gened' && item.domain === entry.domain.id, 0);
@@ -277,6 +282,12 @@ function remainingNeeds(plan) {
   for (const result of audit.groups) {
     if (result.status !== 'missing') continue;
     const { group } = result;
+    if (group.program) {
+      // Minor or certificate: the courses it still needs, or a Gen Ed placeholder for its domain.
+      for (const code of result.missingCodes ?? []) if (!have(code)) needs.push({ code });
+      if (result.missingDomain) needs.push({ domain: result.missingDomain });
+      continue;
+    }
     if (group.type === 'allOf') {
       for (const code of group.courses) if (!have(code)) needs.push({ code });
     } else if (group.id === 'intro') {
@@ -313,6 +324,8 @@ function isMath(need) {
 export function autoPlan() {
   const plan = state.plan;
   const needs = remainingNeeds(plan);
+  placeDomainNeeds(needs);
+  for (let i = needs.length - 1; i >= 0; i -= 1) if (needs[i].domain) needs.splice(i, 1);
   if (!needs.length) {
     pruneSurplusSlots();
     const genEd = fillGenEd();
@@ -410,6 +423,56 @@ export function autoPlan() {
   return { added: added + genEd.added + electives.added, unplaced: pending.map((need) => need.code ?? slotInfo(need.slot)?.label ?? need.slot), electives, genEd, moved };
 }
 
+// Gen Ed placeholders a program needs (Robotics: Physical Principles) when no course covers that domain yet.
+function placeDomainNeeds(needs) {
+  for (const need of needs.filter((entry) => entry.domain)) {
+    const domain = genEdDomain(need.domain);
+    placeSlot(normalizeItem({ slot: 'gened', domain: need.domain, label: `Gen Ed: ${domain?.label ?? need.domain} (${need.domain})`, credits: domain?.credits ?? 3 }));
+  }
+}
+
+// Adds the courses selected minors and certificates still need to the plan (balancing puts them in order later).
+function addProgramNeeds() {
+  const plan = state.plan;
+  if (!(plan.programs ?? []).length) return [];
+  const needs = remainingNeeds(plan).filter((need) => need.domain || (need.code && (plan.programs ?? []).some((id) => programCodes(id).includes(canonical(need.code)))));
+  placeDomainNeeds(needs);
+  const first = usableTerms()[0] ?? ensureTerm(planStartTerm());
+  const added = [];
+  for (const need of needs.filter((entry) => entry.code)) {
+    first.items.push(makeItem(need.code));
+    added.push(need.code);
+  }
+  return added;
+}
+
+export function programCodes(id) {
+  const program = getProgram(id);
+  if (!program) return [];
+  return program.groups.flatMap((group) => group.courses ?? group.options?.flat() ?? []).map(canonical);
+}
+
+// Turns a minor or certificate on or off. Turning one off removes its planned courses that the major doesn't need.
+export function setProgram(id, on) {
+  const plan = state.plan;
+  const list = new Set(plan.programs ?? []);
+  if (on) list.add(id); else list.delete(id);
+  plan.programs = [...list];
+  let removed = 0;
+  if (!on) {
+    const majorCodes = new Set(catalog.requirements.groups.flatMap((group) => group.courses ?? group.options?.flat() ?? []).map(canonical));
+    const otherPrograms = new Set(plan.programs.flatMap(programCodes));
+    for (const term of plan.terms) {
+      const before = term.items.length;
+      term.items = term.items.filter((item) => !(item.code && isPlanned(item) && programCodes(id).includes(canonical(item.code))
+        && !majorCodes.has(canonical(item.code)) && !otherPrograms.has(canonical(item.code))));
+      removed += before - term.items.length;
+    }
+  }
+  const result = plannedCount() || on ? autoPlan() : { added: 0 };
+  return { removed, added: result.added };
+}
+
 /* ---------- Balancing ---------- */
 
 // CS and math courses and CS placeholders ("core") keep prerequisite order; Gen Ed, university electives and other
@@ -480,7 +543,17 @@ export function balancePlan() {
   const chain = core.length ? 1 + Math.max(...core.map((item) => height.get(item.id))) : 0;
 
   const existing = plan.terms.filter(inRange).reduce((total, term) => total + termLoad(term), 0);
-  const termCount = Math.max(chain, Math.ceil((credits(items) + existing) / limit), 1);
+  const total = credits(items) + existing;
+  const needed = Math.max(chain, Math.ceil(total / limit), 1);
+  // With a target (6 semesters by default), spread over it when the plan would finish sooner, but never below a
+  // full-time 12 credits per term on average.
+  const targetTerms = Number(plan.settings.targetTerms) || 0;
+  let termCount = targetTerms > needed ? Math.max(needed, Math.min(targetTerms, Math.floor(total / 12))) : needed;
+  // At least the minimum semesters at JMU (4 by default), counting terms already taken here.
+  const minTerms = Number(plan.settings.minTerms) || 0;
+  const takenHere = plan.terms.filter((term) => termSortKey(term.name) >= termSortKey(plan.student.startTerm) && termSortKey(term.name) < startKey
+    && parseTerm(term.name)?.season !== 'Summer').length;
+  termCount = Math.max(termCount, minTerms - takenHere);
   const names = termSequence(termCount, start);
 
   // Place core items term by term: ready items (prerequisites earlier), longest chain first, aiming for an even
@@ -500,6 +573,10 @@ export function balancePlan() {
       if (takenBefore.has(canon) && takenBefore.get(canon) < termSortKey(name)) return true;
       return placedAt.has(canon) && placedAt.get(canon) < index;
     };
+    const metByNow = (code) => met(code) || (placedAt.has(canonical(code)) && placedAt.get(canonical(code)) <= index);
+    // Terms left in the plan (from this one) in which a semester-locked course can run.
+    const seasonTermsLeft = (item) => names.slice(index, Math.max(termCount, index + 1))
+      .filter((other) => !item.code || reliableSeasons(item.code).includes(parseTerm(other)?.season)).length;
     const ready = pending
       .filter((item) => itemPrereqs(item).every((group) => group.some(met)))
       .filter((item) => !item.code || reliableSeasons(item.code).includes(season) || season === 'Summer')
@@ -509,7 +586,11 @@ export function balancePlan() {
     for (const item of ready) {
       // Math goes in as soon as it can: calculus early is the department's advice, and CS 240 and the algorithms
       // elective wait on it.
-      const critical = height.get(item.id) >= termsLeft - 1 || /^MATH /.test(item.code ?? '');
+      // Co-requisites (CS 457 with CS 361) must be in this term or earlier.
+      const coreqs = item.code ? getCourse(item.code)?.coreqs ?? [] : [];
+      if (!coreqs.every((group) => group.some(metByNow))) continue;
+      const critical = height.get(item.id) >= termsLeft - 1 || /^MATH /.test(item.code ?? '')
+        || seasonTermsLeft(item) <= height.get(item.id) + 1;
       const fitsTarget = coreLoad + item.credits <= target || coreLoad === 0;
       // Split pairs like CS 240 and CS 261 unless keeping them apart would lengthen the plan.
       if (clashesInTerm(item, term) && height.get(item.id) < termsLeft - 1) continue;
@@ -529,6 +610,11 @@ export function balancePlan() {
   const order = (item) => (fillerDomain(item).startsWith('C1') ? 0 : fillerDomain(item) === 'C3L' ? 2 : 1);
   for (const item of fillers.sort((a, b) => order(a) - order(b))) {
     const domain = fillerDomain(item);
+    // A capstone (CISE 481) goes in the last term.
+    if (item.code && getCourse(item.code)?.capstone) {
+      const last = [...plan.terms].reverse().find(inRange);
+      if (last && termLoad(last) + item.credits <= limit) { last.items.push(item); continue; }
+    }
     if (domain === 'C3L') {
       const science = plan.terms.find((term) => inRange(term) && term.items.some((entry) => ['C3PP', 'C3NS'].includes(fillerDomain(entry))));
       if (science && termLoad(science) + item.credits <= limit) { science.items.push(item); continue; }
@@ -537,6 +623,51 @@ export function balancePlan() {
   }
   dropEmptyTail();
   return { terms: plan.terms.filter(inRange).length };
+}
+
+// How the planned part of the plan compares with the target: semesters used, the credits and prerequisite chain
+// behind that, and the lowest credit limit that would fit the target.
+export function targetCheck() {
+  const plan = state.plan;
+  const target = Number(plan.settings.targetTerms) || 0;
+  const startKey = termSortKey(planStartTerm());
+  const inRange = plan.terms.filter((term) => termSortKey(term.name) >= startKey);
+  const used = inRange.length;
+  const total = inRange.reduce((sum, term) => sum + termLoad(term), 0);
+  const core = inRange.flatMap((term) => term.items.filter((item) => isPlanned(item) && isCore(item)));
+  const dependsOn = (item, other) => other.code && itemPrereqs(item).some((group) => group.some((code) => canonical(code) === canonical(other.code)));
+  const memo = new Map();
+  const depth = (item, seen = new Set()) => {
+    if (memo.has(item.id)) return memo.get(item.id);
+    if (seen.has(item.id)) return 1;
+    seen.add(item.id);
+    const prereqs = core.filter((other) => other !== item && dependsOn(item, other));
+    const value = 1 + (prereqs.length ? Math.max(...prereqs.map((other) => depth(other, seen))) : 0);
+    memo.set(item.id, value);
+    return value;
+  };
+  const chain = core.length ? Math.max(...core.map((item) => depth(item))) : 0;
+  // Try each credit limit on a copy of the plan, so the suggestion reflects the real balancing.
+  const fitsAt = target ? CREDIT_LIMITS.find((limit) => limit > maxCredits() && termsAtLimit(limit) <= target) ?? null : null;
+  // Already-taken terms before the planning start count toward the student's semesters at JMU.
+  const takenTerms = plan.terms.filter((term) => termSortKey(term.name) >= termSortKey(plan.student.startTerm) && termSortKey(term.name) < startKey).length;
+  const min = Number(plan.settings.minTerms) || 0;
+  const semesters = plan.terms.filter((term) => termSortKey(term.name) >= termSortKey(plan.student.startTerm) && parseTerm(term.name)?.season !== 'Summer').length;
+  return { target, min, semesters, used: used + takenTerms, total, chain: chain + takenTerms, fitsAt, takenTerms, last: plan.terms[plan.terms.length - 1]?.name ?? '' };
+}
+
+// Semesters the plan would use (from the plan start) if balanced at this credit limit. Works on a copy.
+function termsAtLimit(limit) {
+  const saved = state.plan;
+  try {
+    state.plan = JSON.parse(JSON.stringify(saved));
+    state.plan.settings.maxCredits = limit;
+    if (plannedCount()) { balancePlan(); enforceMaxCredits(); dropEmptyTail(); }
+    const startKey = termSortKey(state.plan.student.startTerm);
+    return state.plan.terms.filter((term) => termSortKey(term.name) >= startKey).length;
+  } finally {
+    state.plan = saved;
+  }
 }
 
 function fillerDomain(item) {

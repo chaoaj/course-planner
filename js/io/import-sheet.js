@@ -138,6 +138,7 @@ export function gridToPlan(grid, { sheetName = '', today = new Date() } = {}) {
   const plan = blankPlan();
   const found = findStudent(grid);
   Object.assign(plan.student, found);
+  if (found.expectedGraduation) plan.settings.autoGraduation = false;
 
   const terms = new Map();
   const credits = [];

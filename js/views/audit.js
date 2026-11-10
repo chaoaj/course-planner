@@ -46,8 +46,9 @@ export function renderSummary() {
     `${audit.totals.total}/${audit.totals.required} credits`,
     `${met} of ${audit.groups.length} requirements met, ${covered} covered by the plan`,
     `${errors} prerequisite problem${errors === 1 ? '' : 's'}, ${warnings} to check`,
-    lastTerm ? `last planned term ${lastTerm}` : 'no terms planned'
+    lastTerm ? `last planned term ${lastTerm}` : 'no terms planned',
+    plan.student.expectedGraduation ? `expected graduation ${plan.student.expectedGraduation}` : ''
   ];
   if (pending) parts.push(`${pending} VCCS course${pending === 1 ? '' : 's'} awaiting review`);
-  document.getElementById('summary-line').textContent = parts.join(' · ');
+  document.getElementById('summary-line').textContent = parts.filter(Boolean).join(' · ');
 }

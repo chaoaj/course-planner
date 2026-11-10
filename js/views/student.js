@@ -1,7 +1,7 @@
 // Student details and the transfer questions on the Student tab, plus the advising notes field.
 
 import { catalog } from '../catalog.js';
-import { state, commit } from '../state.js';
+import { state, commit, syncGraduation } from '../state.js';
 import { escapeHtml } from '../util.js';
 
 function getPath(object, path) {
@@ -30,6 +30,8 @@ export function fillFields() {
   document.getElementById('f-summer').checked = Boolean(state.plan.settings.includeSummer);
   document.getElementById('per-term').value = String(state.plan.settings.coursesPerTerm ?? 3);
   document.getElementById('max-credits').value = String(state.plan.settings.maxCredits ?? 15);
+  document.getElementById('target-terms').value = String(state.plan.settings.targetTerms ?? 0);
+  document.getElementById('min-terms').value = String(state.plan.settings.minTerms ?? 0);
   updateTransferQuestions();
 }
 
@@ -56,6 +58,12 @@ export function bindStudentForm(refresh) {
     const handler = () => {
       const value = input.type === 'checkbox' ? input.checked : input.value;
       setPath(state.plan, input.dataset.field, value);
+      if (input.dataset.field === 'student.expectedGraduation') state.plan.settings.autoGraduation = !value.trim();
+      if (input.dataset.field === 'student.startTerm') {
+        syncGraduation();
+        const grad = document.getElementById('f-grad');
+        if (grad && document.activeElement !== grad) grad.value = state.plan.student.expectedGraduation;
+      }
       // The same setting can appear on more than one tab (the associate degree box); keep the copies in step.
       for (const other of document.querySelectorAll(`[data-field="${input.dataset.field}"]`)) {
         if (other === input) continue;

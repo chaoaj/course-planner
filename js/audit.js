@@ -1,6 +1,6 @@
 // Prerequisite checks for every planned course, and the degree-requirement audit.
 
-import { catalog, canonical, getCourse, courseLevel, isCsCourse, parseTerm, slotInfo, genEdDomains, genEdDomain, termSortKey } from './catalog.js';
+import { catalog, canonical, getCourse, courseLevel, isCsCourse, parseTerm, slotInfo, genEdDomains, genEdDomain, termSortKey, getProgram } from './catalog.js';
 import { gradeMeets } from './util.js';
 import { seasonIssue, isSemesterLocked, reliableSeasons } from './offerings.js';
 
@@ -289,6 +289,16 @@ export function auditRequirements(plan) {
     }
   }
 
+  // Minors and certificates the student is adding. Their courses can also count toward the major.
+  for (const id of plan.programs ?? []) {
+    const program = getProgram(id);
+    if (!program) continue;
+    program.groups.forEach((group, index) => {
+      const labeled = { ...group, id: `${program.id}:${group.id}`, label: `${program.short}: ${group.label}`, program: program.id, note: [index === 0 ? program.note : '', group.note].filter(Boolean).join(' ') };
+      results.push(auditProgramGroup(labeled, plan, ctx));
+    });
+  }
+
   const totals = creditTotals(plan, ctx);
   return { groups: results, totals };
 }
@@ -338,6 +348,58 @@ function auditElectives(group, plan, ctx, used) {
     courses,
     detail: `${allCredits} of ${group.credits} credits planned or earned (${metCredits} earned); ${above} course${above === 1 ? '' : 's'} above CS ${group.aboveLevel}${unknownSlots ? ` plus ${unknownSlots} elective slot${unknownSlots === 1 ? '' : 's'} still to choose` : ''}.`
   };
+}
+
+function auditProgramGroup(group, plan, ctx) {
+  const rankOf = (courses) => Math.min(...courses.map((course) => STATUS_RANK[course.status]));
+  const statusFor = (rank) => Object.keys(STATUS_RANK).find((key) => STATUS_RANK[key] === rank);
+  if (group.type === 'allOf') {
+    const courses = group.courses.map((code) => ({ code, ...courseStatus(code, ctx) }));
+    return { group, status: statusFor(rankOf(courses)), courses, missingCodes: courses.filter((course) => course.status === 'missing').map((course) => course.code) };
+  }
+  if (group.type === 'oneOf') {
+    let best = null;
+    for (const option of group.options) {
+      const courses = option.map((code) => ({ code, ...courseStatus(code, ctx) }));
+      const rank = rankOf(courses);
+      if (!best || rank > best.rank) best = { rank, courses };
+    }
+    return { group, status: statusFor(best.rank), courses: best.courses, missingCodes: best.rank === 0 ? group.options[0] : [] };
+  }
+  if (group.type === 'creditsFrom') {
+    const courses = group.courses.map((code) => ({ code, ...courseStatus(code, ctx), credits: getCourse(code)?.credits ?? 3 }))
+      .filter((course) => course.status !== 'missing');
+    const sum = (list) => list.reduce((total, course) => total + course.credits, 0);
+    const earned = sum(courses.filter((course) => course.status === 'met'));
+    const all = sum(courses);
+    const status = earned >= group.credits ? 'met' : all >= group.credits ? 'planned' : 'missing';
+    const missingCodes = [];
+    let planned = all;
+    for (const code of group.courses) {
+      if (planned >= group.credits) break;
+      if (courses.some((course) => course.code === code)) continue;
+      missingCodes.push(code);
+      planned += getCourse(code)?.credits ?? 3;
+    }
+    return { group, status, courses, missingCodes, detail: `${all} of ${group.credits} credits planned or earned.` };
+  }
+  if (group.type === 'genEdDomain') {
+    const domain = genEdDomain(group.domain);
+    const options = domain?.options ?? [];
+    const found = options.map((code) => ({ code, ...courseStatus(code, ctx) })).filter((course) => course.status !== 'missing')
+      .sort((a, b) => STATUS_RANK[b.status] - STATUS_RANK[a.status])[0];
+    if (found) return { group, status: found.status, courses: [found], missingCodes: [] };
+    const slot = slotItemsFor(plan, (item) => item.slot === 'gened' && item.domain === group.domain)[0];
+    if (slot) return { group, status: 'planned', courses: [{ code: `${domain?.label ?? group.domain} placeholder`, status: 'planned', where: slot.term, placeholder: true }], missingCodes: [] };
+    return { group, status: 'missing', courses: [], missingDomain: group.domain };
+  }
+  return { group, status: 'missing', courses: [] };
+}
+
+// General Education domains a selected program needs a real course for (Robotics: Physical Principles), even when
+// an associate degree covers General Education.
+export function programDomains(plan) {
+  return (plan.programs ?? []).flatMap((id) => getProgram(id)?.groups ?? []).filter((group) => group.type === 'genEdDomain').map((group) => group.domain);
 }
 
 // General Education by domain. Each domain is met by a credited or planned course from its list (the major's math

@@ -10,7 +10,8 @@ export const catalog = {
   samplePlans: null,
   offerings: null,
   offeringAdvice: null,
-  gened: null
+  gened: null,
+  programs: null
 };
 
 async function loadJson(path) {
@@ -20,14 +21,15 @@ async function loadJson(path) {
 }
 
 export async function loadCatalog() {
-  const [courses, requirements, vccs, samplePlans, offerings, offeringAdvice, gened] = await Promise.all([
+  const [courses, requirements, vccs, samplePlans, offerings, offeringAdvice, gened, programs] = await Promise.all([
     loadJson('./data/courses.json'),
     loadJson('./data/requirements.json'),
     loadJson('./data/vccs.json'),
     loadJson('./data/sample-plans.json'),
     loadJson('./data/offerings.json'),
     loadJson('./data/offering-advice.json'),
-    loadJson('./data/gened.json')
+    loadJson('./data/gened.json'),
+    loadJson('./data/programs.json')
   ]);
   for (const course of courses.courses) {
     catalog.courses.set(course.code, course);
@@ -39,6 +41,7 @@ export async function loadCatalog() {
   catalog.offerings = offerings;
   catalog.offeringAdvice = offeringAdvice;
   catalog.gened = gened;
+  catalog.programs = programs;
   // General Education courses join the course list (unless already there, like MATH 220) so they can be planned,
   // credited and checked for their lab co-requisites.
   for (const course of gened.courses) if (!catalog.courses.has(course.code)) catalog.courses.set(course.code, course);
@@ -127,4 +130,22 @@ export function shortTerm(name) {
   const term = parseTerm(name);
   if (!term) return name;
   return `${term.season.slice(0, 2)} ${String(term.year).slice(2)}`;
+}
+
+// The term a plan of `count` fall/spring semesters starting at `start` ends in, and its graduation label.
+export function lastTermOf(start, count, includeSummer = false) {
+  let name = start;
+  for (let i = 1; i < Math.max(1, count); i += 1) name = nextTerm(name, includeSummer);
+  return name;
+}
+
+export function graduationLabel(termName) {
+  const term = parseTerm(termName);
+  if (!term) return '';
+  const month = term.season === 'Spring' ? 'May' : term.season === 'Summer' ? 'August' : 'December';
+  return `${month} ${term.year}`;
+}
+
+export function getProgram(id) {
+  return catalog.programs?.programs.find((program) => program.id === id) ?? null;
 }

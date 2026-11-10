@@ -1,6 +1,6 @@
 // The student's plan: what's saved to and loaded from JSON, and autosaved in this browser.
 
-import { catalog, nextTerm, termSortKey } from './catalog.js';
+import { catalog, nextTerm, termSortKey, lastTermOf, graduationLabel } from './catalog.js';
 import { uid } from './util.js';
 
 export const APP_ID = 'course-planner';
@@ -9,10 +9,13 @@ const STORAGE_KEY = 'course-planner-autosave';
 
 const listeners = new Set();
 
+// Defaults for a new student: start in Fall 2026 and graduate in 6 fall/spring semesters (May 2029).
+export const DEFAULT_START_TERM = 'Fall 2026';
+export const DEFAULT_TARGET_TERMS = 6;
+export const DEFAULT_MIN_TERMS = 4;
+
 function defaultStartTerm() {
-  const now = new Date();
-  // From August on, the next start is next year's fall.
-  return `Fall ${now.getMonth() >= 7 ? now.getFullYear() + 1 : now.getFullYear()}`;
+  return DEFAULT_START_TERM;
 }
 
 export function blankPlan() {
@@ -28,7 +31,7 @@ export function blankPlan() {
       minor: '',
       catalogYear: catalog.requirements?.catalogYear ?? '',
       startTerm: defaultStartTerm(),
-      expectedGraduation: '',
+      expectedGraduation: graduationLabel(lastTermOf(DEFAULT_START_TERM, DEFAULT_TARGET_TERMS)),
       mathPlacement: false,
       admittedToMajor: false
     },
@@ -41,8 +44,9 @@ export function blankPlan() {
       vccs: {},
       other: []
     },
-    settings: { includeSummer: false, coursesPerTerm: 3, maxCredits: 15 },
+    settings: { includeSummer: false, coursesPerTerm: 3, maxCredits: 15, targetTerms: DEFAULT_TARGET_TERMS, minTerms: DEFAULT_MIN_TERMS, autoGraduation: true },
     terms: [],
+    programs: [],
     notes: ''
   };
 }
@@ -89,7 +93,12 @@ export function normalizePlan(input) {
     transfer: { ...base.transfer, ...(input.transfer ?? {}) },
     settings: { ...base.settings, ...(input.settings ?? {}) }
   };
+  // Files saved before these settings existed keep their own graduation date (or get one from their start term).
+  if (input.settings?.autoGraduation === undefined) plan.settings.autoGraduation = !input.student?.expectedGraduation;
+  if (input.settings?.targetTerms === undefined) plan.settings.targetTerms = DEFAULT_TARGET_TERMS;
+  if (input.settings?.minTerms === undefined) plan.settings.minTerms = DEFAULT_MIN_TERMS;
   plan.transfer.vccs = { ...(plan.transfer.vccs ?? {}) };
+  plan.programs = Array.isArray(input.programs) ? input.programs.filter((id) => typeof id === 'string') : [];
   plan.transfer.other = (Array.isArray(plan.transfer.other) ? plan.transfer.other : []).map((row) => ({
     id: row.id || uid('credit'),
     code: String(row.code ?? '').trim(),
@@ -106,6 +115,7 @@ export function normalizePlan(input) {
   plan.terms.sort((a, b) => termSortKey(a.name) - termSortKey(b.name));
   plan.app = APP_ID;
   plan.version = FORMAT_VERSION;
+  syncGraduation(plan);
   return plan;
 }
 
@@ -150,4 +160,11 @@ export function termSequence(count, start = state.plan.student.startTerm) {
   const names = [start];
   while (names.length < count) names.push(nextTerm(names[names.length - 1], state.plan.settings.includeSummer));
   return names;
+}
+
+// Expected graduation follows the start term and target semesters until the advisor types their own date.
+export function syncGraduation(plan = state.plan) {
+  const { student, settings } = plan;
+  if (!settings.autoGraduation || !(Number(settings.targetTerms) > 0)) return;
+  student.expectedGraduation = graduationLabel(lastTermOf(student.startTerm, Number(settings.targetTerms), settings.includeSummer));
 }
