@@ -13,7 +13,7 @@
     </script>
     <title>Course Planner</title>
     <link rel="stylesheet" href="./lib/bootstrap.min.css" />
-    <link rel="stylesheet" href="./css/styles.css?v=2026-11-10i" />
+    <link rel="stylesheet" href="./css/styles.css?v=2026-11-10k" />
     <link rel="icon" type="image/svg+xml" href="./images/course-planner-logo.svg" />
   </head>
   <body class="bg-body-tertiary min-vh-100">
@@ -186,6 +186,10 @@
           </div>
           <div id="gened-cleanup" class="small" aria-live="polite"></div>
         </div>
+        <details id="gened-tracker" class="gened-tracker card mb-3" open hidden>
+          <summary class="card-header fw-semibold" id="gened-tracker-summary">General Education</summary>
+          <div class="card-body py-2" id="gened-tracker-body"></div>
+        </details>
         <div class="legend small mb-3" aria-label="Color key">
           <span class="legend-item"><span class="swatch band-b" aria-hidden="true"></span>B- or better required</span>
           <span class="legend-item"><span class="swatch band-c" aria-hidden="true"></span>C- or better required</span>
@@ -315,6 +319,6 @@
     <script src="./lib/exceljs.min.js" defer></script>
     <script src="./lib/jspdf.umd.min.js" defer></script>
     <script src="./lib/jspdf.plugin.autotable.min.js" defer></script>
-    <script type="module" src="./js/main.js?v=2026-11-10i"></script>
+    <script type="module" src="./js/main.js?v=2026-11-10k"></script>
   </body>
 </html>

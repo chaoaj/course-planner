@@ -118,6 +118,11 @@ export function checkItem(item, termIndex, ctx) {
       }
     }
     if (['algorithms', 'systems', 'cselective'].includes(item.slot)) issues.push({ level: 'info', text: 'Choose a specific course when the schedule is known.' });
+    if (item.slot === 'gened' && item.domain === 'C3L') {
+      const lab = genEdDomain('C3L');
+      const embedded = (lab?.metBy ?? []).find((code) => ctx.credited.has(code) || ctx.placed.has(code));
+      if (embedded) issues.push({ level: 'info', text: `Not needed: ${embedded} includes its lab. Remove this placeholder.` });
+    }
     if (item.slot === 'gened' && item.domain.startsWith('C1') && firstYearTermsBefore(ctx.plan, termIndex) >= 2) {
       issues.push({ level: 'warning', text: 'Madison Foundations must be finished by the end of the first year at JMU; move this to the first year.' });
     }
@@ -333,17 +338,18 @@ function auditGenEd(group, plan, ctx, used) {
   const domains = genEdDomains();
   const takenCodes = new Set();
   const statusOfItem = (item) => (item.status === 'completed' ? 'met' : item.status === 'in-progress' ? 'inprogress' : 'planned');
-  const findCourse = (codes) => {
+  const findCourse = (codes, { allowTaken = false } = {}) => {
+    const free = (canon) => allowTaken || !takenCodes.has(canon);
     // Credit first, then the best-progressed planned course.
     for (const code of codes) {
       const canon = canonical(code);
-      if (ctx.credited.has(canon) && !takenCodes.has(canon)) return { code: canon, status: 'met', where: ctx.credited.get(canon).via };
+      if (ctx.credited.has(canon) && free(canon)) return { code: canon, status: 'met', where: ctx.credited.get(canon).via };
     }
     let best = null;
     plan.terms.forEach((term) => term.items.forEach((item) => {
       if (!item.code) return;
       const canon = canonical(item.code);
-      if (!codes.map(canonical).includes(canon) || takenCodes.has(canon)) return;
+      if (!codes.map(canonical).includes(canon) || !free(canon)) return;
       const status = statusOfItem(item);
       if (!best || STATUS_RANK[status] > STATUS_RANK[best.status]) best = { code: canon, status, where: term.name };
     }));
@@ -355,7 +361,8 @@ function auditGenEd(group, plan, ctx, used) {
     let found = findCourse(domain.options);
     // Lab Experience is also met by a lecture course that includes its lab.
     if (!found && domain.metBy) {
-      const embedded = findCourse(domain.metBy);
+      // The lecture already counts for Physical Principles or Natural Systems; its lab counts here too.
+      const embedded = findCourse(domain.metBy, { allowTaken: true });
       if (embedded) found = { ...embedded, shared: true };
     }
     if (found) {

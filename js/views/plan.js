@@ -2,9 +2,10 @@
 
 import { catalog, canonical, getCourse, gradeBand, slotInfo, parseTerm, genEdDomain, genEdDomains } from '../catalog.js';
 import { state, commit, ensureTerm, followingTerm, normalizeItem } from '../state.js';
-import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal } from '../audit.js';
+import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal, auditRequirements } from '../audit.js';
+import { statusBadge } from './audit.js';
 import { gradeMeets } from '../util.js';
-import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives } from '../scheduler.js';
+import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives, fillGenEd } from '../scheduler.js';
 import { escapeHtml, GRADES, showStatus, announce } from '../util.js';
 import { offeringPattern, reliableSeasons, isSemesterLocked, neverScheduled } from '../offerings.js';
 
@@ -178,8 +179,55 @@ function renderGenEdCleanup() {
   }
 }
 
+// General Education tracker: every domain with its status, shown when there's no associate degree override.
+function renderGenEdTracker() {
+  const tracker = document.getElementById('gened-tracker');
+  if (!tracker) return;
+  const plan = state.plan;
+  tracker.hidden = Boolean(plan.transfer.associateDegree);
+  if (tracker.hidden) return;
+  const result = auditRequirements(plan).groups.find((entry) => entry.group.type === 'gened');
+  if (!result?.domains) return;
+  const counts = { met: 0, inprogress: 0, planned: 0, missing: 0 };
+  for (const entry of result.domains) counts[entry.status] += 1;
+  const total = result.domains.length;
+  document.getElementById('gened-tracker-summary').textContent =
+    `General Education: ${counts.met} of ${total} domains met, ${counts.planned + counts.inprogress} planned, ${counts.missing} still needed`;
+
+  let lastArea = '';
+  const rows = result.domains.map((entry) => {
+    const { domain } = entry;
+    const areaRow = domain.area.label !== lastArea
+      ? `<tr class="area-row"><th scope="rowgroup" colspan="3">${escapeHtml(domain.area.label)}${domain.area.note ? ` <span class="fw-normal small">— ${escapeHtml(domain.area.note)}</span>` : ''}</th></tr>`
+      : '';
+    lastArea = domain.area.label;
+    let course;
+    if (entry.status === 'missing') course = '<span class="text-body-secondary">Not yet planned</span>';
+    else if (entry.placeholder) course = `Placeholder in ${escapeHtml(entry.where)}; choose a course on that card`;
+    else course = `${escapeHtml(entry.code)} ${escapeHtml(getCourse(entry.code)?.title ?? '')}${entry.where ? ` <span class="text-body-secondary">(${escapeHtml(entry.where)})</span>` : ''}${entry.shared ? ' <span class="small">(lab included)</span>' : ''}`;
+    return `${areaRow}<tr>
+      <th scope="row" class="fw-normal">${escapeHtml(domain.label)} <span class="text-body-secondary small">${escapeHtml(domain.id)}</span></th>
+      <td>${statusBadge(entry.status)}</td>
+      <td>${course}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('gened-tracker-body').innerHTML = `
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <caption class="visually-hidden">General Education domains and their status for this student</caption>
+        <thead><tr><th scope="col">Domain</th><th scope="col">Status</th><th scope="col">Course</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-2 small">
+      ${counts.missing ? `<button type="button" class="btn btn-sm btn-primary" data-fill-gened="1">Add placeholders for ${counts.missing} missing domain${counts.missing === 1 ? '' : 's'}</button>` : '<span>Every domain has credit, a course or a placeholder.</span>'}
+      <span>Enter Gen Ed transfer credit on the Transfer credit tab to mark a domain met.</span>
+    </div>`;
+}
+
 export function renderPlan() {
   renderGenEdCleanup();
+  renderGenEdTracker();
   const { terms } = state.plan;
   const issuesById = checkPlan(state.plan);
   document.getElementById('plan-empty').hidden = terms.length > 0;
@@ -272,6 +320,14 @@ export function bindPlan(refresh) {
   panel.addEventListener('click', (event) => {
     const button = event.target.closest('button');
     if (!button) return;
+    if (button.dataset.fillGened) {
+      const result = fillGenEd();
+      commit({ render: false });
+      refresh('all');
+      document.getElementById('gened-tracker-summary')?.focus();
+      showStatus(`Added ${result.added} General Education placeholder${result.added === 1 ? '' : 's'}${result.newTerms.length ? ` (and ${result.newTerms.join(', ')} to fit them)` : ''}. ${result.domains.some((id) => id.startsWith('C1')) ? ' Madison Foundations went in the first year.' : ''}`, 'success');
+      return;
+    }
     if (button.dataset.removeGened) {
       let removed = 0;
       for (const term of state.plan.terms) {

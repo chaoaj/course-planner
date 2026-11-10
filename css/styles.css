@@ -160,3 +160,8 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
 /* "Has credit for" card at the start of the plan */
 .credit-card > header { background: var(--bs-warning-bg-subtle, #fbf6e6); }
 [data-bs-theme="dark"] .credit-card > header { background: #2e2716; }
+
+/* General Education tracker on the Plan tab */
+.gened-tracker > summary { cursor: pointer; }
+.gened-tracker table { font-size: 0.875rem; margin-bottom: 0.5rem; }
+.gened-tracker .area-row th { background: var(--bs-primary-bg-subtle); font-weight: 600; }

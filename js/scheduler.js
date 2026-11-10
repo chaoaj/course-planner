@@ -227,10 +227,11 @@ export function autoPlan() {
 // Foundations go in the first year (the first two fall/spring terms); the rest go in the lightest terms.
 export function fillGenEd() {
   const plan = state.plan;
-  if (plan.transfer.associateDegree) return { added: 0, newTerms: [] };
+  if (plan.transfer.associateDegree) return { added: 0, newTerms: [], domains: [] };
   const result = auditRequirements(plan).groups.find((entry) => entry.group.type === 'gened');
   let added = 0;
   const newTerms = [];
+  const domains = (result?.missingDomains ?? []).map((domain) => domain.id);
   for (const domain of result?.missingDomains ?? []) {
     const lab = domain.id === 'C3L';
     const item = normalizeItem({ slot: 'gened', domain: domain.id, label: `Gen Ed: ${domain.label}${lab ? ' if needed' : ''} (${domain.id})`, credits: domain.credits ?? 3 });
@@ -243,7 +244,7 @@ export function fillGenEd() {
     if (placed.newTerm) newTerms.push(placed.newTerm);
     added += 1;
   }
-  return { added, newTerms };
+  return { added, newTerms, domains };
 }
 
 /* ---------- University electives ---------- */
