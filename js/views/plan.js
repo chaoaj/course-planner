@@ -5,7 +5,7 @@ import { state, commit, ensureTerm, followingTerm, normalizeItem } from '../stat
 import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal, auditRequirements } from '../audit.js';
 import { statusBadge } from './audit.js';
 import { gradeMeets } from '../util.js';
-import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives, fillGenEd, enforceMaxCredits, maxCredits, plannedCount } from '../scheduler.js';
+import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives, fillGenEd, enforceMaxCredits, maxCredits, plannedCount, balancePlan } from '../scheduler.js';
 import { escapeHtml, GRADES, showStatus, announce } from '../util.js';
 import { offeringPattern, reliableSeasons, isSemesterLocked, neverScheduled } from '../offerings.js';
 
@@ -288,12 +288,13 @@ export function bindPlan(refresh) {
     if (target.id === 'per-term') { state.plan.settings.coursesPerTerm = Number(target.value); commit({ render: false }); return; }
     if (target.id === 'max-credits') {
       state.plan.settings.maxCredits = Number(target.value);
-      // Lowering the limit moves planned courses out of terms that are now over it.
+      // A new limit rebalances the planned courses over the terms they now need.
+      if (plannedCount()) balancePlan();
       const moved = enforceMaxCredits();
       while (state.plan.terms.length && !state.plan.terms[state.plan.terms.length - 1].items.length) state.plan.terms.pop();
       commit({ render: false });
       refresh('all');
-      showStatus(`Max ${target.value} credits per term.${moved ? ` Moved ${moved} planned course${moved === 1 ? '' : 's'} to stay under it.` : ''}`, 'info');
+      showStatus(`Max ${target.value} credits per term. ${plannedCount() ? `Rebalanced the plan over ${state.plan.terms.length} terms.` : ''}`, 'info');
       return;
     }
     if (target.id === 'f-summer') { state.plan.settings.includeSummer = target.checked; commit({ render: false }); return; }
@@ -426,6 +427,16 @@ export function bindPlan(refresh) {
     refresh('all');
     if (!result.added) showStatus('Nothing to add: every requirement, including university electives, already has a course in the plan or credit.', 'info');
     else showStatus(`Auto-plan (at most ${maxCredits()} credits per term) added ${result.added} course${result.added === 1 ? '' : 's'}${result.genEd?.added || result.electives?.added ? `, including ${[result.genEd?.added ? `${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'}` : '', result.electives?.added ? `${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}` : ''].filter(Boolean).join(' and ')}` : ''}.${result.unplaced.length ? ` Couldn't place: ${result.unplaced.join(', ')}.` : ''}${state.plan.transfer.associateDegree ? ' General Education is met by the associate degree.' : ''}`, result.unplaced.length ? 'warning' : 'success');
+  });
+
+  document.getElementById('btn-balance').addEventListener('click', () => {
+    if (!plannedCount()) { showStatus('Nothing to balance: the plan has no planned courses yet.', 'info'); return; }
+    const result = balancePlan();
+    enforceMaxCredits();
+    while (state.plan.terms.length && !state.plan.terms[state.plan.terms.length - 1].items.length) state.plan.terms.pop();
+    commit({ render: false });
+    refresh('all');
+    showStatus(`Balanced the planned courses over ${result.terms} term${result.terms === 1 ? '' : 's'}: CS courses spread through the plan in prerequisite order, with General Education and electives filling each term up to ${maxCredits()} credits.`, 'success');
   });
 
   document.getElementById('btn-add-term').addEventListener('click', () => {

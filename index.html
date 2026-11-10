@@ -13,7 +13,7 @@
     </script>
     <title>Course Planner</title>
     <link rel="stylesheet" href="./lib/bootstrap.min.css" />
-    <link rel="stylesheet" href="./css/styles.css?v=2026-11-10m" />
+    <link rel="stylesheet" href="./css/styles.css?v=2026-11-10p" />
     <link rel="icon" type="image/svg+xml" href="./images/course-planner-logo.svg" />
   </head>
   <body class="bg-body-tertiary min-vh-100">
@@ -182,6 +182,8 @@
           </div>
           <div class="col-auto"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="f-summer" /><label class="form-check-label" for="f-summer">Include summer terms</label></div></div>
           <div class="col-auto d-flex gap-2">
+            <button class="btn btn-outline-primary" type="button" id="btn-balance" aria-describedby="balance-help">Balance terms</button>
+            <span id="balance-help" class="visually-hidden">Spreads CS courses across every term in prerequisite order and fills the rest with General Education and electives, within the credit limit.</span>
             <button class="btn btn-outline-secondary" type="button" id="btn-add-term">Add term</button>
             <button class="btn btn-outline-danger" type="button" id="btn-clear-plan">Clear plan</button>
           </div>
@@ -326,6 +328,6 @@
     <script src="./lib/exceljs.min.js" defer></script>
     <script src="./lib/jspdf.umd.min.js" defer></script>
     <script src="./lib/jspdf.plugin.autotable.min.js" defer></script>
-    <script type="module" src="./js/main.js?v=2026-11-10m"></script>
+    <script type="module" src="./js/main.js?v=2026-11-10p"></script>
   </body>
 </html>

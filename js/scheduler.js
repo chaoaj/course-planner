@@ -91,6 +91,7 @@ export function applySamplePlan(planId) {
   added -= pruneSurplusSlots();
   const genEd = fillGenEd();
   const electives = fillUniversityElectives();
+  balancePlan();
   const movedLater = enforceMaxCredits();
   dropEmptyTail();
   added += genEd.added + electives.added;
@@ -316,6 +317,7 @@ export function autoPlan() {
     pruneSurplusSlots();
     const genEd = fillGenEd();
     const electives = fillUniversityElectives();
+    balancePlan();
     const moved = enforceMaxCredits();
     dropEmptyTail();
     return { added: genEd.added + electives.added, unplaced: [], electives, genEd, moved };
@@ -401,9 +403,138 @@ export function autoPlan() {
   pruneSurplusSlots();
   const genEd = fillGenEd();
   const electives = fillUniversityElectives();
+  balancePlan();
   const moved = enforceMaxCredits();
   dropEmptyTail();
   return { added: added + genEd.added + electives.added, unplaced: pending.map((need) => need.code ?? slotInfo(need.slot)?.label ?? need.slot), electives, genEd, moved };
+}
+
+/* ---------- Balancing ---------- */
+
+// CS and math courses and CS placeholders ("core") keep prerequisite order; Gen Ed, university electives and other
+// courses ("fillers") can go in any term.
+function isCore(item) {
+  if (!item.code) return ['algorithms', 'systems', 'cselective'].includes(item.slot);
+  const code = canonical(item.code);
+  if (/^(CS|MATH) /.test(code)) return true;
+  const course = getCourse(code);
+  return Boolean(course && !course.genEd && (course.prereqs ?? []).length);
+}
+
+function itemPrereqs(item) {
+  if (!item.code) return SLOT_PREREQS[item.slot] ?? [];
+  return (getCourse(item.code)?.prereqs ?? []).filter((group) => !group.includes('PLACEMENT'));
+}
+
+// Spreads the planned courses over the terms the plan needs at the credit limit, so CS courses run through the
+// whole plan instead of finishing early and leaving terms of electives only. Completed and in-progress courses
+// stay put. Returns { terms } (how many terms the planned part now uses).
+export function balancePlan() {
+  const plan = state.plan;
+  const limit = maxCredits();
+  const start = planStartTerm();
+  const startKey = termSortKey(start);
+  const inRange = (term) => termSortKey(term.name) >= startKey;
+
+  // Take the planned items out of the terms being balanced.
+  const items = [];
+  for (const term of plan.terms) {
+    if (!inRange(term)) continue;
+    for (const item of term.items.filter(isPlanned)) items.push(item);
+    term.items = term.items.filter((item) => !isPlanned(item));
+  }
+  plan.terms = plan.terms.filter((term) => term.items.length || !inRange(term));
+  if (!items.length) return { terms: 0 };
+
+  const core = items.filter(isCore);
+  const fillers = items.filter((item) => !isCore(item));
+  const credits = (list) => list.reduce((total, item) => total + (Number(item.credits) || 0), 0);
+  const credited = creditedCourses(plan);
+  const takenBefore = new Map(); // code -> term key of completed/in-progress courses
+  plan.terms.forEach((term) => term.items.forEach((item) => { if (item.code) takenBefore.set(canonical(item.code), termSortKey(term.name)); }));
+
+  // Longest chain of core items that depend on each core item.
+  const dependsOn = (item, other) => other.code && itemPrereqs(item).some((group) => group.some((code) => canonical(code) === canonical(other.code)));
+  const height = new Map();
+  const heightOf = (item, seen = new Set()) => {
+    if (height.has(item.id)) return height.get(item.id);
+    if (seen.has(item.id)) return 0;
+    seen.add(item.id);
+    const dependents = core.filter((other) => other !== item && dependsOn(other, item));
+    const value = dependents.length ? 1 + Math.max(...dependents.map((other) => heightOf(other, seen))) : 0;
+    height.set(item.id, value);
+    return value;
+  };
+  core.forEach((item) => heightOf(item));
+  const chain = core.length ? 1 + Math.max(...core.map((item) => height.get(item.id))) : 0;
+
+  const existing = plan.terms.filter(inRange).reduce((total, term) => total + termLoad(term), 0);
+  const termCount = Math.max(chain, Math.ceil((credits(items) + existing) / limit), 1);
+  const names = termSequence(termCount, start);
+
+  // Place core items term by term: ready items (prerequisites earlier), longest chain first, aiming for an even
+  // share of the remaining core credits per term; an item on the critical chain always goes in.
+  const placedAt = new Map(); // code -> term index among names
+  let pending = [...core];
+  for (let index = 0; pending.length && index < termCount + 12; index += 1) {
+    const name = names[index] ?? nextTerm(names[names.length - 1], plan.settings.includeSummer);
+    if (!names[index]) names.push(name);
+    const term = ensureTerm(name);
+    const season = parseTerm(name)?.season;
+    const termsLeft = Math.max(1, termCount - index);
+    const target = Math.ceil(credits(pending) / termsLeft);
+    const met = (code) => {
+      const canon = canonical(code);
+      if (credited.has(canon)) return true;
+      if (takenBefore.has(canon) && takenBefore.get(canon) < termSortKey(name)) return true;
+      return placedAt.has(canon) && placedAt.get(canon) < index;
+    };
+    const ready = pending
+      .filter((item) => itemPrereqs(item).every((group) => group.some(met)))
+      .filter((item) => !item.code || reliableSeasons(item.code).includes(season) || season === 'Summer')
+      .sort((a, b) => height.get(b.id) - height.get(a.id));
+    let coreLoad = 0;
+    const placed = [];
+    for (const item of ready) {
+      // Math goes in as soon as it can: calculus early is the department's advice, and CS 240 and the algorithms
+      // elective wait on it.
+      const critical = height.get(item.id) >= termsLeft - 1 || /^MATH /.test(item.code ?? '');
+      const fitsTarget = coreLoad + item.credits <= target || coreLoad === 0;
+      if ((fitsTarget || critical) && termLoad(term) + item.credits <= limit) {
+        term.items.push(item);
+        coreLoad += item.credits;
+        placed.push(item);
+        if (item.code) placedAt.set(canonical(item.code), index);
+      }
+    }
+    pending = pending.filter((item) => !placed.includes(item));
+  }
+  // Anything that couldn't be placed (an unmet prerequisite) goes after the last term, in its old order.
+  for (const item of pending) placeAfterLast(item);
+
+  // Fillers: Madison Foundations in the first year, labs with their science course, the rest in the lightest terms.
+  const order = (item) => (fillerDomain(item).startsWith('C1') ? 0 : fillerDomain(item) === 'C3L' ? 2 : 1);
+  for (const item of fillers.sort((a, b) => order(a) - order(b))) {
+    const domain = fillerDomain(item);
+    if (domain === 'C3L') {
+      const science = plan.terms.find((term) => inRange(term) && term.items.some((entry) => ['C3PP', 'C3NS'].includes(fillerDomain(entry))));
+      if (science && termLoad(science) + item.credits <= limit) { science.items.push(item); continue; }
+    }
+    placeSlot(item, { firstYearOnly: domain.startsWith('C1') });
+  }
+  dropEmptyTail();
+  return { terms: plan.terms.filter(inRange).length };
+}
+
+function fillerDomain(item) {
+  return item.domain || getCourse(item.code)?.genEd || '';
+}
+
+function placeAfterLast(item) {
+  const plan = state.plan;
+  const last = plan.terms[plan.terms.length - 1];
+  const term = last && termLoad(last) + item.credits <= maxCredits() ? last : ensureTerm(followingTerm());
+  term.items.push(item);
 }
 
 /* ---------- General Education ---------- */
@@ -436,7 +567,8 @@ export function fillGenEd() {
 
 function usableTerms() {
   const plan = state.plan;
-  const start = termSortKey(plan.student.startTerm);
+  // Not past or current terms that already hold completed or in-progress courses.
+  const start = termSortKey(planStartTerm());
   return plan.terms.filter((term) => {
     const season = parseTerm(term.name)?.season;
     return (season !== 'Summer' || plan.settings.includeSummer) && termSortKey(term.name) >= start;
