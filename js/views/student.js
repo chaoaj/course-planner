@@ -29,6 +29,7 @@ export function fillFields() {
   document.getElementById('q-vccs-no').checked = transfer.fromVCCS === false;
   document.getElementById('f-summer').checked = Boolean(state.plan.settings.includeSummer);
   document.getElementById('per-term').value = String(state.plan.settings.coursesPerTerm ?? 3);
+  document.getElementById('max-credits').value = String(state.plan.settings.maxCredits ?? 15);
   updateTransferQuestions();
 }
 

@@ -41,7 +41,7 @@ export function blankPlan() {
       vccs: {},
       other: []
     },
-    settings: { includeSummer: false, coursesPerTerm: 3 },
+    settings: { includeSummer: false, coursesPerTerm: 3, maxCredits: 15 },
     terms: [],
     notes: ''
   };

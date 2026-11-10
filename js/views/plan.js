@@ -5,7 +5,7 @@ import { state, commit, ensureTerm, followingTerm, normalizeItem } from '../stat
 import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal, auditRequirements } from '../audit.js';
 import { statusBadge } from './audit.js';
 import { gradeMeets } from '../util.js';
-import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives, fillGenEd } from '../scheduler.js';
+import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives, fillGenEd, enforceMaxCredits, maxCredits, plannedCount } from '../scheduler.js';
 import { escapeHtml, GRADES, showStatus, announce } from '../util.js';
 import { offeringPattern, reliableSeasons, isSemesterLocked, neverScheduled } from '../offerings.js';
 
@@ -234,12 +234,13 @@ export function renderPlan() {
 
   document.getElementById('terms').innerHTML = renderCreditCard() + terms.map((term, termIndex) => {
     const credits = termCredits(term);
-    const heavy = credits > 18;
+    const limit = maxCredits();
+    const heavy = credits > limit;
     const season = parseTerm(term.name)?.season ?? '';
     return `<section class="term-card" aria-labelledby="${term.id}-heading" data-term-id="${term.id}">
       <header>
         <h3 id="${term.id}-heading">${escapeHtml(term.name)}</h3>
-        <span class="term-credits${heavy ? ' heavy' : ''}">${credits} credits${heavy ? ' (overload)' : ''}</span>
+        <span class="term-credits${heavy ? ' heavy' : ''}">${credits} credits${heavy ? ` <span class="issue-icon issue-warning" aria-hidden="true">?</span> over the ${limit}-credit limit` : ''}</span>
       </header>
       <ul class="term-items" aria-label="Courses in ${escapeHtml(term.name)}">
         ${term.items.length ? term.items.map((item) => renderItem(item, term, termIndex, issuesById.get(item.id) ?? [])).join('') : '<li class="small text-body-secondary px-1">No courses yet.</li>'}
@@ -285,6 +286,16 @@ export function bindPlan(refresh) {
     const target = event.target;
     if (target.id === 'sample-select') { target.dataset.touched = '1'; return; }
     if (target.id === 'per-term') { state.plan.settings.coursesPerTerm = Number(target.value); commit({ render: false }); return; }
+    if (target.id === 'max-credits') {
+      state.plan.settings.maxCredits = Number(target.value);
+      // Lowering the limit moves planned courses out of terms that are now over it.
+      const moved = enforceMaxCredits();
+      while (state.plan.terms.length && !state.plan.terms[state.plan.terms.length - 1].items.length) state.plan.terms.pop();
+      commit({ render: false });
+      refresh('all');
+      showStatus(`Max ${target.value} credits per term.${moved ? ` Moved ${moved} planned course${moved === 1 ? '' : 's'} to stay under it.` : ''}`, 'info');
+      return;
+    }
     if (target.id === 'f-summer') { state.plan.settings.includeSummer = target.checked; commit({ render: false }); return; }
     const action = target.dataset.action;
     const found = target.dataset.item && findItem(target.dataset.item);
@@ -399,11 +410,13 @@ export function bindPlan(refresh) {
 
   document.getElementById('btn-apply-sample').addEventListener('click', () => {
     const id = document.getElementById('sample-select').value;
+    const planned = plannedCount();
+    if (planned && !window.confirm(`Replace the ${planned} planned course${planned === 1 ? '' : 's'} and placeholder${planned === 1 ? '' : 's'} with this sample plan? Completed and in-progress courses stay.`)) return;
     const result = applySamplePlan(id);
     commit({ render: false });
     refresh('all');
     const warning = result.missing.length ? ` This plan assumes credit for ${result.missing.join(' and ')}, which is already in the plan as a course to take.` : '';
-    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.granted?.length ? ` Recorded ${result.granted.join(', ')} as transfer credit, as the plan assumes; confirm on the transfer evaluation.` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.genEd?.added ? ` Added ${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'} (no associate degree).` : ''}${result.electives?.added ? ` Added ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}${result.electives.newTerms.length ? ` (and ${result.electives.newTerms.join(', ')} to fit them)` : ''}.` : ''}${warning}`, warning ? 'warning' : 'success');
+    showStatus(`${result.replaced ? `Replaced the planned courses. ` : ''}Added ${result.added} courses from the sample plan, at most ${maxCredits()} credits per term.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.granted?.length ? ` Recorded ${result.granted.join(', ')} as transfer credit, as the plan assumes; confirm on the transfer evaluation.` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.genEd?.added ? ` Added ${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'} (no associate degree).` : ''}${result.electives?.added ? ` Added ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}${result.electives.newTerms.length ? ` (and ${result.electives.newTerms.join(', ')} to fit them)` : ''}.` : ''}${warning}`, warning ? 'warning' : 'success');
   });
 
   document.getElementById('btn-autoplan').addEventListener('click', () => {
@@ -412,7 +425,7 @@ export function bindPlan(refresh) {
     commit({ render: false });
     refresh('all');
     if (!result.added) showStatus('Nothing to add: every requirement, including university electives, already has a course in the plan or credit.', 'info');
-    else showStatus(`Auto-plan added ${result.added} course${result.added === 1 ? '' : 's'}${result.genEd?.added || result.electives?.added ? `, including ${[result.genEd?.added ? `${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'}` : '', result.electives?.added ? `${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}` : ''].filter(Boolean).join(' and ')}` : ''}.${result.unplaced.length ? ` Couldn't place: ${result.unplaced.join(', ')}.` : ''}${state.plan.transfer.associateDegree ? ' General Education is met by the associate degree.' : ''}`, result.unplaced.length ? 'warning' : 'success');
+    else showStatus(`Auto-plan (at most ${maxCredits()} credits per term) added ${result.added} course${result.added === 1 ? '' : 's'}${result.genEd?.added || result.electives?.added ? `, including ${[result.genEd?.added ? `${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'}` : '', result.electives?.added ? `${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}` : ''].filter(Boolean).join(' and ')}` : ''}.${result.unplaced.length ? ` Couldn't place: ${result.unplaced.join(', ')}.` : ''}${state.plan.transfer.associateDegree ? ' General Education is met by the associate degree.' : ''}`, result.unplaced.length ? 'warning' : 'success');
   });
 
   document.getElementById('btn-add-term').addEventListener('click', () => {

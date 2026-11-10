@@ -12,7 +12,7 @@ import { readSpreadsheet, gridToPlan, sheetLooksLikePlan } from './io/import-she
 import { exportExcel } from './io/export-xlsx.js';
 import { exportPdf } from './io/export-pdf.js';
 import { studentFileBase } from './io/report-model.js';
-import { applySamplePlan } from './scheduler.js';
+import { applySamplePlan, plannedCount, maxCredits } from './scheduler.js';
 import { downloadBlob, showStatus, escapeHtml } from './util.js';
 
 /* ---------- Rendering ---------- */
@@ -182,12 +182,13 @@ function bindFiles() {
   document.getElementById('panel-transfer').addEventListener('click', (event) => {
     const button = event.target.closest('[data-use-sample]');
     if (!button) return;
-    if (state.plan.terms.some((term) => term.items.length) && !window.confirm('The plan already has courses. Add the sample plan\'s courses as well?')) return;
+    const planned = plannedCount();
+    if (planned && !window.confirm(`Replace the ${planned} planned course${planned === 1 ? '' : 's'} and placeholder${planned === 1 ? '' : 's'} with this sample plan? Completed and in-progress courses stay.`)) return;
     const result = applySamplePlan(button.dataset.useSample);
     commit({ render: false });
     refresh('all');
     activateTab(document.getElementById('tab-plan'));
-    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.granted?.length ? ` Recorded ${result.granted.join(', ')} as transfer credit, as the plan assumes; confirm on the transfer evaluation.` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.genEd?.added ? ` Added ${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'} (no associate degree).` : ''}${result.electives?.added ? ` Added ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}${result.electives.newTerms.length ? ` (and ${result.electives.newTerms.join(', ')} to fit them)` : ''}.` : ''}${result.missing.length ? ` It assumes credit for ${result.missing.join(' and ')}, which is already in the plan as a course to take.` : ''}`, result.missing.length ? 'warning' : 'success');
+    showStatus(`${result.replaced ? 'Replaced the planned courses. ' : ''}Added ${result.added} courses from the sample plan, at most ${maxCredits()} credits per term.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.granted?.length ? ` Recorded ${result.granted.join(', ')} as transfer credit, as the plan assumes; confirm on the transfer evaluation.` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.genEd?.added ? ` Added ${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'} (no associate degree).` : ''}${result.electives?.added ? ` Added ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}${result.electives.newTerms.length ? ` (and ${result.electives.newTerms.join(', ')} to fit them)` : ''}.` : ''}${result.missing.length ? ` It assumes credit for ${result.missing.join(' and ')}, which is already in the plan as a course to take.` : ''}`, result.missing.length ? 'warning' : 'success');
   });
 }
 
