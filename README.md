@@ -77,7 +77,7 @@ Built for WCAG 2.1 AA / Section 508: keyboard-operable tabs (arrow keys, Home/En
 | File | Contents |
 |---|---|
 | `data/courses.json` | CS and math courses: title, credits, prerequisites (a list of groups; every group must be met, any course in a group meets it), grade minimums, fall-only offerings, cross-listings |
-| `data/programs.json` | Minors and certificates offered under **Also complete** on the Plan tab: the Information Systems Security (cybersecurity) certificate (CS 457, CS 458, CS 482) and the Robotics minor (draft: confirm the course lists with the coordinator and edit this file). Group types: `allOf`, `oneOf`, `creditsFrom` (credits from a list) and `genEdDomain`. |
+| `data/programs.json` | Minors and certificates offered under **Also complete** on the Plan tab: the Information Systems Security (cybersecurity) certificate (CS 457, CS 458, CS 482) and the Robotics minor (2026–27 catalog: basic preparation, core, 6 elective credits with one outside the core's department, and CISE 481). Group types: `allOf`, `oneOf`, `creditsFrom` (credits from a list) and `genEdDomain`. |
 | `data/gened.json` | General Education (The Human Community, 2026–27): areas, domains and course options from the JMU Gen Ed planner. Applying a plan or Auto-plan adds a placeholder for each missing domain when there's no associate degree; Madison Foundations go in the first year. |
 | `data/requirements.json` | Degree requirement groups (change `count` / `creditsEach` on the university-electives group if that rule changes), grade rules, advising tips |
 | `data/vccs.json` | VCCS → JMU mapping, colleges, transfer notes |

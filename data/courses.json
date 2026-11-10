@@ -698,10 +698,10 @@
     {
       "code": "PHYS 386",
       "title": "Robots: Structure and Theory",
-      "credits": 4,
+      "credits": 3,
       "prereqs": [],
       "prereqText": "See the catalog for prerequisites.",
-      "creditsNote": "Confirm credits in the catalog."
+      "creditsNote": "3 credits as listed for the Robotics minor core; confirm in the catalog."
     },
     {
       "code": "MATH 238",
@@ -718,7 +718,7 @@
     },
     {
       "code": "MATH 248",
-      "title": "Numerical Methods",
+      "title": "Computers and Numerical Algorithms",
       "credits": 3,
       "prereqs": [
         [
@@ -737,6 +737,142 @@
       "prereqText": "Completed or enrolled in an approved robotics project course.",
       "creditsNote": "Confirm credits in the catalog.",
       "capstone": true
+    },
+    {
+      "code": "IA 241",
+      "title": "Introduction to Programming and Data Science",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "ISAT 252",
+      "title": "Programming and Problem Solving",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "ISAT 152",
+      "title": "Topics in Applied Physics in ISAT",
+      "credits": 4,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "PHYS 387",
+      "title": "Theory and Basic Principles of Mobile Robot Construction and Control",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "ENGR 440",
+      "title": "Mechatronics",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "ENGR 445",
+      "title": "Embedded System Design",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "ISAT 331",
+      "title": "Cyber-Physical Industry",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "ISAT 341",
+      "title": "Machine Learning and Data Science",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "ISAT 441",
+      "title": "Simulation and Modeling",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "ISAT 449",
+      "title": "Emerging Topics in Applied Data Science",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "IT 340",
+      "title": "Data Science and Machine Learning",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "MATH 300",
+      "title": "Linear Algebra",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "MATH 336",
+      "title": "Elementary Differential Equations",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "MATH 341",
+      "title": "Non-Linear Dynamics and Chaos",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "PHYS 371",
+      "title": "Digital Electronics",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "PHYS 372",
+      "title": "Microcontrollers and Their Applications",
+      "credits": 4,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Variable 2 or 4 credits; confirm in the catalog."
+    },
+    {
+      "code": "PHYS 388",
+      "title": "Robots for Humanity",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
     }
   ]
 }

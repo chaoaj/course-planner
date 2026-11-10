@@ -293,9 +293,12 @@ export function auditRequirements(plan) {
   for (const id of plan.programs ?? []) {
     const program = getProgram(id);
     if (!program) continue;
+    const byId = {};
     program.groups.forEach((group, index) => {
       const labeled = { ...group, id: `${program.id}:${group.id}`, label: `${program.short}: ${group.label}`, program: program.id, note: [index === 0 ? program.note : '', group.note].filter(Boolean).join(' ') };
-      results.push(auditProgramGroup(labeled, plan, ctx));
+      const result = auditProgramGroup(labeled, plan, ctx, byId);
+      byId[group.id] = result;
+      results.push(result);
     });
   }
 
@@ -350,7 +353,9 @@ function auditElectives(group, plan, ctx, used) {
   };
 }
 
-function auditProgramGroup(group, plan, ctx) {
+const department = (code) => String(code).split(' ')[0];
+
+function auditProgramGroup(group, plan, ctx, earlier = {}) {
   const rankOf = (courses) => Math.min(...courses.map((course) => STATUS_RANK[course.status]));
   const statusFor = (rank) => Object.keys(STATUS_RANK).find((key) => STATUS_RANK[key] === rank);
   if (group.type === 'allOf') {
@@ -372,16 +377,32 @@ function auditProgramGroup(group, plan, ctx) {
     const sum = (list) => list.reduce((total, course) => total + course.credits, 0);
     const earned = sum(courses.filter((course) => course.status === 'met'));
     const all = sum(courses);
-    const status = earned >= group.credits ? 'met' : all >= group.credits ? 'planned' : 'missing';
+    // "At least one elective from a different department than the core course."
+    let otherDepartmentOk = true;
+    let coreDepartment = '';
+    if (group.differentDepartmentFrom) {
+      const core = earlier[group.differentDepartmentFrom];
+      const coreCode = core && core.status !== 'missing' ? core.courses[0]?.code : core?.group?.options?.[0]?.[0];
+      coreDepartment = coreCode ? department(coreCode) : '';
+      otherDepartmentOk = !coreDepartment || courses.some((course) => department(course.code) !== coreDepartment);
+    }
+    let status = earned >= group.credits ? 'met' : all >= group.credits ? 'planned' : 'missing';
+    if (!otherDepartmentOk) status = 'missing';
     const missingCodes = [];
     let planned = all;
-    for (const code of group.courses) {
+    if (!otherDepartmentOk) {
+      const other = [...(group.suggest ?? []), ...group.courses].find((code) => department(code) !== coreDepartment && !courses.some((course) => course.code === code));
+      if (other) { missingCodes.push(other); planned += getCourse(other)?.credits ?? 3; }
+    }
+    // The planner fills from the suggested courses first (CS 444, MATH 238 for a CS major), then the full list.
+    for (const code of [...new Set([...(group.suggest ?? []), ...group.courses])]) {
       if (planned >= group.credits) break;
-      if (courses.some((course) => course.code === code)) continue;
+      if (courses.some((course) => course.code === code) || missingCodes.includes(code)) continue;
       missingCodes.push(code);
       planned += getCourse(code)?.credits ?? 3;
     }
-    return { group, status, courses, missingCodes, detail: `${all} of ${group.credits} credits planned or earned.` };
+    const departmentNote = otherDepartmentOk ? '' : ` Needs at least one elective outside ${coreDepartment} (the core course's department).`;
+    return { group, status, courses, missingCodes, detail: `${all} of ${group.credits} credits planned or earned.${departmentNote}` };
   }
   if (group.type === 'genEdDomain') {
     const domain = genEdDomain(group.domain);

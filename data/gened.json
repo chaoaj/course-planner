@@ -535,7 +535,7 @@
     },
     {
       "code": "ISAT 151",
-      "title": "General Education: Quantitative Reasoning",
+      "title": "Topics in Applied Calculus in ISAT",
       "credits": 3,
       "prereqs": [],
       "genEd": "C3QR"
@@ -656,7 +656,7 @@
     },
     {
       "code": "PHYS 140",
-      "title": "General Education: Physical Principles",
+      "title": "College Physics I",
       "credits": 3,
       "prereqs": [],
       "genEd": "C3PP",
@@ -676,7 +676,7 @@
     },
     {
       "code": "PHYS 240",
-      "title": "General Education: Physical Principles",
+      "title": "University Physics I",
       "credits": 3,
       "prereqs": [],
       "genEd": "C3PP",
@@ -868,14 +868,14 @@
     },
     {
       "code": "PHYS 140L",
-      "title": "General Education: Lab Experience",
+      "title": "General Physics Laboratory I",
       "credits": 1,
       "prereqs": [],
       "genEd": "C3L"
     },
     {
       "code": "PHYS 240L",
-      "title": "General Education: Lab Experience",
+      "title": "University Physics Laboratory I",
       "credits": 1,
       "prereqs": [],
       "genEd": "C3L"

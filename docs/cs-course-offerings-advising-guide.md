@@ -63,20 +63,24 @@ The core runs every term, so a spring start doesn't delay the core. It does shif
 
 ## Robotics minor
 
-The robotics minor is interdisciplinary and ends with a robotics project. Its CS courses are semester-locked: CS 354 (fall only) is a core option and CS 444 (spring only) is an elective.
+From the [2026–27 catalog](https://catalog.jmu.edu/programs/robotics-minor/#requirementstext): 20–21 credits. Coordinator: Nathan Sprague (spragunr@jmu.edu).
 
-| Course | Role | When it runs |
-|---|---|---|
-| CS 354 Introduction to Autonomous Robotics | Core course (or PHYS 386) | Fall only |
-| CS 444 Artificial Intelligence | Elective | Spring only |
-| MATH 238 Linear Algebra with Differential Equations | Elective | Not a CS course; check that department |
-| MATH 248 Numerical Methods | Elective | Not a CS course; check that department |
-| CISE 481 Robotics Project Summary | Robotics project | Not a CS course; check that department |
+| Requirement | Choose | Credits | When CS options run |
+|---|---|---|---|
+| Basic preparation: introductory programming | CS 149, IA 241 or ISAT 252 | 3 | Every term |
+| Basic preparation: calculus | MATH 232, MATH 235 or ISAT 151 | 3–4 | — |
+| Basic preparation: physics | PHYS 140 & 140L, PHYS 240 & 240L, or ISAT 152 | 4 | — |
+| Core course | CS 354, PHYS 386 or PHYS 387 | 3 | CS 354: fall only |
+| Electives (at least 6 credits; at least one from a different department than the core) | CS 444, CS 445, ENGR 440, ENGR 445, ISAT 331, ISAT 341, ISAT 441, ISAT 449, IT 340, MATH 238, MATH 248, MATH 300, MATH 336, MATH 341, PHYS 371, PHYS 372, PHYS 388 | 6 | CS 444: spring only; CS 445: every fall, some springs |
+| Robotics project | CISE 481 | 1 | — |
 
-> **Note:** Course list from the 2016–17 catalog; the current catalog page doesn't list the courses. Confirm current requirements with the coordinator, Nathan Sprague.
+- A basic preparation course may be waived by the minor advisor for a comparable course or experience. Students who completed Physical Principles with a course not listed should meet with the minor advisor.
+- CISE 481 summarizes a capstone robotics project: the student must have completed or be enrolled in an approved capstone, special topics or independent study course with a robotics project (or, at the advisor's discretion, an internship, research or professional project in robotics).
+- For a CS major, CS 149 and calculus are already required, and CS 444/445 also count as CS electives. With CS 354 as the core, at least one elective must be outside CS (for example MATH 238 or MATH 248).
 
 ## General advice
 
+- Avoid taking CS 240 and CS 261 in the same term. Both are demanding gateway courses (C- minimum, at most two attempts); splitting them usually costs no time, since CS 327 needs only CS 240 and can run alongside CS 261. In the tightest plans (an associate-degree student starting from CS 149 or earlier), CS 361 needs both, so separating them adds a semester.
 - Every required core course (CS 149, 159, 227, 240, 261, 327, 345, 361) has run every fall and spring since Fall 2020, so the core sequence can start in either term.
 - CS 430 and CS 412 ran only in spring through Spring 2022 and have run in both terms since Fall 2022.
 - Systems electives split by term: CS 432 and CS 450 are fall courses; CS 456 and CS 470 are mostly spring; CS 455 ran in some early falls but only in spring since Spring 2025. Check which options run in the student's remaining terms before choosing one.

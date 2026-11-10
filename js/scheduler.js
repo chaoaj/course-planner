@@ -482,7 +482,18 @@ function isCore(item) {
   const code = canonical(item.code);
   if (/^(CS|MATH) /.test(code)) return true;
   const course = getCourse(code);
+  // Lecture/lab pairs (PHYS 240 with PHYS 240L) are scheduled together with the core courses.
+  if ((course?.coreqs ?? []).length || coreqTargets().has(code)) return true;
   return Boolean(course && !course.genEd && (course.prereqs ?? []).length);
+}
+
+let coreqTargetCache = null;
+function coreqTargets() {
+  if (!coreqTargetCache) {
+    coreqTargetCache = new Set();
+    for (const course of catalog.courses.values()) for (const group of course.coreqs ?? []) for (const code of group) coreqTargetCache.add(canonical(code));
+  }
+  return coreqTargetCache;
 }
 
 // True when another course in the term is one the department advises against taking with this one.
@@ -504,6 +515,26 @@ function itemPrereqs(item) {
 // whole plan instead of finishing early and leaving terms of electives only. Completed and in-progress courses
 // stay put. Returns { terms } (how many terms the planned part now uses).
 export function balancePlan() {
+  const before = JSON.stringify(state.plan);
+  const first = balanceOnce();
+  // Small credit leftovers (a 4-credit math course, a 1-credit project) can push one elective into a term of its
+  // own. Spreading over one more term leaves room for it instead; keep whichever uses fewer terms.
+  const startKey = termSortKey(planStartTerm());
+  const tail = state.plan.terms[state.plan.terms.length - 1];
+  const tailIsFillerOnly = tail && termSortKey(tail.name) >= startKey && tail.items.every((item) => !isCore(item) && isPlanned(item));
+  if (first.overflow && tailIsFillerOnly && termLoad(tail) < 12) {
+    const after = JSON.stringify(state.plan);
+    Object.assign(state.plan, JSON.parse(before));
+    const second = balanceOnce({ extra: 1 });
+    const tailAfter = state.plan.terms[state.plan.terms.length - 1];
+    const stillLonely = tailAfter && tailAfter.items.every((item) => !isCore(item)) && termLoad(tailAfter) < 12;
+    if (second.terms > first.terms || stillLonely) Object.assign(state.plan, JSON.parse(after));
+    else return second;
+  }
+  return first;
+}
+
+function balanceOnce({ extra = 0 } = {}) {
   const plan = state.plan;
   const limit = maxCredits();
   const start = planStartTerm();
@@ -548,7 +579,7 @@ export function balancePlan() {
   // With a target (6 semesters by default), spread over it when the plan would finish sooner, but never below a
   // full-time 12 credits per term on average.
   const targetTerms = Number(plan.settings.targetTerms) || 0;
-  let termCount = targetTerms > needed ? Math.max(needed, Math.min(targetTerms, Math.floor(total / 12))) : needed;
+  let termCount = (targetTerms > needed ? Math.max(needed, Math.min(targetTerms, Math.floor(total / 12))) : needed) + extra;
   // At least the minimum semesters at JMU (4 by default), counting terms already taken here.
   const minTerms = Number(plan.settings.minTerms) || 0;
   const takenHere = plan.terms.filter((term) => termSortKey(term.name) >= termSortKey(plan.student.startTerm) && termSortKey(term.name) < startKey
@@ -558,6 +589,9 @@ export function balancePlan() {
 
   // Place core items term by term: ready items (prerequisites earlier), longest chain first, aiming for an even
   // share of the remaining core credits per term; an item on the critical chain always goes in.
+  // Courses a selected program wants early (the Robotics minor's basic preparation).
+  const earlyCodes = new Set((plan.programs ?? []).flatMap((id) => getProgram(id)?.groups ?? [])
+    .filter((group) => group.early).flatMap((group) => group.courses ?? group.options?.flat() ?? []).map(canonical));
   const placedAt = new Map(); // code -> term index among names
   let pending = [...core];
   for (let index = 0; pending.length && index < termCount + 12; index += 1) {
@@ -586,19 +620,35 @@ export function balancePlan() {
     for (const item of ready) {
       // Math goes in as soon as it can: calculus early is the department's advice, and CS 240 and the algorithms
       // elective wait on it.
-      // Co-requisites (CS 457 with CS 361) must be in this term or earlier.
+      if (placed.includes(item)) continue;
+      // A lab waits for its lecture, which brings it along.
+      if (item.code && pending.some((other) => other !== item && !placed.includes(other) && (getCourse(other.code)?.coreqs ?? []).some((group) => group.map(canonical).includes(canonical(item.code))))) continue;
+      // Co-requisites (CS 457 with CS 361, PHYS 240 with PHYS 240L) must be in this term or earlier; a pending
+      // partner comes into this term with it.
       const coreqs = item.code ? getCourse(item.code)?.coreqs ?? [] : [];
-      if (!coreqs.every((group) => group.some(metByNow))) continue;
-      const critical = height.get(item.id) >= termsLeft - 1 || /^MATH /.test(item.code ?? '')
+      const partners = [];
+      let coreqsOk = true;
+      for (const group of coreqs) {
+        if (group.some(metByNow)) continue;
+        // The partner must itself be ready (its own prerequisites done earlier).
+        const partner = ready.find((other) => other.code && group.map(canonical).includes(canonical(other.code)) && !placed.includes(other));
+        if (partner) partners.push(partner); else coreqsOk = false;
+      }
+      if (!coreqsOk) continue;
+      const pairCredits = partners.reduce((total, other) => total + other.credits, 0);
+      if (partners.length && termLoad(term) + item.credits + pairCredits > limit) continue;
+      const critical = height.get(item.id) >= termsLeft - 1 || /^MATH /.test(item.code ?? '') || earlyCodes.has(canonical(item.code ?? ''))
         || seasonTermsLeft(item) <= height.get(item.id) + 1;
       const fitsTarget = coreLoad + item.credits <= target || coreLoad === 0;
       // Split pairs like CS 240 and CS 261 unless keeping them apart would lengthen the plan.
       if (clashesInTerm(item, term) && height.get(item.id) < termsLeft - 1) continue;
-      if ((fitsTarget || critical) && termLoad(term) + item.credits <= limit) {
-        term.items.push(item);
-        coreLoad += item.credits;
-        placed.push(item);
-        if (item.code) placedAt.set(canonical(item.code), index);
+      if ((fitsTarget || critical) && termLoad(term) + item.credits + pairCredits <= limit) {
+        for (const entry of [item, ...partners]) {
+          term.items.push(entry);
+          coreLoad += entry.credits;
+          placed.push(entry);
+          if (entry.code) placedAt.set(canonical(entry.code), index);
+        }
       }
     }
     pending = pending.filter((item) => !placed.includes(item));
@@ -607,7 +657,7 @@ export function balancePlan() {
   for (const item of pending) placeAfterLast(item);
 
   // Fillers: Madison Foundations in the first year, labs with their science course, the rest in the lightest terms.
-  const order = (item) => (fillerDomain(item).startsWith('C1') ? 0 : fillerDomain(item) === 'C3L' ? 2 : 1);
+  const order = (item) => (item.code && getCourse(item.code)?.capstone ? -1 : fillerDomain(item).startsWith('C1') ? 0 : fillerDomain(item) === 'C3L' ? 2 : 1);
   for (const item of fillers.sort((a, b) => order(a) - order(b))) {
     const domain = fillerDomain(item);
     // A capstone (CISE 481) goes in the last term.
@@ -622,7 +672,8 @@ export function balancePlan() {
     placeSlot(item, { firstYearOnly: domain.startsWith('C1') });
   }
   dropEmptyTail();
-  return { terms: plan.terms.filter(inRange).length };
+  const used = plan.terms.filter(inRange).length;
+  return { terms: used, overflow: used > termCount };
 }
 
 // How the planned part of the plan compares with the target: semesters used, the credits and prerequisite chain

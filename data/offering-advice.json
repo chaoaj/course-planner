@@ -119,34 +119,39 @@
     }
   ],
   "robotics": {
-    "summary": "The robotics minor is interdisciplinary and ends with a robotics project. Its CS courses are semester-locked: CS 354 (fall only) is a core option and CS 444 (spring only) is an elective.",
+    "summary": "The Robotics minor (20\u201321 credits, 2026\u201327 catalog) has basic preparation (programming, calculus, physics), one core course, at least 6 elective credits (one from a different department than the core) and the CISE 481 robotics project. For a CS major, CS 149, calculus and CS electives overlap with the major. The CS options are semester-locked: CS 354 (fall only) for the core and CS 444 (spring only) as an elective.",
     "courses": [
       {
+        "code": "CS 149",
+        "title": "Introduction to Programming",
+        "role": "Basic preparation (or IA 241, ISAT 252)"
+      },
+      {
+        "code": "MATH 235",
+        "title": "Calculus I",
+        "role": "Basic preparation (or MATH 232, ISAT 151)"
+      },
+      {
+        "code": "PHYS 240",
+        "title": "University Physics I (with PHYS 240L)",
+        "role": "Basic preparation (or PHYS 140/140L, ISAT 152)"
+      },
+      {
         "code": "CS 354",
-        "role": "Core course (or PHYS 386)",
-        "title": "Introduction to Autonomous Robotics"
+        "title": "Introduction to Autonomous Robotics",
+        "role": "Core course (or PHYS 386, PHYS 387)"
       },
       {
         "code": "CS 444",
-        "role": "Elective",
-        "title": "Artificial Intelligence"
-      },
-      {
-        "code": "MATH 238",
-        "role": "Elective",
-        "title": "Linear Algebra with Differential Equations"
-      },
-      {
-        "code": "MATH 248",
-        "role": "Elective",
-        "title": "Numerical Methods"
+        "title": "Artificial Intelligence",
+        "role": "Elective (also CS 445, MATH 238, MATH 248, ENGR, ISAT, IT and PHYS options)"
       },
       {
         "code": "CISE 481",
-        "role": "Robotics project",
-        "title": "Robotics Project Summary"
+        "title": "Robotics Project Summary",
+        "role": "Robotics project (1 credit)"
       }
     ],
-    "caveat": "Course list from the 2016\u201317 catalog; the current catalog page doesn't list the courses. Confirm current requirements with the coordinator, Nathan Sprague."
+    "caveat": "From the 2026\u201327 catalog. Coordinator: Nathan Sprague (spragunr@jmu.edu)."
   }
 }

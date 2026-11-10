@@ -26,13 +26,70 @@
       "id": "robotics",
       "label": "Robotics minor",
       "short": "Robotics minor",
-      "source": "https://catalog.jmu.edu/programs/robotics-minor/",
-      "draft": true,
-      "note": "20\u201321 credits. Interdisciplinary: at least one elective must come from a different department than the core course, and the minor ends with a robotics project summarized in CISE 481. Course lists here are partial (the 2016\u201317 catalog list and the 2023\u201324 structure); confirm the current requirements with the coordinator, Nathan Sprague (spragunr@jmu.edu), and edit data/programs.json.",
+      "source": "https://catalog.jmu.edu/programs/robotics-minor/#requirementstext",
+      "catalogYear": "2026-2027",
+      "note": "20\u201321 credits (2026\u201327 catalog). Basic preparation (programming, calculus, physics) can be waived by the minor advisor for a comparable course or experience. At least one elective must come from a different department than the core course. CISE 481 summarizes a capstone robotics project: the student must have completed or be enrolled in an approved capstone, special topics or independent study course with a robotics project, or, at the advisor's discretion, an internship, research or professional project in robotics. Coordinator: Nathan Sprague (spragunr@jmu.edu).",
       "groups": [
         {
+          "id": "rob-programming",
+          "label": "Basic preparation: introductory programming",
+          "type": "oneOf",
+          "options": [
+            [
+              "CS 149"
+            ],
+            [
+              "IA 241"
+            ],
+            [
+              "ISAT 252"
+            ]
+          ],
+          "credits": "3",
+          "early": true
+        },
+        {
+          "id": "rob-calculus",
+          "label": "Basic preparation: calculus",
+          "type": "oneOf",
+          "options": [
+            [
+              "MATH 235"
+            ],
+            [
+              "MATH 232"
+            ],
+            [
+              "ISAT 151"
+            ]
+          ],
+          "credits": "3-4",
+          "early": true
+        },
+        {
+          "id": "rob-physics",
+          "label": "Basic preparation: physics",
+          "type": "oneOf",
+          "options": [
+            [
+              "PHYS 240",
+              "PHYS 240L"
+            ],
+            [
+              "PHYS 140",
+              "PHYS 140L"
+            ],
+            [
+              "ISAT 152"
+            ]
+          ],
+          "credits": "4",
+          "note": "PHYS 140/140L and PHYS 240/240L also meet General Education Physical Principles and Lab Experience. Students who completed Physical Principles with a course not listed should meet with the minor advisor.",
+          "early": true
+        },
+        {
           "id": "rob-core",
-          "label": "Robotics core course",
+          "label": "Core course",
           "type": "oneOf",
           "options": [
             [
@@ -40,37 +97,55 @@
             ],
             [
               "PHYS 386"
+            ],
+            [
+              "PHYS 387"
             ]
           ],
+          "credits": "3",
           "note": "CS 354 runs in fall only."
         },
         {
-          "id": "rob-pp",
-          "label": "Physical Principles (General Education C3PP) course",
-          "type": "genEdDomain",
-          "domain": "C3PP",
-          "note": "Also counts toward General Education. See the coordinator if the student's Physical Principles course isn't on the minor's list."
-        },
-        {
-          "id": "rob-elect",
+          "id": "rob-electives",
           "label": "Electives (at least 6 credits)",
           "type": "creditsFrom",
           "credits": 6,
+          "differentDepartmentFrom": "rob-core",
           "courses": [
             "CS 444",
+            "CS 445",
+            "ENGR 440",
+            "ENGR 445",
+            "ISAT 331",
+            "ISAT 341",
+            "ISAT 441",
+            "ISAT 449",
+            "IT 340",
             "MATH 238",
-            "MATH 248"
+            "MATH 248",
+            "MATH 300",
+            "MATH 336",
+            "MATH 341",
+            "PHYS 371",
+            "PHYS 372",
+            "PHYS 388"
           ],
-          "note": "At least one elective must be from a different department than the core course. CS 444 runs in spring only. The full elective list is longer; confirm with the coordinator."
+          "note": "At least one elective must be from a different department than the core course. CS 444 runs in spring only.",
+          "suggest": [
+            "CS 444",
+            "MATH 238",
+            "CS 445",
+            "MATH 248"
+          ]
         },
         {
           "id": "rob-capstone",
-          "label": "Robotics project (CISE 481)",
+          "label": "Robotics project",
           "type": "allOf",
           "courses": [
             "CISE 481"
           ],
-          "note": "Taken with, or after, an approved capstone, special topics or independent study course involving a robotics project; an internship or research experience in robotics may also be approved."
+          "credits": "1"
         }
       ]
     }
