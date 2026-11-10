@@ -31,7 +31,7 @@
     {
       "id": "149-159-227-240",
       "title": "Credit for CS 149, CS 159, CS 227, CS 240, calculus and statistics, three semesters",
-      "note": "Added for advising (not one of the department's 2019 sample plans). Calculus and statistics are already done, so nothing holds back CS 261 or CS 327 in the first term. The CS 261 \u2192 CS 361 \u2192 systems elective chain puts the systems elective in the last term; a fourth semester would let it move earlier, as the advising sheet recommends.",
+      "note": "Added for advising (not one of the department's 2019 sample plans). Applying it records MATH 235 (calculus) and MATH 220 (statistics) as transfer credit unless the student already has credit for those requirements; confirm on the transfer evaluation. Nothing then holds back CS 261 or CS 327 in the first term. The CS 261 \u2192 CS 361 \u2192 systems elective chain puts the systems elective in the last term; a fourth semester would let it move earlier, as the advising sheet recommends.",
       "assumes": [
         "CS 149",
         "CS 159",
@@ -65,6 +65,10 @@
             "slot": "cselective"
           }
         ]
+      ],
+      "grants": [
+        "MATH 235",
+        "MATH 220"
       ]
     },
     {

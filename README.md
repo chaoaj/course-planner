@@ -38,7 +38,7 @@ Notes:
 1. **Student**: name, advisor, first term at JMU, then the transfer questions: *Is the student transferring?* and *Are they coming from a VCCS college?* A VCCS answer opens the college picker (with a note for the PVCC and BRCC articulation agreements) and the associate-degree checkbox (which satisfies General Education).
 2. **Transfer credit**: check off the VCCS courses taken, with grades. CSC 201, MTH 245, MTH 263, MTH 288 and CSC 208 map automatically; ITP 220, CSC 202 and CSC 205 need an advisor decision (the JMU course, or CS 000 elective credit). Add AP, IB, other-college or waived credit below. The tab suggests the matching department sample plan.
 3. **Plan**: apply a sample transfer plan, or **Auto-plan the rest** (fills remaining requirements term by term in prerequisite order, with a chosen number of CS courses per term). Add courses or placeholders (CS elective, systems elective, Gen Ed...), move them between terms, mark them completed with a grade. Each course shows prerequisite problems, fall-only offerings, duplicates, and grade minimums.
-4. **Requirements**: the degree audit (core, discrete math, calculus, statistics, algorithms, systems, 9 credits of CS electives with two above CS 332), credit totals, grade rules, advising notes, and the year-by-year advising tips.
+4. **Requirements**: the degree audit (core, discrete math, calculus, statistics, algorithms, systems, 9 credits of CS electives with two above CS 332, and 8 three-credit university electives taken at JMU), credit totals, grade rules, advising notes, and the year-by-year advising tips.
 5. **Prerequisite map**: a p5.js graph of the courses by prerequisite depth, colored and labeled by status (credit, done, planned with term, needed). Click a course or use the arrow keys to highlight its whole chain. A text table version sits below it.
 
 ## Files
@@ -61,9 +61,9 @@ Built for WCAG 2.1 AA / Section 508: keyboard-operable tabs (arrow keys, Home/En
 | File | Contents |
 |---|---|
 | `data/courses.json` | CS and math courses: title, credits, prerequisites (a list of groups; every group must be met, any course in a group meets it), grade minimums, fall-only offerings, cross-listings |
-| `data/requirements.json` | Degree requirement groups, grade rules, advising tips |
+| `data/requirements.json` | Degree requirement groups (change `count` / `creditsEach` on the university-electives group if that rule changes), grade rules, advising tips |
 | `data/vccs.json` | VCCS → JMU mapping, colleges, transfer notes |
-| `data/sample-plans.json` | The department's five transfer sample plans (term placement follows the current prerequisites), three added plans for students with credit for CS 149 + CS 159 + CS 227 + CS 240 (with calculus and statistics), CS 149 + CS 159 + CS 227, or CS 149 + CS 159, and placeholder types. Applying a plan also adds calculus and statistics to the first term when the student has no credit for them. |
+| `data/sample-plans.json` | The department's five transfer sample plans (term placement follows the current prerequisites), three added plans for students with credit for CS 149 + CS 159 + CS 227 + CS 240 (with calculus and statistics), CS 149 + CS 159 + CS 227, or CS 149 + CS 159, and placeholder types. Applying the CS 149/159/227/240 plan records MATH 235 and MATH 220 as transfer credit (unless calculus or statistics is already credited); applying any other plan adds calculus and statistics to the first term when the student has no credit for them. |
 
 Sources: [CS B.S. requirements](https://catalog.jmu.edu/programs/computer-science-bs/#requirementstext), [CS course listings](https://catalog.jmu.edu/courses/cs/), [VCCS transfer](https://www.jmu.edu/cise/cs/undergraduate/transfer/vccs-transfer.shtml), [Sample plans for transfer students](https://www.jmu.edu/cise/cs/_files/transfer-student-sample-plans.pdf). Update the JSON files when the catalog changes; a few math titles and credits (MATH 155/156, 229, 318) are marked `creditsNote` to confirm.
 

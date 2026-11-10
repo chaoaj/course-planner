@@ -6,14 +6,139 @@
   "genEdCredits": 41,
   "genEdNote": "Some General Education credits may be met by major courses. A completed VCCS associate degree satisfies JMU General Education.",
   "groups": [
-    { "id": "intro", "label": "Introductory programming", "type": "oneOf", "options": [["CS 149"], ["CS 145"]], "note": "B- or better to continue to CS 159 and CS 227." },
-    { "id": "core", "label": "Required CS core", "type": "allOf", "courses": ["CS 159", "CS 240", "CS 261", "CS 327", "CS 345", "CS 361", "CS 430"] },
-    { "id": "discrete", "label": "Introductory discrete math", "type": "oneOf", "options": [["CS 227"], ["MATH 227"], ["MATH 245"]] },
-    { "id": "calculus", "label": "Calculus", "type": "oneOf", "options": [["MATH 235"], ["MATH 231", "MATH 232"]], "note": "Take calculus early; MATH 231 or equivalent is a prerequisite for CS 240." },
-    { "id": "stats", "label": "Statistics", "type": "oneOf", "options": [["MATH 220"], ["MATH 229"], ["MATH 318"]], "note": "Recommended in the second year; needed for CS 412/452." },
-    { "id": "algorithms", "label": "Algorithms elective", "type": "oneOf", "options": [["CS 412"], ["CS 452"], ["MATH 452"]] },
-    { "id": "systems", "label": "Systems elective", "type": "oneOf", "options": [["CS 432"], ["CS 450"], ["CS 455"], ["CS 456"], ["CS 470"]], "note": "Take the systems elective before your final semester when you can. CS 432 is offered in fall only." },
-    { "id": "cselectives", "label": "CS electives", "type": "electives", "credits": 9, "minLevel": 300, "aboveLevel": 332, "aboveCount": 2, "note": "9 credits of CS at the 300 level or above, with at least two courses above CS 332. Courses used for another requirement don't count twice." }
+    {
+      "id": "intro",
+      "label": "Introductory programming",
+      "type": "oneOf",
+      "options": [
+        [
+          "CS 149"
+        ],
+        [
+          "CS 145"
+        ]
+      ],
+      "note": "B- or better to continue to CS 159 and CS 227."
+    },
+    {
+      "id": "core",
+      "label": "Required CS core",
+      "type": "allOf",
+      "courses": [
+        "CS 159",
+        "CS 240",
+        "CS 261",
+        "CS 327",
+        "CS 345",
+        "CS 361",
+        "CS 430"
+      ]
+    },
+    {
+      "id": "discrete",
+      "label": "Introductory discrete math",
+      "type": "oneOf",
+      "options": [
+        [
+          "CS 227"
+        ],
+        [
+          "MATH 227"
+        ],
+        [
+          "MATH 245"
+        ]
+      ]
+    },
+    {
+      "id": "calculus",
+      "label": "Calculus",
+      "type": "oneOf",
+      "options": [
+        [
+          "MATH 235"
+        ],
+        [
+          "MATH 231",
+          "MATH 232"
+        ]
+      ],
+      "note": "Take calculus early; MATH 231 or equivalent is a prerequisite for CS 240."
+    },
+    {
+      "id": "stats",
+      "label": "Statistics",
+      "type": "oneOf",
+      "options": [
+        [
+          "MATH 220"
+        ],
+        [
+          "MATH 229"
+        ],
+        [
+          "MATH 318"
+        ]
+      ],
+      "note": "Recommended in the second year; needed for CS 412/452."
+    },
+    {
+      "id": "algorithms",
+      "label": "Algorithms elective",
+      "type": "oneOf",
+      "options": [
+        [
+          "CS 412"
+        ],
+        [
+          "CS 452"
+        ],
+        [
+          "MATH 452"
+        ]
+      ]
+    },
+    {
+      "id": "systems",
+      "label": "Systems elective",
+      "type": "oneOf",
+      "options": [
+        [
+          "CS 432"
+        ],
+        [
+          "CS 450"
+        ],
+        [
+          "CS 455"
+        ],
+        [
+          "CS 456"
+        ],
+        [
+          "CS 470"
+        ]
+      ],
+      "note": "Take the systems elective before your final semester when you can. CS 432 is offered in fall only."
+    },
+    {
+      "id": "cselectives",
+      "label": "CS electives",
+      "type": "electives",
+      "credits": 9,
+      "minLevel": 300,
+      "aboveLevel": 332,
+      "aboveCount": 2,
+      "note": "9 credits of CS at the 300 level or above, with at least two courses above CS 332. Courses used for another requirement don't count twice."
+    },
+    {
+      "id": "univelectives",
+      "label": "University electives",
+      "type": "jmuElectives",
+      "count": 8,
+      "creditsEach": 3,
+      "note": "8 three-credit university electives taken at JMU (24 credits). Transfer credit doesn't count. Any JMU course not used for another requirement counts, including extra CS courses beyond the 9 CS elective credits; General Education placeholders don't."
+    }
   ],
   "gradeRules": [
     "CS 149 and CS 227 need a B- or better to continue in the major.",

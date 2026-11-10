@@ -301,7 +301,7 @@ export function bindPlan(refresh) {
     commit({ render: false });
     refresh('all');
     const warning = result.missing.length ? ` This plan assumes credit for ${result.missing.join(' and ')}, which the student doesn't have yet.` : '';
-    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${warning}`, warning ? 'warning' : 'success');
+    showStatus(`Added ${result.added} courses from the sample plan.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.granted?.length ? ` Recorded ${result.granted.join(' and ')} as transfer credit; confirm on the transfer evaluation.` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.electives?.added ? ` Added ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}${result.electives.newTerms.length ? ` (and ${result.electives.newTerms.join(', ')} to fit them)` : ''}.` : ''}${warning}`, warning ? 'warning' : 'success');
   });
 
   document.getElementById('btn-autoplan').addEventListener('click', () => {
@@ -309,8 +309,8 @@ export function bindPlan(refresh) {
     const result = autoPlan();
     commit({ render: false });
     refresh('all');
-    if (!result.added) showStatus('Nothing to add: every requirement already has a course in the plan or credit.', 'info');
-    else showStatus(`Auto-plan added ${result.added} course${result.added === 1 ? '' : 's'}.${result.unplaced.length ? ` Couldn't place: ${result.unplaced.join(', ')}.` : ''} General Education and university electives are not added automatically.`, result.unplaced.length ? 'warning' : 'success');
+    if (!result.added) showStatus('Nothing to add: every requirement, including university electives, already has a course in the plan or credit.', 'info');
+    else showStatus(`Auto-plan added ${result.added} course${result.added === 1 ? '' : 's'}${result.electives?.added ? `, including ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}` : ''}.${result.unplaced.length ? ` Couldn't place: ${result.unplaced.join(', ')}.` : ''} General Education is not added automatically.`, result.unplaced.length ? 'warning' : 'success');
   });
 
   document.getElementById('btn-add-term').addEventListener('click', () => {

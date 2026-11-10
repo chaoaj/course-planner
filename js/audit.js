@@ -241,6 +241,8 @@ export function auditRequirements(plan) {
       results.push({ group, status, courses });
     } else if (group.type === 'electives') {
       results.push(auditElectives(group, plan, ctx, used));
+    } else if (group.type === 'jmuElectives') {
+      results.push(auditJmuElectives(group, plan, used));
     }
   }
 
@@ -267,6 +269,13 @@ function auditElectives(group, plan, ctx, used) {
     counted.push(candidate);
   }
   counted.sort((a, b) => STATUS_RANK[b.status] - STATUS_RANK[a.status]);
+  // Courses this requirement uses are marked so extras beyond its credits can count as university electives.
+  let usedCredits = 0;
+  for (const course of counted) {
+    if (usedCredits >= group.credits) break;
+    used.add(course.code);
+    usedCredits += Number(course.credits) || 0;
+  }
   const slots = slotItems(plan, 'cselective').map(({ term, item }) => ({ code: 'CS Elective', status: 'planned', where: term, credits: item.credits, placeholder: true }));
   const courses = [...counted, ...slots];
 
@@ -285,6 +294,53 @@ function auditElectives(group, plan, ctx, used) {
     status,
     courses,
     detail: `${allCredits} of ${group.credits} credits planned or earned (${metCredits} earned); ${above} course${above === 1 ? '' : 's'} above CS ${group.aboveLevel}${unknownSlots ? ` plus ${unknownSlots} elective slot${unknownSlots === 1 ? '' : 's'} still to choose` : ''}.`
+  };
+}
+
+// University electives: courses in the JMU plan (not transfer credit) that no other requirement uses. Elective and
+// custom placeholders count; General Education placeholders and other requirement placeholders don't.
+export function jmuElectiveItems(plan, used) {
+  const found = [];
+  const seen = new Set();
+  plan.terms.forEach((term) => {
+    for (const item of term.items) {
+      let counts = false;
+      if (!item.code) counts = item.slot === 'elective' || item.slot === 'other';
+      else {
+        const code = canonical(item.code);
+        counts = !used.has(code) && !seen.has(code);
+        seen.add(code);
+      }
+      if (counts) found.push({ term: term.name, item });
+    }
+  });
+  return found;
+}
+
+function auditJmuElectives(group, plan, used) {
+  const items = jmuElectiveItems(plan, used);
+  const needed = group.count * group.creditsEach;
+  const statusOf = (item) => (item.status === 'completed' ? 'met' : item.status === 'in-progress' ? 'inprogress' : 'planned');
+  const credits = (list) => list.reduce((total, { item }) => total + (Number(item.credits) || 0), 0);
+  const earned = credits(items.filter(({ item }) => item.status === 'completed'));
+  const all = credits(items);
+  let status = 'missing';
+  if (earned >= needed) status = 'met';
+  else if (all >= needed) status = items.some(({ item }) => item.status === 'in-progress') ? 'inprogress' : 'planned';
+  const courses = items.map(({ term, item }) => ({
+    code: item.code || item.label || slotInfo(item.slot)?.label || 'Elective',
+    status: statusOf(item),
+    where: term,
+    credits: item.credits,
+    placeholder: !item.code
+  }));
+  const remaining = Math.max(0, Math.ceil((needed - all) / group.creditsEach));
+  return {
+    group,
+    status,
+    courses,
+    remaining,
+    detail: `${items.length} of ${group.count} courses (${all} of ${needed} credits) planned or earned at JMU, ${earned} earned.${remaining ? ` Add ${remaining} more.` : ''}`
   };
 }
 
