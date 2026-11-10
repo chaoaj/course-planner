@@ -29,6 +29,45 @@
   },
   "plans": [
     {
+      "id": "149-159-227-240",
+      "title": "Credit for CS 149, CS 159, CS 227, CS 240, calculus and statistics, three semesters",
+      "note": "Added for advising (not one of the department's 2019 sample plans). Calculus and statistics are already done, so nothing holds back CS 261 or CS 327 in the first term. The CS 261 \u2192 CS 361 \u2192 systems elective chain puts the systems elective in the last term; a fourth semester would let it move earlier, as the advising sheet recommends.",
+      "assumes": [
+        "CS 149",
+        "CS 159",
+        "CS 227",
+        "CS 240"
+      ],
+      "terms": [
+        [
+          "CS 261",
+          "CS 327",
+          "CS 345"
+        ],
+        [
+          "CS 361",
+          "CS 430",
+          {
+            "slot": "algorithms"
+          },
+          {
+            "slot": "cselective"
+          }
+        ],
+        [
+          {
+            "slot": "systems"
+          },
+          {
+            "slot": "cselective"
+          },
+          {
+            "slot": "cselective"
+          }
+        ]
+      ]
+    },
+    {
       "id": "149-240",
       "title": "Credit for CS 149 and CS 240 (CS 159 waived), four semesters",
       "assumes": [
@@ -73,7 +112,7 @@
     {
       "id": "149-159-227",
       "title": "Credit for CS 149, CS 159 and CS 227, four semesters",
-      "note": "Added for advising (not one of the department's 2019 sample plans). With 4 CS courses per term this can finish in three semesters.",
+      "note": "Added for advising (not one of the department's 2019 sample plans). CS 240 is in the first term, so the student needs calculus (MATH 231 or MATH 235) done before starting; otherwise move CS 240 to the second term. With 4 CS courses per term this can finish in three semesters.",
       "assumes": [
         "CS 149",
         "CS 159",

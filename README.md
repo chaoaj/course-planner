@@ -63,7 +63,7 @@ Built for WCAG 2.1 AA / Section 508: keyboard-operable tabs (arrow keys, Home/En
 | `data/courses.json` | CS and math courses: title, credits, prerequisites (a list of groups; every group must be met, any course in a group meets it), grade minimums, fall-only offerings, cross-listings |
 | `data/requirements.json` | Degree requirement groups, grade rules, advising tips |
 | `data/vccs.json` | VCCS → JMU mapping, colleges, transfer notes |
-| `data/sample-plans.json` | The department's five transfer sample plans (term placement follows the current prerequisites), two added plans for students with credit for CS 149 + CS 159 + CS 227 or CS 149 + CS 159, and placeholder types. Applying a plan also adds calculus and statistics to the first term when the student has no credit for them. |
+| `data/sample-plans.json` | The department's five transfer sample plans (term placement follows the current prerequisites), three added plans for students with credit for CS 149 + CS 159 + CS 227 + CS 240 (with calculus and statistics), CS 149 + CS 159 + CS 227, or CS 149 + CS 159, and placeholder types. Applying a plan also adds calculus and statistics to the first term when the student has no credit for them. |
 
 Sources: [CS B.S. requirements](https://catalog.jmu.edu/programs/computer-science-bs/#requirementstext), [CS course listings](https://catalog.jmu.edu/courses/cs/), [VCCS transfer](https://www.jmu.edu/cise/cs/undergraduate/transfer/vccs-transfer.shtml), [Sample plans for transfer students](https://www.jmu.edu/cise/cs/_files/transfer-student-sample-plans.pdf). Update the JSON files when the catalog changes; a few math titles and credits (MATH 155/156, 229, 318) are marked `creditsNote` to confirm.
 

@@ -17,6 +17,7 @@ function makeItem(entry) {
 export function recommendSamplePlan(plan) {
   const credited = creditedCourses(plan);
   const has = (code) => credited.has(canonical(code));
+  if (has('CS 149') && has('CS 159') && has('CS 227') && has('CS 240')) return '149-159-227-240';
   if (has('CS 149') && has('CS 240')) return '149-240';
   if (has('CS 149') && has('CS 159') && has('CS 227')) return '149-159-227';
   if (has('CS 149') && has('CS 159')) return '149-159';
