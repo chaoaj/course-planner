@@ -494,6 +494,12 @@ function isCore(item) {
   return Boolean(course && !course.genEd && (course.prereqs ?? []).length);
 }
 
+// A CS course or a CS placeholder (algorithms, systems, CS elective).
+function isCsItem(item) {
+  if (!item.code) return ['algorithms', 'systems', 'cselective'].includes(item.slot);
+  return /^CS /.test(canonical(item.code));
+}
+
 let coreqTargetCache = null;
 function coreqTargets() {
   if (!coreqTargetCache) {
@@ -624,6 +630,9 @@ function balanceOnce({ extra = 0 } = {}) {
       .sort((a, b) => height.get(b.id) - height.get(a.id));
     let coreLoad = 0;
     const placed = [];
+    // Keep the student in at least one CS course every term when one is ready, even if math or other core
+    // courses already fill this term's share.
+    let csPlaced = term.items.some(isCsItem);
     for (const item of ready) {
       // Math goes in as soon as it can: calculus early is the department's advice, and CS 240 and the algorithms
       // elective wait on it.
@@ -646,7 +655,7 @@ function balanceOnce({ extra = 0 } = {}) {
       if (partners.length && termLoad(term) + item.credits + pairCredits > limit) continue;
       const critical = height.get(item.id) >= termsLeft - 1 || /^MATH /.test(item.code ?? '') || earlyCodes.has(canonical(item.code ?? ''))
         || seasonTermsLeft(item) <= height.get(item.id) + 1;
-      const fitsTarget = coreLoad + item.credits <= target || coreLoad === 0;
+      const fitsTarget = coreLoad + item.credits <= target || coreLoad === 0 || (!csPlaced && isCsItem(item));
       // Split pairs like CS 240 and CS 261 unless keeping them apart would lengthen the plan.
       if (clashesInTerm(item, term) && height.get(item.id) < termsLeft - 1) continue;
       if ((fitsTarget || critical) && termLoad(term) + item.credits + pairCredits <= limit) {
@@ -655,6 +664,7 @@ function balanceOnce({ extra = 0 } = {}) {
           coreLoad += entry.credits;
           placed.push(entry);
           if (entry.code) placedAt.set(canonical(entry.code), index);
+          if (isCsItem(entry)) csPlaced = true;
         }
       }
     }
