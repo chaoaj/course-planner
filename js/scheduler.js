@@ -2,7 +2,7 @@
 
 import { catalog, canonical, getCourse, parseTerm, slotInfo, termSortKey, nextTerm, genEdDomain, getProgram } from './catalog.js';
 import { state, ensureTerm, termSequence, normalizeItem, followingTerm } from './state.js';
-import { auditRequirements, creditedCourses, SLOT_PREREQS, programDomains } from './audit.js';
+import { auditRequirements, creditedCourses, SLOT_PREREQS, programDomains, residencyCheck } from './audit.js';
 import { reliableSeasons } from './offerings.js';
 import { uid } from './util.js';
 
@@ -263,8 +263,15 @@ export function pruneSurplusSlots() {
   }
   const university = resultFor('jmuElectives');
   if (university) {
-    const realCount = university.courses.filter((course) => !course.placeholder).length;
-    removeSlots((item) => item.slot === 'elective', Math.max(0, university.group.count - realCount));
+    // Credits from real courses (JMU or transfer); placeholders only cover what's still missing.
+    const realCredits = university.courses.filter((course) => !course.placeholder).reduce((total, course) => total + (Number(course.credits) || 0), 0);
+    const needed = university.group.count * university.group.creditsEach;
+    const slotCredits = plan.terms.flatMap((term) => term.items).filter((item) => !item.code && isPlanned(item) && item.slot === 'elective').reduce((total, item) => total + (Number(item.credits) || 0), 0);
+    const shortOf120 = audit.totals.required - (audit.totals.total - slotCredits);
+    const residency = residencyCheck(plan);
+    const residencyShort = residency.jmuNeeded - (residency.jmuPlanned - slotCredits);
+    const keep = Math.max(Math.ceil((needed - realCredits) / university.group.creditsEach), Math.ceil(shortOf120 / university.group.creditsEach), Math.ceil(residencyShort / university.group.creditsEach), 0);
+    removeSlots((item) => item.slot === 'elective', keep);
   }
   return removed;
 }
@@ -817,8 +824,15 @@ function placeSlot(item, { firstYearOnly = false } = {}) {
 // lightest fall or spring term that has room (at most 5 courses), adding a term at the end only when none has room.
 export function fillUniversityElectives() {
   const plan = state.plan;
-  const result = auditRequirements(plan).groups.find((entry) => entry.group.type === 'jmuElectives');
+  const audit = auditRequirements(plan);
+  const result = audit.groups.find((entry) => entry.group.type === 'jmuElectives');
   let remaining = result?.remaining ?? 0;
+  // Also enough electives to reach the 120 credits the degree needs.
+  const short = audit.totals.required - audit.totals.total;
+  if (short > 0) remaining = Math.max(remaining, Math.ceil(short / (result?.group.creditsEach ?? 3)));
+  // And enough JMU credit for the residency rule (25% at JMU; 50% at JMU or four-year schools).
+  const residency = residencyCheck(plan);
+  if (residency.short > 0) remaining = Math.max(remaining, Math.ceil(residency.short / (result?.group.creditsEach ?? 3)));
   const info = slotInfo('elective');
   let added = 0;
   const newTerms = [];

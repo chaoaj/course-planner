@@ -284,6 +284,8 @@ export function auditRequirements(plan) {
       results.push(auditElectives(group, plan, ctx, used));
     } else if (group.type === 'gened') {
       results.push(auditGenEd(group, plan, ctx, used));
+    } else if (group.type === 'residency') {
+      results.push(auditResidency(group, plan));
     } else if (group.type === 'jmuElectives') {
       results.push(auditJmuElectives(group, plan, used));
     }
@@ -455,6 +457,7 @@ function auditGenEd(group, plan, ctx, used) {
   for (const domain of domains) {
     // Transfer credit recorded by domain (a GNED row for C2HQC) meets that domain directly.
     const byDomain = plan.transfer.other.find((row) => row.genEd === domain.id);
+    if (byDomain) used.add(canonical(byDomain.code));
     let found = byDomain ? { code: row_label(byDomain), status: 'met', where: byDomain.source || 'Transfer' } : null;
     found ??= findCourse(domain.options);
     // Lab Experience is also met by a lecture course that includes its lab.
@@ -510,8 +513,8 @@ function slotItemsFor(plan, test) {
   return found;
 }
 
-// University electives: courses in the JMU plan (not transfer credit) that no other requirement uses. Elective and
-// custom placeholders count; General Education placeholders and other requirement placeholders don't.
+// University electives must be taken at JMU: courses in the plan's terms that no other requirement uses. Elective and
+// custom placeholders count; General Education and requirement placeholders don't. Transfer credit never counts.
 export function jmuElectiveItems(plan, used) {
   const found = [];
   const seen = new Set();
@@ -553,7 +556,50 @@ function auditJmuElectives(group, plan, used) {
     status,
     courses,
     remaining,
-    detail: `${items.length} of ${group.count} courses (${all} of ${needed} credits) planned or earned at JMU, ${earned} earned.${remaining ? ` Add ${remaining} more.` : ''}`
+    detail: `${items.length} of ${group.count} courses (${all} of ${needed} credits) at JMU, ${earned} earned. Transfer credit doesn't count.${remaining ? ` Add ${remaining} more.` : ''}`
+  };
+}
+
+// Credit residency: at least 25% of required hours at JMU, and at least 50% at JMU or from four-year schools.
+export function residencyCheck(plan) {
+  const required = catalog.requirements.totalCredits;
+  const group = catalog.requirements.groups.find((entry) => entry.type === 'residency');
+  const jmuMin = Math.ceil(required * (group?.jmuPercent ?? 25) / 100);
+  const halfMin = Math.ceil(required * (group?.jmuOrFourYearPercent ?? 50) / 100);
+  let jmuPlanned = 0;
+  let jmuEarned = 0;
+  for (const term of plan.terms) {
+    for (const item of term.items) {
+      const credits = Number(item.credits) || 0;
+      jmuPlanned += credits;
+      if (item.status === 'completed') jmuEarned += credits;
+    }
+  }
+  // Four-year transfer credit: rows marked four-year. VCCS credit is community college credit.
+  const fourYear = plan.transfer.other
+    .filter((row) => row.institution === 'four-year' && row.source !== 'Waived')
+    .reduce((total, row) => total + (Number(row.credits) || 0), 0);
+  const transfer = transferCreditTotal(plan);
+  const otherTransfer = Math.max(0, transfer - fourYear);
+  const jmuNeeded = Math.max(jmuMin, halfMin - fourYear);
+  return { required, jmuMin, halfMin, jmuPlanned, jmuEarned, fourYear, otherTransfer, jmuNeeded, short: Math.max(0, jmuNeeded - jmuPlanned) };
+}
+
+function auditResidency(group, plan) {
+  const check = residencyCheck(plan);
+  const status = check.jmuEarned >= check.jmuNeeded ? 'met' : check.jmuPlanned >= check.jmuNeeded ? 'planned' : 'missing';
+  const courses = [
+    { code: `JMU credits: ${check.jmuPlanned} planned or taken (${check.jmuEarned} earned); at least ${check.jmuMin} (25%) must be at JMU`, status: check.jmuPlanned >= check.jmuMin ? (check.jmuEarned >= check.jmuMin ? 'met' : 'planned') : 'missing' },
+    { code: `JMU + four-year transfer: ${check.jmuPlanned + check.fourYear} of at least ${check.halfMin} (50%); community college and exam credit: ${check.otherTransfer}`, status: check.jmuPlanned + check.fourYear >= check.halfMin ? 'planned' : 'missing' }
+  ];
+  return {
+    group,
+    status,
+    courses,
+    jmuNeeded: check.jmuNeeded,
+    detail: check.short
+      ? `The plan needs ${check.short} more credits at JMU (at least ${check.jmuNeeded} in all).`
+      : `At least ${check.jmuNeeded} JMU credits needed; the plan has ${check.jmuPlanned}.`
   };
 }
 

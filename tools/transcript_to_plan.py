@@ -208,6 +208,8 @@ def build_plan(transcript_text, schedule_text, catalog, *, name='', term=None, s
             'credits': row['earned'],
             'grade': '' if row['grade'] == 'CR' else row['grade'],
             'source': 'Other college',
+            # For the residency rule (50% at JMU or four-year schools): community colleges are two-year.
+            'institution': 'two-year' if re.search(r'community college', college, re.I) else 'four-year',
             'note': f"{college}: {row['code']} {nice_title(row['description'])}",
         }
         domain = GENED_DOMAIN_RE.search(row['description'])

@@ -143,7 +143,15 @@
       "type": "jmuElectives",
       "count": 8,
       "creditsEach": 3,
-      "note": "8 three-credit university electives taken at JMU (24 credits). Transfer credit doesn't count. Any JMU course not used for another requirement counts, including extra CS courses beyond the 9 CS elective credits; General Education placeholders don't."
+      "note": "8 three-credit university electives (24 credits) taken at JMU. Transfer credit doesn't count. Any JMU course no other requirement uses counts, including extra CS courses beyond the 9 CS elective credits; General Education placeholders don't."
+    },
+    {
+      "id": "residency",
+      "label": "Credit residency",
+      "type": "residency",
+      "jmuPercent": 25,
+      "jmuOrFourYearPercent": 50,
+      "note": "To earn a bachelor's degree, at least 50% of required hours must be earned through enrollment at JMU and/or accepted transfer credit from four-year institutions, and at least 25% must be earned at JMU. Community college and exam (AP/IB) credit count toward the rest."
     }
   ],
   "gradeRules": [

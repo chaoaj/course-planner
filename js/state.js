@@ -106,7 +106,8 @@ export function normalizePlan(input) {
     grade: row.grade ?? '',
     source: row.source ?? 'Other college',
     note: row.note ?? '',
-    genEd: row.genEd ?? ''
+    genEd: row.genEd ?? '',
+    institution: row.institution || guessInstitution(row)
   }));
   plan.terms = (Array.isArray(plan.terms) ? plan.terms : []).map((term) => ({
     id: term.id || uid('term'),
@@ -168,4 +169,14 @@ export function syncGraduation(plan = state.plan) {
   const { student, settings } = plan;
   if (!settings.autoGraduation || !(Number(settings.targetTerms) > 0)) return;
   student.expectedGraduation = graduationLabel(lastTermOf(student.startTerm, Number(settings.targetTerms), settings.includeSummer));
+}
+
+// Where transfer credit came from, for the residency rule: 'two-year' (community college, dual enrollment),
+// 'four-year', or 'exam' (AP, IB). Guessed from the source and note when a file doesn't say.
+export function guessInstitution(row) {
+  if (row.source === 'AP' || row.source === 'IB') return 'exam';
+  if (row.source === 'Dual enrollment') return 'two-year';
+  if (/community college|\bVCCS\b|\b(PVCC|BRCC|NOVA)\b/i.test(row.note ?? '')) return 'two-year';
+  if (/university|four-year|4-year/i.test(row.note ?? '')) return 'four-year';
+  return 'two-year';
 }
