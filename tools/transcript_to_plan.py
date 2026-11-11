@@ -35,7 +35,9 @@ from pathlib import Path
 APP_ID = 'course-planner'
 FORMAT_VERSION = 1
 
-TERM_RE = re.compile(r'\b(Fall|Spring|Summer)\s+(\d{4})\b', re.I)
+# "Fall 2026", "Spring Semester 2027", "2027 Spring".
+TERM_RE = re.compile(r'\b(Fall|Spring|Summer)\s+(?:Semester\s+|Term\s+)?(\d{4})\b', re.I)
+TERM_HEADING_RE = re.compile(r'^(?:(Fall|Spring|Summer)\s+(?:Semester\s+|Term\s+)?(\d{4})|(\d{4})\s+(Fall|Spring|Summer)(?:\s+(?:Semester|Term))?)\s*$', re.I)
 # "CS 261 COMPUTER SYSTEMS I 3.00 0.00 0.000" and "ARTH 205 PREHIST TO RENAISSANCE 0.00 3.00 CR 0.000".
 ROW_RE = re.compile(
     r'^\s*([A-Z]{2,5})\s+([0-9O]{3}[A-Z]?)\s+(.*?)\s+(\d+\.\d{2})\s+(\d+\.\d{2})(?:\s+([A-Z][A-Z+\-]{0,2}))?\s+(\d+\.\d{3})\s*$'
@@ -54,9 +56,20 @@ def uid(prefix):
     return f'{prefix}-{uuid.uuid4().hex[:10]}'
 
 
+SMALL_WORDS = {'a', 'an', 'and', 'as', 'at', 'for', 'from', 'in', 'of', 'on', 'or', 'the', 'to', 'with'}
+ACRONYMS = {'CS', 'IT', 'UNST', 'WRTC', 'GNED', 'US', 'U.S.', 'AI', 'II', 'III', 'IV'}
+
+
 def nice_title(text):
-    title = text.title()
-    return re.sub(r'\b(I{1,3}|Iv|Vi{0,3})\b', lambda match: match.group(1).upper(), title.replace(' Ii', ' II').replace(' Iii', ' III'))
+    words = []
+    for index, word in enumerate(text.split()):
+        if word.upper() in ACRONYMS:
+            words.append(word.upper())
+        elif index and word.lower() in SMALL_WORDS:
+            words.append(word.lower())
+        else:
+            words.append(word[:1].upper() + word[1:].lower())
+    return ' '.join(words)
 
 
 def term_key(name):
@@ -123,8 +136,11 @@ def parse_transcript(text):
         if stripped.startswith('Course Trans GPA'):
             in_transfer = False
             continue
-        if TERM_RE.fullmatch(stripped) or re.match(r'^(Fall|Spring|Summer)\s+\d{4}\b', stripped):
-            term = normal_term(stripped)
+        heading = TERM_HEADING_RE.match(stripped)
+        if heading:
+            season = heading.group(1) or heading.group(4)
+            year = heading.group(2) or heading.group(3)
+            term = f'{season.capitalize()} {year}'
             continue
         if stripped.startswith('Topic:') and last is not None:
             last['topic'] = nice_title(stripped.split(':', 1)[1].strip())
