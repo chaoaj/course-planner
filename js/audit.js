@@ -287,7 +287,7 @@ export function auditRequirements(plan) {
     } else if (group.type === 'residency') {
       results.push(auditResidency(group, plan));
     } else if (group.type === 'jmuElectives') {
-      results.push(auditJmuElectives(group, plan, used));
+      results.push(auditJmuElectives(group, plan, used, results.find((entry) => entry.group.type === 'gened')));
     }
   }
 
@@ -533,7 +533,7 @@ export function jmuElectiveItems(plan, used) {
   return found;
 }
 
-function auditJmuElectives(group, plan, used) {
+function auditJmuElectives(group, plan, used, genEdResult) {
   const items = jmuElectiveItems(plan, used);
   const needed = group.count * group.creditsEach;
   const statusOf = (item) => (item.status === 'completed' ? 'met' : item.status === 'in-progress' ? 'inprogress' : 'planned');
@@ -551,12 +551,22 @@ function auditJmuElectives(group, plan, used) {
     placeholder: !item.code
   }));
   const remaining = Math.max(0, Math.ceil((needed - all) / group.creditsEach));
+  // JMU courses in the plan that General Education is using instead. With an associate degree they'd count here.
+  const termNames = new Set(plan.terms.map((term) => term.name));
+  const forGenEd = (genEdResult?.domains ?? [])
+    .filter((result) => result.code && !result.placeholder && termNames.has(result.where) && !/^(CS|MATH) /.test(result.code))
+    .map((result) => result.code);
+  const genEdNote = forGenEd.length
+    ? ` ${[...new Set(forGenEd)].join(', ')} count toward General Education instead; if the student's General Education is already satisfied (a completed associate degree), check that box and they count here.`
+    : '';
+  // Electives beyond the eight are there for the residency rule or the 120-credit total.
+  const extra = all > needed ? ` The ${all - needed} credits beyond ${needed} keep the plan at the JMU credits the residency rule or the 120-credit total needs.` : '';
   return {
     group,
     status,
     courses,
     remaining,
-    detail: `${items.length} of ${group.count} courses (${all} of ${needed} credits) at JMU, ${earned} earned. Transfer credit doesn't count.${remaining ? ` Add ${remaining} more.` : ''}`
+    detail: `${Math.min(items.length, group.count)} of ${group.count} courses (${Math.min(all, needed)} of ${needed} credits) at JMU, ${Math.min(earned, needed)} earned. Transfer credit doesn't count.${remaining ? ` Add ${remaining} more.` : ''}${extra}${genEdNote}`
   };
 }
 
