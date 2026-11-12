@@ -283,6 +283,8 @@ export function auditRequirements(plan) {
     } else if (group.type === 'electives') {
       results.push(auditElectives(group, plan, ctx, used));
     } else if (group.type === 'gened') {
+      // Courses the major itself uses (before General Education), for minors that limit double-counting.
+      ctx.majorUsed = new Set(used);
       results.push(auditGenEd(group, plan, ctx, used));
     } else if (group.type === 'residency') {
       results.push(auditResidency(group, plan));
@@ -298,7 +300,7 @@ export function auditRequirements(plan) {
     const byId = {};
     program.groups.forEach((group, index) => {
       const labeled = { ...group, id: `${program.id}:${group.id}`, label: `${program.short}: ${group.label}`, program: program.id, note: [index === 0 ? program.note : '', group.note].filter(Boolean).join(' ') };
-      const result = auditProgramGroup(labeled, plan, ctx, byId);
+      const result = auditProgramGroup(labeled, plan, ctx, byId, id);
       byId[group.id] = result;
       results.push(result);
     });
@@ -357,7 +359,7 @@ function auditElectives(group, plan, ctx, used) {
 
 const department = (code) => String(code).split(' ')[0];
 
-function auditProgramGroup(group, plan, ctx, earlier = {}) {
+function auditProgramGroup(group, plan, ctx, earlier = {}, programId = '') {
   const rankOf = (courses) => Math.min(...courses.map((course) => STATUS_RANK[course.status]));
   const statusFor = (rank) => Object.keys(STATUS_RANK).find((key) => STATUS_RANK[key] === rank);
   if (group.type === 'allOf') {
@@ -405,6 +407,32 @@ function auditProgramGroup(group, plan, ctx, earlier = {}) {
     }
     const departmentNote = otherDepartmentOk ? '' : ` Needs at least one elective outside ${coreDepartment} (the core course's department).`;
     return { group, status, courses, missingCodes, detail: `${all} of ${group.credits} credits planned or earned.${departmentNote}` };
+  }
+  if (group.type === 'doubleCountLimit') {
+    // Credits this minor shares with the major's requirements or another selected minor or certificate.
+    const otherCodes = new Set((plan.programs ?? []).filter((id) => id !== programId)
+      .flatMap((id) => getProgram(id)?.groups ?? []).flatMap((entry) => entry.courses ?? entry.options?.flat() ?? []).map(canonical));
+    const counted = [];
+    for (const result of Object.values(earlier)) {
+      let room = result.group.type === 'creditsFrom' ? result.group.credits : Infinity;
+      for (const course of result.courses ?? []) {
+        if (course.status === 'missing' || course.placeholder || room <= 0) continue;
+        const credits = Number(course.credits ?? getCourse(course.code)?.credits ?? 3) || 0;
+        counted.push({ ...course, credits });
+        room -= credits;
+      }
+    }
+    const shared = counted.filter((course) => ctx.majorUsed?.has(canonical(course.code)) || otherCodes.has(canonical(course.code)))
+      .map((course) => ({ ...course, where: `${course.where ? `${course.where}; ` : ''}also counts toward ${ctx.majorUsed?.has(canonical(course.code)) ? 'the major' : 'another program'}` }));
+    const sharedCredits = shared.reduce((total, course) => total + course.credits, 0);
+    const over = sharedCredits > group.maxCredits;
+    return {
+      group,
+      status: over ? 'missing' : 'met',
+      courses: shared.length ? shared : [{ code: 'No shared courses', status: 'met', where: '' }],
+      missingCodes: [],
+      detail: `${sharedCredits} of at most ${group.maxCredits} credits double-count.${over ? ` Replace ${sharedCredits - group.maxCredits} credit${sharedCredits - group.maxCredits === 1 ? '' : 's'} with minor courses the major doesn't use.` : ''}`
+    };
   }
   if (group.type === 'genEdDomain') {
     const domain = genEdDomain(group.domain);
@@ -559,8 +587,9 @@ function auditJmuElectives(group, plan, used, genEdResult) {
   const genEdNote = forGenEd.length
     ? ` ${[...new Set(forGenEd)].join(', ')} count toward General Education instead; if the student's General Education is already satisfied (a completed associate degree), check that box and they count here.`
     : '';
-  // Electives beyond the eight are there for the residency rule or the 120-credit total.
-  const extra = all > needed ? ` The ${all - needed} credits beyond ${needed} keep the plan at the JMU credits the residency rule or the 120-credit total needs.` : '';
+  // Electives beyond the eight are there for the residency rule.
+  const over = all - needed;
+  const extra = over > 0 ? ` ${over} credit${over === 1 ? '' : 's'} beyond ${needed} (whole courses, the residency rule's JMU credits, or courses added by hand).` : '';
   return {
     group,
     status,
@@ -600,7 +629,7 @@ function auditResidency(group, plan) {
   const status = check.jmuEarned >= check.jmuNeeded ? 'met' : check.jmuPlanned >= check.jmuNeeded ? 'planned' : 'missing';
   const courses = [
     { code: `JMU credits: ${check.jmuPlanned} planned or taken (${check.jmuEarned} earned); at least ${check.jmuMin} (25%) must be at JMU`, status: check.jmuPlanned >= check.jmuMin ? (check.jmuEarned >= check.jmuMin ? 'met' : 'planned') : 'missing' },
-    { code: `JMU + four-year transfer: ${check.jmuPlanned + check.fourYear} of at least ${check.halfMin} (50%); community college and exam credit: ${check.otherTransfer}`, status: check.jmuPlanned + check.fourYear >= check.halfMin ? 'planned' : 'missing' }
+    { code: `JMU + four-year transfer: ${check.jmuPlanned + check.fourYear} of at least ${check.halfMin} (50%); community college, exam, and military credit: ${check.otherTransfer}`, status: check.jmuPlanned + check.fourYear >= check.halfMin ? 'planned' : 'missing' }
   ];
   return {
     group,

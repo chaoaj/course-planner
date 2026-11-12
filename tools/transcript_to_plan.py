@@ -91,6 +91,12 @@ def next_term(name):
     return f'Spring {year + 1}' if season == 'Fall' else f'Fall {year}'
 
 
+def previous_term(name):
+    season, year = name.split()
+    year = int(year)
+    return f'Fall {year - 1}' if season == 'Spring' else f'Spring {year}'
+
+
 def graduation_label(start, semesters=6):
     name = start
     for _ in range(semesters - 1):
@@ -118,20 +124,50 @@ class Catalog:
         return self.courses.get(self.canonical(code))
 
 
+TWO_YEAR_RE = re.compile(r'community college|county college|technical college|junior college|rowan college of south jersey|\bCCD?\b', re.I)
+MILITARY_RE = re.compile(r'joint services|military|air university|coast guard|\bJST\b', re.I)
+
+
+def institution_type(college):
+    """'two-year', 'four-year', or 'other' (military and other credit that isn't from a four-year school)."""
+    if MILITARY_RE.search(college):
+        return 'other'
+    if TWO_YEAR_RE.search(college):
+        return 'two-year'
+    return 'four-year'
+
+
 def parse_transcript(text):
     """Returns (transfer rows, JMU rows). Transfer rows carry their college; JMU rows their term (if shown)."""
     transfer, jmu = [], []
     college = None
+    state = ''
     term = ''
     in_transfer = False
     last = None
-    for line in text.splitlines():
-        stripped = line.strip()
-        if not stripped:
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    # A long description can wrap: "SCOM 121 FUND HUMAN COMM:" / "0.00 2.00 CR 0.000" / "PRESENTATIONS".
+    # Join a course line that isn't a full row with the numbers on the next line (and the rest of the title after).
+    joined = []
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        if (not ROW_RE.match(line) and re.match(r'^[A-Z]{2,5}\s+[0-9O]{3}[A-Z]?\s', line)
+                and index + 1 < len(lines) and re.match(r'^\d+\.\d{2}\s+\d+\.\d{2}', lines[index + 1])):
+            numbers = lines[index + 1]
+            tail = lines[index + 2] if index + 2 < len(lines) and re.match(r'^[A-Z][A-Z &/,:\-]*$', lines[index + 2]) and not re.match(r'^[A-Z]{2,5}\s+[0-9O]{3}', lines[index + 2]) else ''
+            parts = numbers.split()
+            # Title words go before the attempted/earned/grade/points columns.
+            joined.append(f"{line} {tail} {' '.join(parts)}".replace('  ', ' '))
+            index += 3 if tail else 2
             continue
-        found = re.match(r'Transfer Credit from (.+?)(?:,\s*[A-Z]{2})?$', stripped)
+        joined.append(line)
+        index += 1
+    for stripped in joined:
+        found = re.match(r'Transfer Credit from (.+?)(?:,\s*([A-Z]{2}))?$', stripped)
         if found:
             college, in_transfer = found.group(1).strip(), True
+            state = found.group(2) or ''
             continue
         if stripped.startswith('Course Trans GPA'):
             in_transfer = False
@@ -158,7 +194,11 @@ def parse_transcript(text):
         }
         if in_transfer:
             row['college'] = college
+            row['state'] = state
             transfer.append(row)
+        elif not term and grade == 'W':
+            row['term'] = ''
+            jmu.append(row)
         else:
             row['term'] = term
             jmu.append(row)
@@ -208,8 +248,8 @@ def build_plan(transcript_text, schedule_text, catalog, *, name='', term=None, s
             'credits': row['earned'],
             'grade': '' if row['grade'] == 'CR' else row['grade'],
             'source': 'Other college',
-            # For the residency rule (50% at JMU or four-year schools): community colleges are two-year.
-            'institution': 'two-year' if re.search(r'community college', college, re.I) else 'four-year',
+            # For the residency rule (50% at JMU or four-year schools).
+            'institution': institution_type(college),
             'note': f"{college}: {row['code']} {nice_title(row['description'])}",
         }
         domain = GENED_DOMAIN_RE.search(row['description'])
@@ -226,6 +266,8 @@ def build_plan(transcript_text, schedule_text, catalog, *, name='', term=None, s
         breakdown = f"{' + '.join(f'{amount:g}' for amount in amounts)} = " if len(amounts) > 1 else ''
         report.append(f"{code} general credit ({breakdown}{total:g} credit{'' if total == 1 else 's'}) counts toward the 120 credits but not a specific requirement.")
     transfer_total = sum(row['earned'] for row in transfer_rows)
+    # A Virginia community college is part of the VCCS.
+    vccs = any(institution_type(row['college']) == 'two-year' and (row['state'] == 'VA' or row['college'].lower() in COLLEGE_NAMES) for row in transfer_rows)
 
     # JMU coursework: graded rows are completed; rows with attempted credit and no grade yet are in progress.
     terms = {}
@@ -239,6 +281,18 @@ def build_plan(transcript_text, schedule_text, catalog, *, name='', term=None, s
             'credits': credits, 'status': status, 'grade': grade,
         })
 
+    # Graded JMU coursework listed before any term heading: the term before the earliest dated term (or the current one).
+    dated = sorted({row['term'] for row in jmu_rows if row['term']} | {current_term}, key=term_key)
+    earlier = previous_term(dated[0])
+    undated = [row['code'] for row in jmu_rows if not row['term'] and row['grade'] and row['grade'] != 'W']
+    if undated:
+        report.append(f"{', '.join(undated)} had no term heading on the transcript; placed in {earlier} as completed. Fix the term if it's wrong.")
+    for row in jmu_rows:
+        if not row['term'] and row['grade']:
+            row['term'] = earlier
+    for row in jmu_rows:
+        if row['grade'] == 'W':
+            report.append(f"{row['code']} was withdrawn (W); it isn't counted and still needs to be taken.")
     for row in jmu_rows:
         code = catalog.canonical(row['code'])
         credits = row['attempted'] or (catalog.get(code) or {}).get('credits', 3)
@@ -269,7 +323,7 @@ def build_plan(transcript_text, schedule_text, catalog, *, name='', term=None, s
             if depth > 0:
                 assumed.append(code)
                 other.append({
-                    'id': uid('credit'), 'code': code, 'credits': 0, 'grade': '', 'source': 'Other college',
+                    'id': uid('credit'), 'code': code, 'credits': 0, 'grade': '', 'source': 'Other college', 'institution': 'two-year',
                     'note': f'Assumed: {reason} and the student is taking courses that require it. Likely covered by '
                             f'general transfer credit (such as CS 000); confirm on the transfer evaluation.',
                 })
@@ -306,7 +360,7 @@ def build_plan(transcript_text, schedule_text, catalog, *, name='', term=None, s
             'admittedToMajor': any(code in taken for code in ('CS 240', 'CS 261', 'CS 327', 'CS 345', 'CS 361')),
         },
         'transfer': {
-            'isTransfer': bool(transfer_rows), 'fromVCCS': any('Community College' in college for college in colleges),
+            'isTransfer': bool(transfer_rows), 'fromVCCS': vccs,
             'college': ' and '.join(colleges), 'associateDegree': associate,
             'acceptedCredits': transfer_total or '', 'vccs': {}, 'other': other,
         },

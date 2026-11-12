@@ -13,7 +13,7 @@
     </script>
     <title>Course Planner</title>
     <link rel="stylesheet" href="./lib/bootstrap.min.css" />
-    <link rel="stylesheet" href="./css/styles.css?v=2026-11-11i" />
+    <link rel="stylesheet" href="./css/styles.css?v=2026-11-12b" />
     <link rel="icon" type="image/svg+xml" href="./images/course-planner-logo.svg" />
   </head>
   <body class="bg-body-tertiary min-vh-100">
@@ -78,7 +78,7 @@
             <input class="form-control" id="f-start" data-field="student.startTerm" aria-describedby="f-start-help" />
             <div id="f-start-help" class="form-text">For example, Fall 2026 (the default).</div>
           </div>
-          <div class="col-md-3"><label class="form-label" for="f-grad">Expected graduation</label><input class="form-control" id="f-grad" data-field="student.expectedGraduation" placeholder="May 2029" aria-describedby="f-grad-help" /><div id="f-grad-help" class="form-text">Filled in from the first term and the target semesters on the Plan tab; type a date to set it yourself.</div></div>
+          <div class="col-md-3"><label class="form-label" for="f-grad">Expected graduation</label><input class="form-control" id="f-grad" data-field="student.expectedGraduation" placeholder="May 2029" aria-describedby="f-grad-help" /><div id="f-grad-help" class="form-text">Follows the plan&rsquo;s last term (before there&rsquo;s a plan, the first term plus Finish within on the Plan tab); type a date to set it yourself.</div></div>
           <div class="col-12 d-flex flex-wrap gap-4">
             <div class="form-check"><input class="form-check-input" type="checkbox" id="f-placement" data-field="student.mathPlacement" /><label class="form-check-label" for="f-placement">Math placement met for CS 149</label></div>
             <div class="form-check"><input class="form-check-input" type="checkbox" id="f-admitted" data-field="student.admittedToMajor" /><label class="form-check-label" for="f-admitted">Fully admitted to the CS major</label></div>
@@ -187,7 +187,7 @@
             </select>
           </div>
           <div class="col-6 col-sm-3 col-lg-2">
-            <label class="form-label" for="target-terms">Target semesters</label>
+            <label class="form-label" for="target-terms">Finish within (semesters)</label>
             <select class="form-select" id="target-terms">
               <option value="0">No target</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
             </select>
@@ -195,7 +195,7 @@
           <div class="col-auto"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="f-summer" /><label class="form-check-label" for="f-summer">Include summer terms</label></div></div>
           <div class="col-auto d-flex gap-2">
             <button class="btn btn-outline-primary" type="button" id="btn-balance" aria-describedby="balance-help">Balance terms</button>
-            <span id="balance-help" class="visually-hidden">Spreads CS courses across every term in prerequisite order and fills the rest with General Education and electives, within the credit limit.</span>
+            <span id="balance-help" class="visually-hidden">Fits the plan into as few terms as prerequisites and the credit limit allow, with at least one CS course each term, and fills the rest with General Education and electives.</span>
             <button class="btn btn-outline-secondary" type="button" id="btn-add-term">Add term</button>
             <button class="btn btn-outline-danger" type="button" id="btn-clear-plan">Clear plan</button>
           </div>
@@ -346,6 +346,6 @@
     <script src="./lib/exceljs.min.js" defer></script>
     <script src="./lib/jspdf.umd.min.js" defer></script>
     <script src="./lib/jspdf.plugin.autotable.min.js" defer></script>
-    <script type="module" src="./js/main.js?v=2026-11-11i"></script>
+    <script type="module" src="./js/main.js?v=2026-11-12b"></script>
   </body>
 </html>

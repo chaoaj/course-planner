@@ -32,7 +32,7 @@ export function exportPdf(plan) {
   const totals = report.audit.totals;
   const lines = [
     [`Student ID: ${s.studentId || '—'}`, `Advisor: ${s.advisor || '—'}`, `Minor: ${s.minor || 'TBD'}`, `Catalog year: ${s.catalogYear || '—'}`],
-    [`Transfer: ${plan.transfer.fromVCCS ? `VCCS${plan.transfer.college ? `, ${plan.transfer.college}` : ''}` : plan.transfer.isTransfer ? 'Yes' : 'No'}`, `Transfer credits: ${totals.transfer}`, `Credits planned: ${totals.total} of ${totals.required}`, `General Education: ${totals.genEdMet ? 'met by associate degree' : `${totals.genEdPlanned} credits planned`}`]
+    [`Transfer: ${plan.transfer.fromVCCS ? `VCCS${plan.transfer.college ? `, ${plan.transfer.college}` : ''}` : plan.transfer.isTransfer ? 'Yes' : 'No'}`, `Transfer credits: ${totals.transfer}`, `Credits planned: ${totals.total} of ${totals.required}${totals.remaining ? ` (${totals.remaining} other credits needed)` : ''}`, `General Education: ${totals.genEdMet ? 'met by associate degree' : `${totals.genEdPlanned} credits planned`}`]
   ];
   for (const line of lines) {
     doc.text(line.join('     '), margin, y);

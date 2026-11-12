@@ -36,7 +36,7 @@
       "short": "Robotics minor",
       "source": "https://catalog.jmu.edu/programs/robotics-minor/#requirementstext",
       "catalogYear": "2026-2027",
-      "note": "20\u201321 credits (2026\u201327 catalog). Basic preparation (programming, calculus, physics) can be waived by the minor advisor for a comparable course or experience. At least one elective must come from a different department than the core course. CISE 481 summarizes a capstone robotics project: the student must have completed or be enrolled in an approved capstone, special topics or independent study course with a robotics project, or, at the advisor's discretion, an internship, research or professional project in robotics. Coordinator: Nathan Sprague (spragunr@jmu.edu).",
+      "note": "20–21 credits (2026–27 catalog). Basic preparation (programming, calculus, physics) can be waived by the minor advisor for a comparable course or experience. At least one elective must come from a different department than the core course. CISE 481 summarizes a capstone robotics project: the student must have completed or be enrolled in an approved capstone, special topics or independent study course with a robotics project, or, at the advisor's discretion, an internship, research or professional project in robotics. Coordinator: Nathan Sprague (spragunr@jmu.edu).",
       "groups": [
         {
           "id": "rob-programming",
@@ -154,6 +154,104 @@
             "CISE 481"
           ],
           "credits": "1"
+        }
+      ]
+    },
+    {
+      "id": "data-analytics",
+      "label": "Data Analytics minor",
+      "short": "Data Analytics minor",
+      "source": "https://catalog.jmu.edu/programs/data-analytics-minor/",
+      "catalogYear": "2026-2027",
+      "note": "18 credits: 12 required (DATA 200, MATH 229, MATH 268, DATA/MATH 358) and at least 6 from the restricted electives in one or more foci (Mathematics/Statistics, Biological Sciences, Earth Sciences, Physical Sciences). No more than six credits from majors and other minors may double-count toward this minor. MATH 229 isn't open to students with credit in MATH 220, MATH 318 or MATH 329; students with that credit should check with the minor advisor. Advisor: Karen Barnard-Kubow (barnarkb@jmu.edu).",
+      "groups": [
+        {
+          "id": "da-required",
+          "label": "Required courses",
+          "type": "allOf",
+          "courses": [
+            "DATA 200",
+            "MATH 229",
+            "MATH 268"
+          ],
+          "credits": "9",
+          "note": "MATH 229 comes before MATH 268 and DATA/MATH 358."
+        },
+        {
+          "id": "da-ml",
+          "label": "Introduction to Machine Learning",
+          "type": "oneOf",
+          "options": [
+            [
+              "DATA 358"
+            ],
+            [
+              "MATH 358"
+            ]
+          ],
+          "credits": "3",
+          "note": "Cross-listed as DATA 358 and MATH 358; take one."
+        },
+        {
+          "id": "da-electives",
+          "label": "Restricted electives (at least 6 credits)",
+          "type": "creditsFrom",
+          "credits": 6,
+          "courses": [
+            "MATH 248",
+            "MATH 300",
+            "MATH 309",
+            "MATH 322",
+            "MATH 327",
+            "MATH 328",
+            "MATH 368",
+            "MATH 421",
+            "MATH 426",
+            "BIO 204",
+            "BIO 342",
+            "MATH 342",
+            "BIO 346",
+            "BIO 454",
+            "MATH 354",
+            "BIO 457",
+            "BIO 481",
+            "BIO 483",
+            "GEOL 360",
+            "GEOL 390",
+            "GEOL 406",
+            "GEOL 410",
+            "GEOL 440",
+            "GEOL 489",
+            "PHYS 339",
+            "PHYS 344",
+            "PHYS 345",
+            "PHYS 346",
+            "PHYS 386",
+            "PHYS 390",
+            "CHEM 351",
+            "CHEM 352",
+            "CHEM 352L"
+          ],
+          "note": "Mathematics/Statistics focus: MATH 248, MATH 300, MATH 309, MATH 322, MATH 327, MATH 328, MATH 368, MATH 421, MATH 426. Biological Sciences focus: BIO 204, BIO/MATH 342, BIO 346, BIO 454/MATH 354, BIO 457, BIO 481, BIO 483. Earth Sciences focus: GEOL 360, GEOL 390, GEOL 406, GEOL 410, GEOL 440, GEOL 489. Physical Sciences focus: PHYS 339, PHYS 344, PHYS 345, PHYS 346, PHYS 386, PHYS 390, CHEM 351, CHEM 352 and 352L.",
+          "suggest": [
+            "MATH 300",
+            "MATH 322",
+            "MATH 368"
+          ]
+        },
+        {
+          "id": "da-doublecount",
+          "label": "Double-counting limit",
+          "type": "doubleCountLimit",
+          "maxCredits": 6,
+          "note": "No more than six credits from majors and other minors may be used to double-count toward this minor."
+        }
+      ],
+      "replacesPlanned": [
+        {
+          "remove": "MATH 220",
+          "when": "MATH 229",
+          "reason": "MATH 229 meets the major's statistics requirement and isn't open to students with MATH 220 credit"
         }
       ]
     }

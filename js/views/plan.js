@@ -232,16 +232,21 @@ function renderTargetNote() {
   const check = targetCheck();
   if (!state.plan.terms.length) { box.innerHTML = ''; return; }
   const grad = graduationLabel(check.last);
-  const minNote = check.min && check.semesters < check.min
+  let minNote = check.min && check.semesters < check.min
     ? `<div class="alert alert-warning py-2 mb-2 small"><strong>Under the minimum:</strong> the plan has ${check.semesters} fall/spring semester${check.semesters === 1 ? '' : 's'} at JMU; the minimum is ${check.min}. Add a term or use Balance terms to spread the plan over ${check.min}.</div>`
     : '';
   const lowLoad = state.plan.terms.filter((term) => termCredits(term) > 0 && termCredits(term) < 12 && parseTerm(term.name)?.season !== 'Summer').length;
   const loadNote = lowLoad && check.min && check.semesters === check.min
     ? `<p class="small mb-1">${lowLoad} semester${lowLoad === 1 ? ' is' : 's are'} under 12 credits (part-time) because the plan is spread over the ${check.min}-semester minimum. Add electives or a minor to keep full-time status if the student needs it.</p>`
     : '';
+  const remaining = auditRequirements(state.plan).totals.remaining;
+  const otherNote = remaining
+    ? `<p class="small mb-1"><strong>Other credits needed:</strong> ${remaining} more credit${remaining === 1 ? '' : 's'} to reach ${catalog.requirements.totalCredits}, from any JMU or transfer courses. The plan doesn't add electives for these; check the transfer evaluation first.</p>`
+    : '';
+  minNote += otherNote;
   if (!check.target) { box.innerHTML = minNote + loadNote; return; }
   if (check.used <= check.target) {
-    box.innerHTML = `${minNote}${loadNote}<p class="small mb-0"><strong>On target:</strong> ${check.used} of ${check.target} semesters, finishing ${escapeHtml(check.last)}${grad ? ` (${escapeHtml(grad)} graduation)` : ''}${check.min ? `; minimum ${check.min} at JMU` : ''}.</p>`;
+    box.innerHTML = `${minNote}${loadNote}<p class="small mb-0"><strong>On target:</strong> ${check.used} semesters (within ${check.target}), finishing ${escapeHtml(check.last)}${grad ? ` (${escapeHtml(grad)} graduation)` : ''}${check.min ? `; minimum ${check.min} at JMU` : ''}.</p>`;
     return;
   }
   const reasons = [];
@@ -249,7 +254,7 @@ function renderTargetNote() {
   else if (check.fitsAt && check.fitsAt > maxCredits()) reasons.push(`raising Max credits per term to ${check.fitsAt} would fit it in ${check.target}`);
   else if (!check.fitsAt) reasons.push(`it doesn't fit in ${check.target} semesters even at 21 credits per term`);
   reasons.push('transfer credit, summer terms, or an associate degree (for General Education) can shorten it');
-  box.innerHTML = `${minNote}<div class="alert alert-warning py-2 mb-0 small"><strong>Over target:</strong> the plan uses ${check.used} semesters (through ${escapeHtml(check.last)}), more than the ${check.target}-semester target. ${escapeHtml(reasons.join('; ').replace(/^./, (letter) => letter.toUpperCase()))}.</div>`;
+  box.innerHTML = `${minNote}<div class="alert alert-warning py-2 mb-0 small"><strong>Over target:</strong> the plan uses ${check.used} semesters (through ${escapeHtml(check.last)}), more than the ${check.target} set in Finish within. ${escapeHtml(reasons.join('; ').replace(/^./, (letter) => letter.toUpperCase()))}.</div>`;
 }
 
 // Minor and certificate checkboxes, with each selected program's notes and source.
@@ -367,7 +372,7 @@ export function bindPlan(refresh) {
       const grad = document.getElementById('f-grad');
       if (grad) grad.value = state.plan.student.expectedGraduation;
       refresh('all');
-      showStatus(Number(target.value) ? `Target ${target.value} semesters${state.plan.settings.autoGraduation ? `; expected graduation ${state.plan.student.expectedGraduation}` : ''}.${plannedCount() ? ' Rebalanced the plan.' : ''}` : 'No semester target.', 'info');
+      showStatus(Number(target.value) ? `Finish within ${target.value} semesters${state.plan.settings.autoGraduation ? `; expected graduation ${state.plan.student.expectedGraduation}` : ''}.${plannedCount() ? ' Rebalanced the plan.' : ''}` : 'No semester target.', 'info');
       return;
     }
     if (target.id === 'max-credits') {

@@ -59,6 +59,7 @@ export function onChange(listener) {
 
 // Call after any change to the plan: saves in this browser and redraws.
 export function commit({ render = true } = {}) {
+  syncGraduation();
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.plan));
   } catch (error) {
@@ -165,9 +166,13 @@ export function termSequence(count, start = state.plan.student.startTerm) {
 }
 
 // Expected graduation follows the start term and target semesters until the advisor types their own date.
+// Once there's a plan, graduation follows its last term, so finishing sooner moves the date up.
 export function syncGraduation(plan = state.plan) {
   const { student, settings } = plan;
-  if (!settings.autoGraduation || !(Number(settings.targetTerms) > 0)) return;
+  if (!settings.autoGraduation) return;
+  const last = [...plan.terms].reverse().find((term) => term.items.length);
+  if (last) { student.expectedGraduation = graduationLabel(last.name); return; }
+  if (!(Number(settings.targetTerms) > 0)) return;
   student.expectedGraduation = graduationLabel(lastTermOf(student.startTerm, Number(settings.targetTerms), settings.includeSummer));
 }
 

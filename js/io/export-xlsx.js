@@ -70,7 +70,7 @@ function planSheet(workbook, report) {
   legendC.value = 'C- or better (marked "C-")';
   legendC.fill = solid(BAND_FILLS['C-']);
   legendC.border = box;
-  sheet.getCell(5, 7).value = `${catalog.requirements.totalCredits} credits are required to graduate. Planned total: ${totals.total}.`;
+  sheet.getCell(5, 7).value = `${catalog.requirements.totalCredits} credits are required to graduate. Planned total: ${totals.total}.${totals.remaining ? ` Other credits needed: ${totals.remaining} (any JMU or transfer courses).` : ''}`;
 
   let row = 7;
   const COLS_PER_TERM = 3; // Course, Credit Hrs, spacer

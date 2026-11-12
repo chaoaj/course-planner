@@ -7,7 +7,7 @@ import { recommendSamplePlan } from '../scheduler.js';
 import { escapeHtml, GRADES, uid, parseCourseCodes } from '../util.js';
 
 const SOURCES = ['Other college', 'AP', 'IB', 'Dual enrollment', 'Waived', 'Imported'];
-const INSTITUTIONS = [['two-year', 'Community college'], ['four-year', 'Four-year'], ['exam', 'Exam (AP/IB)']];
+const INSTITUTIONS = [['two-year', 'Community college'], ['four-year', 'Four-year'], ['exam', 'Exam (AP/IB)'], ['other', 'Military or other']];
 
 function gradeOptions(selected) {
   return ['<option value="">—</option>', ...GRADES.map((grade) => `<option value="${grade}"${grade === selected ? ' selected' : ''}>${grade}</option>`)].join('');
@@ -98,7 +98,7 @@ function renderCreditSummary() {
     <p class="mb-1">${total} transfer credit${total === 1 ? '' : 's'} toward the 120 required.${state.plan.transfer.associateDegree ? ' General Education is satisfied by the associate degree.' : ''}</p>
     ${(() => {
       const check = residencyCheck(state.plan);
-      return `<p class="mb-1"><strong>Residency:</strong> ${check.fourYear} four-year and ${check.otherTransfer} community college or exam credit. The student needs at least ${check.jmuNeeded} credits at JMU (25% of 120 at JMU, and 50% at JMU or four-year schools); the plan has ${check.jmuPlanned}.${check.short ? ` <span class="issue-text-warning">${check.short} more needed.</span>` : ''}</p>`;
+      return `<p class="mb-1"><strong>Residency:</strong> ${check.fourYear} four-year and ${check.otherTransfer} community college, exam, or military credit. The student needs at least ${check.jmuNeeded} credits at JMU (25% of 120 at JMU, and 50% at JMU or four-year schools); the plan has ${check.jmuPlanned}.${check.short ? ` <span class="issue-text-warning">${check.short} more needed.</span>` : ''}</p>`;
     })()}
     ${items.length ? `<ul class="mb-1">${items.join('')}</ul>` : '<p class="text-body-secondary mb-1">No JMU course credit yet.</p>'}
     ${pending.length ? `<p class="issue-text-warning mb-0"><strong>Needs a decision:</strong> ${pending.map((mapping) => mapping.vccs).join(', ')} (advisor review).</p>` : ''}`;

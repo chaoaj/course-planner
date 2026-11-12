@@ -267,11 +267,27 @@ export function pruneSurplusSlots() {
     const realCredits = university.courses.filter((course) => !course.placeholder).reduce((total, course) => total + (Number(course.credits) || 0), 0);
     const needed = university.group.count * university.group.creditsEach;
     const slotCredits = plan.terms.flatMap((term) => term.items).filter((item) => !item.code && isPlanned(item) && item.slot === 'elective').reduce((total, item) => total + (Number(item.credits) || 0), 0);
-    const shortOf120 = audit.totals.required - (audit.totals.total - slotCredits);
     const residency = residencyCheck(plan);
     const residencyShort = residency.jmuNeeded - (residency.jmuPlanned - slotCredits);
-    const keep = Math.max(Math.ceil((needed - realCredits) / university.group.creditsEach), Math.ceil(shortOf120 / university.group.creditsEach), Math.ceil(residencyShort / university.group.creditsEach), 0);
-    removeSlots((item) => item.slot === 'elective', keep);
+    // Three-credit slots for the eight-course rule; beyond that only the JMU credits the residency rule still needs,
+    // with the last slot cut down to the exact shortfall (no extra credits). Credits short of the 120 total aren't
+    // filled with electives: they're reported, since other transfer credit often covers them.
+    const each = university.group.creditsEach;
+    const countSlots = Math.max(0, Math.ceil((needed - realCredits) / each));
+    const creditNeed = Math.max(countSlots * each, residencyShort, 0);
+    let keptSlots = 0;
+    let keptCredits = 0;
+    for (const term of plan.terms) {
+      term.items = term.items.filter((item) => {
+        if (item.code || !isPlanned(item) || item.slot !== 'elective') return true;
+        if (keptCredits >= creditNeed) { removed += 1; return false; }
+        if (keptSlots >= countSlots) item.credits = Math.min(each, creditNeed - keptCredits);
+        else item.credits = each;
+        keptSlots += 1;
+        keptCredits += item.credits;
+        return true;
+      });
+    }
   }
   return removed;
 }
@@ -330,6 +346,7 @@ function isMath(need) {
 // Fills the remaining requirements into terms. CS courses are capped per term; math adds at most one per term.
 export function autoPlan() {
   const plan = state.plan;
+  replacePlannedForPrograms();
   const needs = remainingNeeds(plan);
   placeDomainNeeds(needs);
   for (let i = needs.length - 1; i >= 0; i -= 1) if (needs[i].domain) needs.splice(i, 1);
@@ -450,7 +467,22 @@ function addProgramNeeds() {
     first.items.push(makeItem(need.code));
     added.push(need.code);
   }
+  replacePlannedForPrograms();
   return added;
+}
+
+// A program course that also meets a major requirement replaces the planned course the major would otherwise use
+// (the Data Analytics minor's MATH 229 replaces a planned MATH 220 for statistics).
+function replacePlannedForPrograms() {
+  const plan = state.plan;
+  const credited = creditedCourses(plan);
+  const inPlan = (code) => credited.has(canonical(code)) || plan.terms.some((term) => term.items.some((item) => item.code && canonical(item.code) === canonical(code)));
+  for (const id of plan.programs ?? []) {
+    for (const rule of getProgram(id)?.replacesPlanned ?? []) {
+      if (!inPlan(rule.when)) continue;
+      for (const term of plan.terms) term.items = term.items.filter((item) => !(item.code && isPlanned(item) && canonical(item.code) === canonical(rule.remove)));
+    }
+  }
 }
 
 export function programCodes(id) {
@@ -589,10 +621,9 @@ function balanceOnce({ extra = 0 } = {}) {
   const existing = plan.terms.filter(inRange).reduce((total, term) => total + termLoad(term), 0);
   const total = credits(items) + existing;
   const needed = Math.max(chain, Math.ceil(total / limit), 1);
-  // With a target (6 semesters by default), spread over it when the plan would finish sooner, but never below a
-  // full-time 12 credits per term on average.
-  const targetTerms = Number(plan.settings.targetTerms) || 0;
-  let termCount = (targetTerms > needed ? Math.max(needed, Math.min(targetTerms, Math.floor(total / 12))) : needed) + extra;
+  // As few terms as the prerequisite chain and the credit limit allow, so the student finishes as soon as possible.
+  // The target (6 semesters by default) is a ceiling to check against, not a length to stretch the plan to.
+  let termCount = needed + extra;
   // At least the minimum semesters at JMU (4 by default), counting terms already taken here.
   const minTerms = Number(plan.settings.minTerms) || 0;
   const takenHere = plan.terms.filter((term) => termSortKey(term.name) >= termSortKey(plan.student.startTerm) && termSortKey(term.name) < startKey
@@ -605,6 +636,9 @@ function balanceOnce({ extra = 0 } = {}) {
   // Courses a selected program wants early (the Robotics minor's basic preparation).
   const earlyCodes = new Set((plan.programs ?? []).flatMap((id) => getProgram(id)?.groups ?? [])
     .filter((group) => group.early).flatMap((group) => group.courses ?? group.options?.flat() ?? []).map(canonical));
+  // The major's calculus and statistics go in early; other math (a minor's) is placed like any other course.
+  const majorMath = new Set(catalog.requirements.groups.filter((group) => ['calculus', 'stats'].includes(group.id))
+    .flatMap((group) => group.options.flat()).map(canonical));
   const placedAt = new Map(); // code -> term index among names
   let pending = [...core];
   for (let index = 0; pending.length && index < termCount + 12; index += 1) {
@@ -653,7 +687,7 @@ function balanceOnce({ extra = 0 } = {}) {
       if (!coreqsOk) continue;
       const pairCredits = partners.reduce((total, other) => total + other.credits, 0);
       if (partners.length && termLoad(term) + item.credits + pairCredits > limit) continue;
-      const critical = height.get(item.id) >= termsLeft - 1 || /^MATH /.test(item.code ?? '') || earlyCodes.has(canonical(item.code ?? ''))
+      const critical = height.get(item.id) >= termsLeft - 1 || majorMath.has(canonical(item.code ?? '')) || earlyCodes.has(canonical(item.code ?? ''))
         || seasonTermsLeft(item) <= height.get(item.id) + 1;
       const fitsTarget = coreLoad + item.credits <= target || coreLoad === 0 || (!csPlaced && isCsItem(item));
       // Split pairs like CS 240 and CS 261 unless keeping them apart would lengthen the plan.
@@ -836,21 +870,21 @@ export function fillUniversityElectives() {
   const plan = state.plan;
   const audit = auditRequirements(plan);
   const result = audit.groups.find((entry) => entry.group.type === 'jmuElectives');
-  let remaining = result?.remaining ?? 0;
-  // Also enough electives to reach the 120 credits the degree needs.
-  const short = audit.totals.required - audit.totals.total;
-  if (short > 0) remaining = Math.max(remaining, Math.ceil(short / (result?.group.creditsEach ?? 3)));
-  // And enough JMU credit for the residency rule (25% at JMU; 50% at JMU or four-year schools).
+  const each = result?.group.creditsEach ?? 3;
+  const countSlots = result?.remaining ?? 0;
+  // Also the JMU credits the residency rule (25% at JMU; 50% at JMU or four-year schools) still needs, with no extra:
+  // the last elective covers just the credits left. Credits short of the 120 total are reported, not filled.
   const residency = residencyCheck(plan);
-  if (residency.short > 0) remaining = Math.max(remaining, Math.ceil(residency.short / (result?.group.creditsEach ?? 3)));
+  let credits = Math.max(countSlots * each, residency.short, 0);
   const info = slotInfo('elective');
   let added = 0;
   const newTerms = [];
-  while (remaining > 0) {
-    const placed = placeSlot(normalizeItem({ slot: 'elective', label: info?.label ?? 'University Elective', credits: info?.credits ?? 3 }));
+  while (credits > 0) {
+    const size = added < countSlots ? each : Math.min(each, credits);
+    const placed = placeSlot(normalizeItem({ slot: 'elective', label: info?.label ?? 'University Elective', credits: size }));
     if (placed.newTerm) newTerms.push(placed.newTerm);
     added += 1;
-    remaining -= 1;
+    credits -= size;
   }
   return { added, newTerms };
 }

@@ -8,6 +8,116 @@
   ],
   "courses": [
     {
+      "code": "BIO 204",
+      "title": "Viral Genome and Bioinformatics",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "BIO 342",
+      "title": "Mathematical Models in Biology",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 232",
+          "MATH 235"
+        ]
+      ],
+      "prereqText": "MATH 232 or MATH 235 or equivalent. Cross-listed as MATH 342."
+    },
+    {
+      "code": "BIO 346",
+      "title": "Laboratory in Bacterial Pathogenomics",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "BIO 454",
+      "title": "Introduction to Biometrics",
+      "credits": 4,
+      "prereqs": [
+        [
+          "MATH 220",
+          "MATH 229",
+          "MATH 318"
+        ]
+      ],
+      "prereqText": "MATH 220, MATH 229, MATH 318 or equivalent. Cross-listed as MATH 354."
+    },
+    {
+      "code": "BIO 457",
+      "title": "Biological Applications of Geographic Information Systems",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "BIO 481",
+      "title": "Genomics",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "BIO 483",
+      "title": "Bioinformatics",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "CHEM 351",
+      "title": "Analytical Chemistry",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "CHEM 352",
+      "title": "Instrumental Analysis",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog.",
+      "coreqs": [
+        [
+          "CHEM 352L"
+        ]
+      ]
+    },
+    {
+      "code": "CHEM 352L",
+      "title": "Instrumental Analysis Laboratory",
+      "credits": 1,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "CISE 481",
+      "title": "Robotics Project Summary",
+      "credits": 1,
+      "prereqs": [],
+      "prereqText": "Completed or enrolled in an approved robotics project course.",
+      "creditsNote": "Confirm credits in the catalog.",
+      "capstone": true
+    },
+    {
+      "code": "CS 000",
+      "title": "Transfer credit: university elective (does not count toward the CS major)",
+      "credits": 3,
+      "prereqs": [],
+      "transferOnly": true
+    },
+    {
       "code": "CS 101",
       "title": "Introduction to Computer Science",
       "credits": 3,
@@ -608,147 +718,91 @@
       "prereqText": "Fully admitted CS majors or minors only, junior standing, and permission of the program coordinator"
     },
     {
-      "code": "MATH 155",
-      "title": "Math placement prerequisite for CS 149 (see catalog)",
+      "code": "DATA 200",
+      "title": "Introduction to Data",
       "credits": 3,
       "prereqs": [],
-      "creditsNote": "Confirm title and credits in the catalog."
+      "prereqText": "None."
     },
     {
-      "code": "MATH 156",
-      "title": "Math placement prerequisite for CS 149 (see catalog)",
-      "credits": 3,
-      "prereqs": [],
-      "creditsNote": "Confirm title and credits in the catalog."
-    },
-    {
-      "code": "MATH 220",
-      "title": "Elementary Statistics",
-      "credits": 3,
-      "prereqs": [],
-      "majorMinGrade": "C-"
-    },
-    {
-      "code": "MATH 229",
-      "title": "Introduction to Applied Statistics Using R",
-      "credits": 3,
-      "prereqs": [],
-      "majorMinGrade": "C-",
-      "creditsNote": "Statistics options are 3-4 credits; confirm in the catalog."
-    },
-    {
-      "code": "MATH 318",
-      "title": "Introduction to Probability and Statistics",
-      "credits": 4,
-      "prereqs": [],
-      "majorMinGrade": "C-",
-      "creditsNote": "Statistics options are 3-4 credits; confirm in the catalog."
-    },
-    {
-      "code": "MATH 231",
-      "title": "Calculus with Functions I",
-      "credits": 3,
-      "prereqs": [],
-      "majorMinGrade": "C-"
-    },
-    {
-      "code": "MATH 232",
-      "title": "Calculus with Functions II",
+      "code": "DATA 358",
+      "title": "Introduction to Machine Learning",
       "credits": 3,
       "prereqs": [
         [
-          "MATH 231"
+          "MATH 229",
+          "MATH 220"
         ]
       ],
-      "majorMinGrade": "C-"
+      "prereqText": "MATH 229, or MATH 220 with permission of the instructor. Cross-listed as DATA 358 and MATH 358."
     },
     {
-      "code": "MATH 235",
-      "title": "Calculus I",
-      "credits": 4,
-      "prereqs": [],
-      "majorMinGrade": "C-"
-    },
-    {
-      "code": "MATH 236",
-      "title": "Calculus II",
-      "credits": 4,
-      "prereqs": [
-        [
-          "MATH 235",
-          "MATH 232"
-        ]
-      ],
-      "creditsNote": "Recommended for students planning U.S. government CS careers; confirm credits in the catalog."
-    },
-    {
-      "code": "MATH 245",
-      "title": "Discrete Mathematics",
-      "credits": 3,
-      "prereqs": [],
-      "majorMinGrade": "B-"
-    },
-    {
-      "code": "CS 000",
-      "title": "Transfer credit: university elective (does not count toward the CS major)",
-      "credits": 3,
-      "prereqs": [],
-      "transferOnly": true
-    },
-    {
-      "code": "PHYS 386",
-      "title": "Robots: Structure and Theory",
+      "code": "ENGR 440",
+      "title": "Mechatronics",
       "credits": 3,
       "prereqs": [],
       "prereqText": "See the catalog for prerequisites.",
-      "creditsNote": "3 credits as listed for the Robotics minor core; confirm in the catalog."
-    },
-    {
-      "code": "MATH 238",
-      "title": "Linear Algebra with Differential Equations",
-      "credits": 4,
-      "prereqs": [
-        [
-          "MATH 232",
-          "MATH 235"
-        ]
-      ],
-      "prereqText": "Calculus; confirm in the catalog.",
       "creditsNote": "Confirm credits in the catalog."
     },
     {
-      "code": "MATH 248",
-      "title": "Computers and Numerical Algorithms",
+      "code": "ENGR 445",
+      "title": "Embedded System Design",
       "credits": 3,
-      "prereqs": [
-        [
-          "MATH 232",
-          "MATH 235"
-        ]
-      ],
-      "prereqText": "Calculus; confirm in the catalog.",
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
       "creditsNote": "Confirm credits in the catalog."
     },
     {
-      "code": "CISE 481",
-      "title": "Robotics Project Summary",
-      "credits": 1,
+      "code": "GEOL 360",
+      "title": "GIS for the Geoscientist",
+      "credits": 3,
       "prereqs": [],
-      "prereqText": "Completed or enrolled in an approved robotics project course.",
-      "creditsNote": "Confirm credits in the catalog.",
-      "capstone": true
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "GEOL 390",
+      "title": "Laboratory Techniques in Geology",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "GEOL 406",
+      "title": "Paleoclimatology and Paleoceanography",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "GEOL 410",
+      "title": "Engineering Geology",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "GEOL 440",
+      "title": "Geophysics",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "GEOL 489",
+      "title": "Quantitative Methods in Geology",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
     },
     {
       "code": "IA 241",
       "title": "Introduction to Programming and Data Science",
-      "credits": 3,
-      "prereqs": [],
-      "prereqText": "See the catalog for prerequisites.",
-      "creditsNote": "Confirm credits in the catalog."
-    },
-    {
-      "code": "ISAT 252",
-      "title": "Programming and Problem Solving",
       "credits": 3,
       "prereqs": [],
       "prereqText": "See the catalog for prerequisites.",
@@ -763,24 +817,8 @@
       "creditsNote": "Confirm credits in the catalog."
     },
     {
-      "code": "PHYS 387",
-      "title": "Theory and Basic Principles of Mobile Robot Construction and Control",
-      "credits": 3,
-      "prereqs": [],
-      "prereqText": "See the catalog for prerequisites.",
-      "creditsNote": "Confirm credits in the catalog."
-    },
-    {
-      "code": "ENGR 440",
-      "title": "Mechatronics",
-      "credits": 3,
-      "prereqs": [],
-      "prereqText": "See the catalog for prerequisites.",
-      "creditsNote": "Confirm credits in the catalog."
-    },
-    {
-      "code": "ENGR 445",
-      "title": "Embedded System Design",
+      "code": "ISAT 252",
+      "title": "Programming and Problem Solving",
       "credits": 3,
       "prereqs": [],
       "prereqText": "See the catalog for prerequisites.",
@@ -827,12 +865,190 @@
       "creditsNote": "Confirm credits in the catalog."
     },
     {
+      "code": "MATH 155",
+      "title": "Math placement prerequisite for CS 149 (see catalog)",
+      "credits": 3,
+      "prereqs": [],
+      "creditsNote": "Confirm title and credits in the catalog."
+    },
+    {
+      "code": "MATH 156",
+      "title": "Math placement prerequisite for CS 149 (see catalog)",
+      "credits": 3,
+      "prereqs": [],
+      "creditsNote": "Confirm title and credits in the catalog."
+    },
+    {
+      "code": "MATH 220",
+      "title": "Elementary Statistics",
+      "credits": 3,
+      "prereqs": [],
+      "majorMinGrade": "C-"
+    },
+    {
+      "code": "MATH 229",
+      "title": "Introduction to Applied Statistics Using R",
+      "credits": 3,
+      "prereqs": [],
+      "majorMinGrade": "C-",
+      "creditsNote": "Statistics options are 3-4 credits; confirm in the catalog.",
+      "prereqText": "Sufficient statistics and calculus placement scores (the calculus score may be waived with C- or better in MATH 231). Not open to students with credit in MATH 220, MATH 318, MATH 329 or equivalent."
+    },
+    {
+      "code": "MATH 231",
+      "title": "Calculus with Functions I",
+      "credits": 3,
+      "prereqs": [],
+      "majorMinGrade": "C-"
+    },
+    {
+      "code": "MATH 232",
+      "title": "Calculus with Functions II",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 231"
+        ]
+      ],
+      "majorMinGrade": "C-"
+    },
+    {
+      "code": "MATH 235",
+      "title": "Calculus I",
+      "credits": 4,
+      "prereqs": [],
+      "majorMinGrade": "C-"
+    },
+    {
+      "code": "MATH 236",
+      "title": "Calculus II",
+      "credits": 4,
+      "prereqs": [
+        [
+          "MATH 235",
+          "MATH 232"
+        ]
+      ],
+      "creditsNote": "Recommended for students planning U.S. government CS careers; confirm credits in the catalog."
+    },
+    {
+      "code": "MATH 238",
+      "title": "Linear Algebra with Differential Equations",
+      "credits": 4,
+      "prereqs": [
+        [
+          "MATH 232",
+          "MATH 235"
+        ]
+      ],
+      "prereqText": "Calculus; confirm in the catalog.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "MATH 245",
+      "title": "Discrete Mathematics",
+      "credits": 3,
+      "prereqs": [],
+      "majorMinGrade": "B-"
+    },
+    {
+      "code": "MATH 248",
+      "title": "Computers and Numerical Algorithms",
+      "credits": 4,
+      "prereqs": [
+        [
+          "MATH 236"
+        ]
+      ],
+      "prereqText": "MATH 236 (or as a corequisite with permission of the instructor). Not open to students with credit in MATH 448/CS 448."
+    },
+    {
+      "code": "MATH 268",
+      "title": "Data Analysis and Visualization",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 220",
+          "MATH 229",
+          "MATH 318"
+        ]
+      ],
+      "prereqText": "MATH 220 or MATH 229 or (both MATH 318 and permission of the instructor)."
+    },
+    {
       "code": "MATH 300",
       "title": "Linear Algebra",
       "credits": 3,
+      "prereqs": [
+        [
+          "MATH 232",
+          "MATH 235"
+        ]
+      ],
+      "prereqText": "MATH 232 or MATH 235; not open for credit to students with credit in MATH 238."
+    },
+    {
+      "code": "MATH 309",
+      "title": "SAS Programming and Data Management",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 220",
+          "MATH 229",
+          "MATH 318"
+        ]
+      ],
+      "prereqText": "MATH 220, MATH 229, MATH 318 or equivalent."
+    },
+    {
+      "code": "MATH 318",
+      "title": "Introduction to Probability and Statistics",
+      "credits": 4,
       "prereqs": [],
-      "prereqText": "See the catalog for prerequisites.",
-      "creditsNote": "Confirm credits in the catalog."
+      "majorMinGrade": "C-",
+      "creditsNote": "Statistics options are 3-4 credits; confirm in the catalog."
+    },
+    {
+      "code": "MATH 322",
+      "title": "Applied Linear Regression",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 220",
+          "MATH 229",
+          "MATH 318"
+        ]
+      ],
+      "prereqText": "MATH 220, MATH 229, MATH 318 or equivalent."
+    },
+    {
+      "code": "MATH 327",
+      "title": "Categorical Data Analysis",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 220",
+          "MATH 229",
+          "MATH 318"
+        ]
+      ],
+      "prereqText": "MATH 220, MATH 229, MATH 318 or equivalent."
+    },
+    {
+      "code": "MATH 328",
+      "title": "Time Series Analysis",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 238",
+          "MATH 300"
+        ],
+        [
+          "MATH 318",
+          "MATH 329"
+        ]
+      ],
+      "prereqText": "MATH 238 or MATH 300; and MATH 318 or MATH 329."
     },
     {
       "code": "MATH 336",
@@ -845,6 +1061,114 @@
     {
       "code": "MATH 341",
       "title": "Non-Linear Dynamics and Chaos",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "MATH 342",
+      "title": "Mathematical Models in Biology",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 232",
+          "MATH 235"
+        ]
+      ],
+      "prereqText": "MATH 232 or MATH 235 or equivalent. Cross-listed as BIO 342."
+    },
+    {
+      "code": "MATH 354",
+      "title": "Introduction to Biometrics",
+      "credits": 4,
+      "prereqs": [
+        [
+          "MATH 220",
+          "MATH 229",
+          "MATH 318"
+        ]
+      ],
+      "prereqText": "MATH 220, MATH 229, MATH 318 or equivalent. Cross-listed as BIO 454."
+    },
+    {
+      "code": "MATH 358",
+      "title": "Introduction to Machine Learning",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 229",
+          "MATH 220"
+        ]
+      ],
+      "prereqText": "MATH 229, or MATH 220 with permission of the instructor. Cross-listed as DATA 358 and MATH 358."
+    },
+    {
+      "code": "MATH 368",
+      "title": "Statistical Computing",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 229"
+        ]
+      ],
+      "prereqText": "MATH 229."
+    },
+    {
+      "code": "MATH 421",
+      "title": "Applied Multivariate Statistical Analysis",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 300",
+          "MATH 238"
+        ],
+        [
+          "MATH 321",
+          "MATH 322"
+        ]
+      ],
+      "prereqText": "MATH 300 or MATH 238 and MATH 321 or MATH 322."
+    },
+    {
+      "code": "MATH 426",
+      "title": "Probability and Mathematical Statistics I",
+      "credits": 3,
+      "prereqs": [
+        [
+          "MATH 318",
+          "MATH 329"
+        ]
+      ],
+      "prereqText": "MATH 318 or MATH 329."
+    },
+    {
+      "code": "PHYS 339",
+      "title": "Introductory Nuclear Science",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "PHYS 344",
+      "title": "Advanced Physics Laboratory I",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "PHYS 345",
+      "title": "Advanced Physics Laboratory II",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "PHYS 346",
+      "title": "Advanced Physics Laboratory III",
       "credits": 3,
       "prereqs": [],
       "prereqText": "See the catalog for prerequisites.",
@@ -867,8 +1191,32 @@
       "creditsNote": "Variable 2 or 4 credits; confirm in the catalog."
     },
     {
+      "code": "PHYS 386",
+      "title": "Robots: Structure and Theory",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "3 credits as listed for the Robotics minor core; confirm in the catalog."
+    },
+    {
+      "code": "PHYS 387",
+      "title": "Theory and Basic Principles of Mobile Robot Construction and Control",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
       "code": "PHYS 388",
       "title": "Robots for Humanity",
+      "credits": 3,
+      "prereqs": [],
+      "prereqText": "See the catalog for prerequisites.",
+      "creditsNote": "Confirm credits in the catalog."
+    },
+    {
+      "code": "PHYS 390",
+      "title": "Computer Applications in Physics",
       "credits": 3,
       "prereqs": [],
       "prereqText": "See the catalog for prerequisites.",
