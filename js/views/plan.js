@@ -55,6 +55,12 @@ function choiceGroups(choices, termName) {
     + group('Not on any recent schedule', never);
 }
 
+// Status text for the residency placeholders a planning step added.
+function residencyNote(result) {
+  const credits = result.electives?.residencyCredits ?? 0;
+  return credits ? ` The plan has ${credits} credit${credits === 1 ? '' : 's'} of JMU Residency Credit placeholders, spread across terms, for the residency rule.` : '';
+}
+
 function itemLabel(item) {
   if (item.code) return item.code;
   return item.label || slotInfo(item.slot)?.label || 'Course';
@@ -437,7 +443,7 @@ export function bindPlan(refresh) {
         removed += before - term.items.length;
       }
       // University elective placeholders move up into the space that freed, and terms left empty at the end go.
-      for (const term of state.plan.terms) term.items = term.items.filter((item) => item.code || item.slot !== 'elective');
+      for (const term of state.plan.terms) term.items = term.items.filter((item) => item.code || (item.slot !== 'elective' && item.slot !== 'residency'));
       const dropEmptyTail = () => { while (state.plan.terms.length && !state.plan.terms[state.plan.terms.length - 1].items.length) state.plan.terms.pop(); };
       dropEmptyTail();
       fillUniversityElectives();
@@ -506,7 +512,7 @@ export function bindPlan(refresh) {
     commit({ render: false });
     refresh('all');
     const warning = result.missing.length ? ` This plan assumes credit for ${result.missing.join(' and ')}, which is already in the plan as a course to take.` : '';
-    showStatus(`${result.replaced ? `Replaced the planned courses. ` : ''}Added ${result.added} courses from the sample plan, at most ${maxCredits()} credits per term.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.granted?.length ? ` Recorded ${result.granted.join(', ')} as transfer credit, as the plan assumes; confirm on the transfer evaluation.` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.genEd?.added ? ` Added ${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'} (no associate degree).` : ''}${result.electives?.added ? ` Added ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}${result.electives.newTerms.length ? ` (and ${result.electives.newTerms.join(', ')} to fit them)` : ''}.` : ''}${warning}`, warning ? 'warning' : 'success');
+    showStatus(`${result.replaced ? `Replaced the planned courses. ` : ''}Added ${result.added} courses from the sample plan, at most ${maxCredits()} credits per term.${result.skipped.length ? ` Left out ${result.skipped.join(', ')} (already credited).` : ''}${result.granted?.length ? ` Recorded ${result.granted.join(', ')} as transfer credit, as the plan assumes; confirm on the transfer evaluation.` : ''}${result.mathAdded.length ? ` Added ${result.mathAdded.join(' and ')} to the first term; move or replace them if the student takes math elsewhere.` : ''}${result.genEd?.added ? ` Added ${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'} (no associate degree).` : ''}${result.electives?.added ? ` Added ${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}${result.electives.newTerms.length ? ` (and ${result.electives.newTerms.join(', ')} to fit them)` : ''}.` : ''}${residencyNote(result)}${warning}`, warning ? 'warning' : 'success');
   });
 
   document.getElementById('btn-autoplan').addEventListener('click', () => {
@@ -515,7 +521,7 @@ export function bindPlan(refresh) {
     commit({ render: false });
     refresh('all');
     if (!result.added) showStatus('Nothing to add: every requirement, including university electives, already has a course in the plan or credit.', 'info');
-    else showStatus(`Auto-plan (at most ${maxCredits()} credits per term) added ${result.added} course${result.added === 1 ? '' : 's'}${result.genEd?.added || result.electives?.added ? `, including ${[result.genEd?.added ? `${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'}` : '', result.electives?.added ? `${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}` : ''].filter(Boolean).join(' and ')}` : ''}.${result.unplaced.length ? ` Couldn't place: ${result.unplaced.join(', ')}.` : ''}${state.plan.transfer.associateDegree ? ' General Education is met by the associate degree.' : ''}`, result.unplaced.length ? 'warning' : 'success');
+    else showStatus(`Auto-plan (at most ${maxCredits()} credits per term) added ${result.added} course${result.added === 1 ? '' : 's'}${result.genEd?.added || result.electives?.added ? `, including ${[result.genEd?.added ? `${result.genEd.added} General Education placeholder${result.genEd.added === 1 ? '' : 's'}` : '', result.electives?.added ? `${result.electives.added} university elective${result.electives.added === 1 ? '' : 's'}` : ''].filter(Boolean).join(' and ')}` : ''}.${result.unplaced.length ? ` Couldn't place: ${result.unplaced.join(', ')}.` : ''}${residencyNote(result)}${state.plan.transfer.associateDegree ? ' General Education is met by the associate degree.' : ''}`, result.unplaced.length ? 'warning' : 'success');
   });
 
   document.getElementById('btn-balance').addEventListener('click', () => {

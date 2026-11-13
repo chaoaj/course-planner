@@ -2,7 +2,7 @@
 
 import { catalog, canonical, getCourse, parseTerm, slotInfo, termSortKey, nextTerm, genEdDomain, getProgram } from './catalog.js';
 import { state, ensureTerm, termSequence, normalizeItem, followingTerm } from './state.js';
-import { auditRequirements, creditedCourses, SLOT_PREREQS, programDomains } from './audit.js';
+import { auditRequirements, creditedCourses, SLOT_PREREQS, programDomains, residencyCheck } from './audit.js';
 import { reliableSeasons } from './offerings.js';
 import { uid } from './util.js';
 
@@ -96,7 +96,7 @@ export function applySamplePlan(planId) {
   balancePlan();
   const movedLater = enforceMaxCredits();
   dropEmptyTail();
-  added += genEd.added + electives.added;
+  added += genEd.added + electives.added + electives.residencyAdded;
   return { added, missing, skipped, mathAdded, granted, electives, genEd, replaced, moved: moved + movedLater, programAdded };
 }
 
@@ -163,7 +163,7 @@ export function enforceMaxCredits() {
   const plan = state.plan;
   const rank = (item) => {
     if (!item.code) {
-      if (item.slot === 'elective' || item.slot === 'other') return 0;
+      if (item.slot === 'elective' || item.slot === 'residency' || item.slot === 'other') return 0;
       if (item.slot === 'gened' && !item.domain.startsWith('C1')) return 1;
       if (item.slot === 'cselective') return 2;
       if (item.slot === 'gened') return 9; // Madison Foundations: first year
@@ -191,7 +191,7 @@ export function enforceMaxCredits() {
       // A placeholder with no prerequisites (Gen Ed, university elective) can go back to an earlier term with room;
       // Madison Foundations only within the first year.
       const firstYear = plan.terms.filter((other) => usable(other) && parseTerm(other.name)?.season !== 'Summer').slice(0, 2);
-      const back = term.items.filter((item) => !item.code && isPlanned(item) && (item.slot === 'elective' || item.slot === 'gened' || item.slot === 'other'));
+      const back = term.items.filter((item) => !item.code && isPlanned(item) && (item.slot === 'elective' || item.slot === 'residency' || item.slot === 'gened' || item.slot === 'other'));
       let movedBack = false;
       for (const item of back) {
         const earlier = plan.terms.slice(0, index)
@@ -353,7 +353,7 @@ export function autoPlan() {
     balancePlan();
     const moved = enforceMaxCredits();
     dropEmptyTail();
-    return { added: genEd.added + electives.added, unplaced: [], electives, genEd, moved };
+    return { added: genEd.added + electives.added + electives.residencyAdded, unplaced: [], electives, genEd, moved };
   }
 
   const credited = creditedCourses(plan);
@@ -440,7 +440,7 @@ export function autoPlan() {
   balancePlan();
   const moved = enforceMaxCredits();
   dropEmptyTail();
-  return { added: added + genEd.added + electives.added, unplaced: pending.map((need) => need.code ?? slotInfo(need.slot)?.label ?? need.slot), electives, genEd, moved };
+  return { added: added + genEd.added + electives.added + electives.residencyAdded, unplaced: pending.map((need) => need.code ?? slotInfo(need.slot)?.label ?? need.slot), electives, genEd, moved };
 }
 
 // Gen Ed placeholders a program needs (Robotics: Physical Principles) when no course covers that domain yet.
@@ -838,7 +838,7 @@ function placeSlot(item, { firstYearOnly = false } = {}) {
     let target = lightest(firstYear.filter(fits));
     if (!target) {
       for (const term of firstYear) {
-        const bump = term.items.find((entry) => !entry.code && isPlanned(entry) && (entry.slot === 'elective' || (entry.slot === 'gened' && !entry.domain.startsWith('C1'))));
+        const bump = term.items.find((entry) => !entry.code && isPlanned(entry) && (entry.slot === 'elective' || entry.slot === 'residency' || (entry.slot === 'gened' && !entry.domain.startsWith('C1'))));
         if (bump) {
           term.items.splice(term.items.indexOf(bump), 1);
           placeSlot(bump);
@@ -864,11 +864,15 @@ function placeSlot(item, { firstYearOnly = false } = {}) {
 // lightest fall or spring term that has room (at most 5 courses), adding a term at the end only when none has room.
 export function fillUniversityElectives() {
   const plan = state.plan;
+  // Residency placeholders are recomputed from scratch after the electives, so remove the planned ones first.
+  const residencyBefore = plan.terms.flatMap((term) => term.items).filter((item) => !item.code && isPlanned(item) && item.slot === 'residency').reduce((total, item) => total + item.credits, 0);
+  for (const term of plan.terms) term.items = term.items.filter((item) => item.code || !isPlanned(item) || item.slot !== 'residency');
   const audit = auditRequirements(plan);
   const result = audit.groups.find((entry) => entry.group.type === 'jmuElectives');
   const each = result?.group.creditsEach ?? 3;
   const countSlots = result?.remaining ?? 0;
-  // Only up to the eight courses. Credits short of 120 or of the residency rule are reported, not filled.
+  // Only up to the eight courses. Credits short of 120 are reported, not filled; the residency rule gets its own
+  // placeholders (fillResidency).
   let credits = countSlots * each;
   const info = slotInfo('elective');
   let added = 0;
@@ -880,6 +884,30 @@ export function fillUniversityElectives() {
     added += 1;
     credits -= size;
   }
-  return { added, newTerms };
+  const residency = fillResidency();
+  newTerms.push(...residency.newTerms.filter((name) => !newTerms.includes(name)));
+  // Report residency placeholders only when the amount changed (they're re-placed on every run).
+  const changed = residency.credits !== residencyBefore;
+  return { added, newTerms, residencyAdded: changed ? residency.added : 0, residencyCredits: changed ? residency.credits : 0 };
+}
+
+// Adds "JMU Residency Credit" placeholders for the JMU credits the residency rule (25% at JMU; 50% at JMU or
+// four-year schools) still needs after the eight university electives: three credits each with the last one cut to
+// the exact shortfall, each in the lightest term with room so they spread across semesters.
+export function fillResidency() {
+  const info = slotInfo('residency');
+  const each = info?.credits ?? 3;
+  let credits = Math.max(0, residencyCheck(state.plan).short);
+  const total = credits;
+  let added = 0;
+  const newTerms = [];
+  while (credits > 0) {
+    const size = Math.min(each, credits);
+    const placed = placeSlot(normalizeItem({ slot: 'residency', label: info?.label ?? 'JMU Residency Credit', credits: size }));
+    if (placed.newTerm) newTerms.push(placed.newTerm);
+    added += 1;
+    credits -= size;
+  }
+  return { added, credits: total, newTerms };
 }
 

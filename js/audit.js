@@ -625,6 +625,7 @@ export function residencyCheck(plan) {
 }
 
 function auditResidency(group, plan) {
+  const residencySlots = plan.terms.flatMap((term) => term.items).filter((item) => !item.code && item.slot === 'residency').reduce((total, item) => total + (Number(item.credits) || 0), 0);
   const check = residencyCheck(plan);
   const status = check.jmuEarned >= check.jmuNeeded ? 'met' : check.jmuPlanned >= check.jmuNeeded ? 'planned' : 'missing';
   const courses = [
@@ -636,9 +637,10 @@ function auditResidency(group, plan) {
     status,
     courses,
     jmuNeeded: check.jmuNeeded,
-    detail: check.short
-      ? `The plan needs ${check.short} more credits at JMU (at least ${check.jmuNeeded} in all).`
-      : `At least ${check.jmuNeeded} JMU credits needed; the plan has ${check.jmuPlanned}.`
+    detail: (check.short
+      ? `The plan needs ${check.short} more credits at JMU (at least ${check.jmuNeeded} in all). Auto-plan adds JMU Residency Credit placeholders for them.`
+      : `At least ${check.jmuNeeded} JMU credits needed; the plan has ${check.jmuPlanned}.`)
+      + (residencySlots ? ` Includes ${residencySlots} credit${residencySlots === 1 ? '' : 's'} of JMU Residency Credit placeholders: choose any JMU courses for them.` : '')
   };
 }
 
