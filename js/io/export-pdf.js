@@ -3,6 +3,7 @@
 import { catalog } from '../catalog.js';
 import { buildReport, itemText, itemBand, BAND_FILLS, studentFileBase } from './report-model.js';
 import { getCourse } from '../catalog.js';
+import { otherCreditsText } from '../audit.js';
 
 const hex = (rgb) => [parseInt(rgb.slice(0, 2), 16), parseInt(rgb.slice(2, 4), 16), parseInt(rgb.slice(4, 6), 16)];
 const PURPLE = [69, 0, 132];
@@ -32,7 +33,7 @@ export function exportPdf(plan) {
   const totals = report.audit.totals;
   const lines = [
     [`Student ID: ${s.studentId || '—'}`, `Advisor: ${s.advisor || '—'}`, `Minor: ${s.minor || 'TBD'}`, `Catalog year: ${s.catalogYear || '—'}`],
-    [`Transfer: ${plan.transfer.fromVCCS ? `VCCS${plan.transfer.college ? `, ${plan.transfer.college}` : ''}` : plan.transfer.isTransfer ? 'Yes' : 'No'}`, `Transfer credits: ${totals.transfer}`, `Credits planned: ${totals.total} of ${totals.required}${totals.remaining ? ` (${totals.remaining} other credits needed)` : ''}`, `General Education: ${totals.genEdMet ? 'met by associate degree' : `${totals.genEdPlanned} credits planned`}`]
+    [`Transfer: ${plan.transfer.fromVCCS ? `VCCS${plan.transfer.college ? `, ${plan.transfer.college}` : ''}` : plan.transfer.isTransfer ? 'Yes' : 'No'}`, `Transfer credits: ${totals.transfer}`, `Credits planned: ${totals.total} of ${totals.required}${otherCreditsText(totals) ? `. Other credits needed: ${otherCreditsText(totals)}` : ''}`, `General Education: ${totals.genEdMet ? 'met by associate degree' : `${totals.genEdPlanned} credits planned`}`]
   ];
   for (const line of lines) {
     doc.text(line.join('     '), margin, y);

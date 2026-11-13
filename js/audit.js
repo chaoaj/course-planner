@@ -589,7 +589,7 @@ function auditJmuElectives(group, plan, used, genEdResult) {
     : '';
   // Electives beyond the eight are there for the residency rule.
   const over = all - needed;
-  const extra = over > 0 ? ` ${over} credit${over === 1 ? '' : 's'} beyond ${needed} (whole courses, the residency rule's JMU credits, or courses added by hand).` : '';
+  const extra = over > 0 ? ` ${over} credit${over === 1 ? '' : 's'} beyond ${needed} from JMU courses no other requirement uses.` : '';
   return {
     group,
     status,
@@ -664,8 +664,23 @@ export function creditTotals(plan, ctx = buildContext(plan)) {
     required,
     genEdPlanned: genEd,
     genEdMet: Boolean(plan.transfer.associateDegree),
-    remaining: Math.max(0, required - transfer - planned)
+    remaining: Math.max(0, required - transfer - planned),
+    // JMU credits the residency rule still needs beyond the plan. The planner doesn't fill these (or the credits short
+    // of 120) with extra electives; they're reported so the advisor can account for other credit first.
+    jmuShort: residencyCheck(plan).short
   };
+}
+
+// "Other credits needed" in words, or '' when the plan reaches 120 and the residency rule. Plain text.
+export function otherCreditsText(totals) {
+  const needed = Math.max(totals.remaining, totals.jmuShort);
+  if (!needed) return '';
+  const jmu = totals.jmuShort
+    ? totals.jmuShort >= needed
+      ? ` ${needed === 1 ? 'It' : 'All of them'} must be taken at JMU (residency rule).`
+      : ` At least ${totals.jmuShort} of them must be taken at JMU (residency rule).`
+    : ' They can be any courses, at JMU or transferred in.';
+  return `${needed} more credit${needed === 1 ? '' : 's'} needed${totals.remaining ? ` to reach ${totals.required}` : ' for the residency rule'}.${jmu}`;
 }
 
 export function termCredits(term) {

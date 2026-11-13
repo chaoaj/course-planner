@@ -2,7 +2,7 @@
 
 import { catalog, canonical, getCourse, gradeBand, slotInfo, parseTerm, genEdDomain, genEdDomains, graduationLabel } from '../catalog.js';
 import { state, commit, ensureTerm, followingTerm, normalizeItem, syncGraduation } from '../state.js';
-import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal, auditRequirements } from '../audit.js';
+import { checkPlan, termCredits, SLOT_PREREQS, creditedCourses, pendingVccsReviews, transferCreditTotal, auditRequirements, otherCreditsText } from '../audit.js';
 import { statusBadge } from './audit.js';
 import { gradeMeets } from '../util.js';
 import { applySamplePlan, autoPlan, recommendSamplePlan, fillUniversityElectives, fillGenEd, enforceMaxCredits, maxCredits, plannedCount, balancePlan, targetCheck, setProgram } from '../scheduler.js';
@@ -239,9 +239,9 @@ function renderTargetNote() {
   const loadNote = lowLoad && check.min && check.semesters === check.min
     ? `<p class="small mb-1">${lowLoad} semester${lowLoad === 1 ? ' is' : 's are'} under 12 credits (part-time) because the plan is spread over the ${check.min}-semester minimum. Add electives or a minor to keep full-time status if the student needs it.</p>`
     : '';
-  const remaining = auditRequirements(state.plan).totals.remaining;
-  const otherNote = remaining
-    ? `<p class="small mb-1"><strong>Other credits needed:</strong> ${remaining} more credit${remaining === 1 ? '' : 's'} to reach ${catalog.requirements.totalCredits}, from any JMU or transfer courses. The plan doesn't add electives for these; check the transfer evaluation first.</p>`
+  const other = otherCreditsText(auditRequirements(state.plan).totals);
+  const otherNote = other
+    ? `<p class="small mb-1"><strong>Other credits needed:</strong> ${escapeHtml(other)} The plan adds no electives beyond the eight university electives; check the transfer evaluation first.</p>`
     : '';
   minNote += otherNote;
   if (!check.target) { box.innerHTML = minNote + loadNote; return; }

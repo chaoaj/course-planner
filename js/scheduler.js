@@ -2,7 +2,7 @@
 
 import { catalog, canonical, getCourse, parseTerm, slotInfo, termSortKey, nextTerm, genEdDomain, getProgram } from './catalog.js';
 import { state, ensureTerm, termSequence, normalizeItem, followingTerm } from './state.js';
-import { auditRequirements, creditedCourses, SLOT_PREREQS, programDomains, residencyCheck } from './audit.js';
+import { auditRequirements, creditedCourses, SLOT_PREREQS, programDomains } from './audit.js';
 import { reliableSeasons } from './offerings.js';
 import { uid } from './util.js';
 
@@ -266,15 +266,11 @@ export function pruneSurplusSlots() {
     // Credits from real courses (JMU or transfer); placeholders only cover what's still missing.
     const realCredits = university.courses.filter((course) => !course.placeholder).reduce((total, course) => total + (Number(course.credits) || 0), 0);
     const needed = university.group.count * university.group.creditsEach;
-    const slotCredits = plan.terms.flatMap((term) => term.items).filter((item) => !item.code && isPlanned(item) && item.slot === 'elective').reduce((total, item) => total + (Number(item.credits) || 0), 0);
-    const residency = residencyCheck(plan);
-    const residencyShort = residency.jmuNeeded - (residency.jmuPlanned - slotCredits);
-    // Three-credit slots for the eight-course rule; beyond that only the JMU credits the residency rule still needs,
-    // with the last slot cut down to the exact shortfall (no extra credits). Credits short of the 120 total aren't
-    // filled with electives: they're reported, since other transfer credit often covers them.
+    // Only the three-credit slots the eight-course rule still needs. Credits short of 120 or of the residency rule
+    // aren't filled with electives: they're reported as other credits needed, since other credit often covers them.
     const each = university.group.creditsEach;
     const countSlots = Math.max(0, Math.ceil((needed - realCredits) / each));
-    const creditNeed = Math.max(countSlots * each, residencyShort, 0);
+    const creditNeed = countSlots * each;
     let keptSlots = 0;
     let keptCredits = 0;
     for (const term of plan.terms) {
@@ -872,10 +868,8 @@ export function fillUniversityElectives() {
   const result = audit.groups.find((entry) => entry.group.type === 'jmuElectives');
   const each = result?.group.creditsEach ?? 3;
   const countSlots = result?.remaining ?? 0;
-  // Also the JMU credits the residency rule (25% at JMU; 50% at JMU or four-year schools) still needs, with no extra:
-  // the last elective covers just the credits left. Credits short of the 120 total are reported, not filled.
-  const residency = residencyCheck(plan);
-  let credits = Math.max(countSlots * each, residency.short, 0);
+  // Only up to the eight courses. Credits short of 120 or of the residency rule are reported, not filled.
+  let credits = countSlots * each;
   const info = slotInfo('elective');
   let added = 0;
   const newTerms = [];

@@ -2,7 +2,7 @@
 
 import { catalog } from '../catalog.js';
 import { state } from '../state.js';
-import { auditRequirements, checkPlan, pendingVccsReviews, STATUS_LABELS } from '../audit.js';
+import { auditRequirements, checkPlan, pendingVccsReviews, STATUS_LABELS, otherCreditsText } from '../audit.js';
 import { escapeHtml } from '../util.js';
 
 export function statusBadge(status) {
@@ -13,7 +13,7 @@ export function renderAudit() {
   const audit = auditRequirements(state.plan);
   const { totals } = audit;
   document.getElementById('audit-totals').innerHTML = `
-    <p class="mb-1"><strong>${totals.total} of ${totals.required} credits</strong> (${totals.transfer} transfer, ${totals.planned} in the plan, ${totals.completed} completed). ${totals.remaining ? `<span class="issue-text-warning"><strong>Other credits needed:</strong> ${totals.remaining} more credit${totals.remaining === 1 ? '' : 's'} to reach ${totals.required}.</span> These can be any courses, at JMU or transferred in; the planner doesn't add electives for them. Check the transfer evaluation for credit not listed here, or add courses to the plan.` : 'The plan reaches the credit total.'}</p>
+    <p class="mb-1"><strong>${totals.total} of ${totals.required} credits</strong> (${totals.transfer} transfer, ${totals.planned} in the plan, ${totals.completed} completed). ${otherCreditsText(totals) ? `<span class="issue-text-warning"><strong>Other credits needed:</strong> ${escapeHtml(otherCreditsText(totals))}</span> The planner adds no electives beyond the eight university electives; check the transfer evaluation for credit not listed here, or add courses to the plan.` : 'The plan reaches the credit total and the residency rule.'}</p>
     ${state.plan.transfer.isTransfer && !(Number(state.plan.transfer.acceptedCredits) > 0) ? '<p class="mb-1 issue-text-warning"><strong>Check:</strong> transfer credits count only the courses listed. Enter the total JMU accepted on the Transfer credit tab for an accurate credit total.</p>' : ''}
     <p class="mb-0">General Education (${catalog.requirements.genEdCredits} credits): ${escapeHtml(audit.groups.find((result) => result.group.type === 'gened')?.detail ?? '')} ${totals.genEdMet ? '' : 'Choose a course for each placeholder on the Plan tab, or check the associate degree box on the Student tab if it applies.'}</p>`;
 

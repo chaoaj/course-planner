@@ -6,6 +6,7 @@ import { buildReport, itemText, itemBand, BAND_FILLS, JMU_PURPLE, studentFileBas
 import { downloadBlob } from '../util.js';
 import { offeringPattern } from '../offerings.js';
 import { getCourse } from '../catalog.js';
+import { otherCreditsText } from '../audit.js';
 
 const solid = (rgb) => ({ type: 'pattern', pattern: 'solid', fgColor: { argb: `FF${rgb}` } });
 const thin = { style: 'thin', color: { argb: 'FF7F7F7F' } };
@@ -70,7 +71,7 @@ function planSheet(workbook, report) {
   legendC.value = 'C- or better (marked "C-")';
   legendC.fill = solid(BAND_FILLS['C-']);
   legendC.border = box;
-  sheet.getCell(5, 7).value = `${catalog.requirements.totalCredits} credits are required to graduate. Planned total: ${totals.total}.${totals.remaining ? ` Other credits needed: ${totals.remaining} (any JMU or transfer courses).` : ''}`;
+  sheet.getCell(5, 7).value = `${catalog.requirements.totalCredits} credits are required to graduate. Planned total: ${totals.total}.${otherCreditsText(totals) ? ` Other credits needed: ${otherCreditsText(totals)}` : ''}`;
 
   let row = 7;
   const COLS_PER_TERM = 3; // Course, Credit Hrs, spacer
